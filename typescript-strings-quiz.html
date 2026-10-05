@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Strings in TypeScript – MCQ Quiz</title>
+<style>
+  :root {
+    --bg: #f4f6fb; --card: #fff; --text: #1e2333; --muted: #6b7280;
+    --primary: #7048e8; --primary-light: #f0ebff;
+    --ok: #2f9e44; --ok-bg: #ebfbee; --bad: #e03131; --bad-bg: #fff5f5;
+    --code-bg: #1e1e2e; --code-text: #e4e4f0; --border: #dde2ee;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.5;
+  }
+  .wrap { max-width: 820px; margin: 0 auto; padding: 24px 16px 48px; }
+  header h1 { margin: 0 0 4px; font-size: 1.6rem; }
+  header p { margin: 0 0 20px; color: var(--muted); }
+  .card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+    padding: 24px; box-shadow: 0 2px 10px rgba(30, 35, 51, .05);
+  }
+  .hidden { display: none !important; }
+
+  /* Reference table */
+  details.ref { margin-bottom: 20px; }
+  details.ref summary { cursor: pointer; font-weight: 600; color: var(--primary); }
+  .ref table { font-size: .88rem; }
+  .ref td code { font-family: Consolas, monospace; font-size: .85rem; }
+
+  /* Start screen */
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 20px; }
+  .chip {
+    border: 1px solid var(--border); background: #fff; border-radius: 999px;
+    padding: 6px 14px; cursor: pointer; font-family: Consolas, monospace; font-size: .9rem;
+    user-select: none; transition: all .15s;
+  }
+  .chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  label.check { display: flex; gap: 6px; align-items: center; cursor: pointer; color: var(--muted); }
+
+  button.btn {
+    border: none; border-radius: 10px; padding: 10px 20px; font-size: 1rem;
+    cursor: pointer; font-weight: 600; transition: opacity .15s, transform .05s;
+  }
+  button.btn:active { transform: scale(.98); }
+  button.btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-ghost { background: var(--primary-light); color: var(--primary); }
+
+  /* Quiz screen */
+  .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: .9rem; color: var(--muted); }
+  .progress { height: 8px; background: var(--primary-light); border-radius: 99px; overflow: hidden; margin-bottom: 20px; }
+  .progress > div { height: 100%; background: var(--primary); width: 0; transition: width .3s; }
+  .tag {
+    display: inline-block; background: var(--primary-light); color: var(--primary);
+    font-family: Consolas, monospace; font-size: .85rem; padding: 2px 10px; border-radius: 6px; margin-bottom: 10px;
+  }
+  .question { font-size: 1.1rem; font-weight: 600; margin: 0 0 12px; }
+  pre.code {
+    background: var(--code-bg); color: var(--code-text); padding: 14px 16px; border-radius: 10px;
+    overflow-x: auto; font-family: Consolas, "Courier New", monospace; font-size: .92rem; margin: 0 0 16px;
+  }
+  .options { display: grid; gap: 10px; }
+  .option {
+    display: flex; gap: 12px; align-items: flex-start; text-align: left;
+    border: 2px solid var(--border); background: #fff; border-radius: 10px; padding: 12px 14px;
+    cursor: pointer; font-size: .98rem; color: var(--text); transition: border-color .15s, background .15s;
+  }
+  .option:hover:not(:disabled) { border-color: var(--primary); background: #fbfaff; }
+  .option:disabled { cursor: default; }
+  .option .key {
+    flex: 0 0 26px; height: 26px; border-radius: 50%; background: var(--primary-light); color: var(--primary);
+    display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .85rem;
+  }
+  .option code { font-family: Consolas, monospace; white-space: pre-wrap; }
+  .option.correct { border-color: var(--ok); background: var(--ok-bg); }
+  .option.correct .key { background: var(--ok); color: #fff; }
+  .option.wrong { border-color: var(--bad); background: var(--bad-bg); }
+  .option.wrong .key { background: var(--bad); color: #fff; }
+  .feedback { margin-top: 16px; padding: 12px 14px; border-radius: 10px; font-size: .95rem; }
+  .feedback.ok { background: var(--ok-bg); border-left: 4px solid var(--ok); }
+  .feedback.bad { background: var(--bad-bg); border-left: 4px solid var(--bad); }
+  .feedback code { font-family: Consolas, monospace; background: rgba(0,0,0,.06); padding: 0 4px; border-radius: 4px; }
+  .nav { display: flex; justify-content: space-between; margin-top: 20px; }
+
+  /* Results */
+  .score-big { font-size: 3rem; font-weight: 800; margin: 0; color: var(--primary); }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: .95rem; }
+  th, td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; }
+  td.m { font-family: Consolas, monospace; }
+  .bar { height: 8px; border-radius: 99px; background: #eee; overflow: hidden; min-width: 80px; }
+  .bar > div { height: 100%; }
+  .review-item { border-top: 1px solid var(--border); padding: 14px 0; }
+  .review-item .yours { color: var(--bad); }
+  .review-item .right { color: var(--ok); }
+  .review-item pre.code { margin-top: 8px; font-size: .85rem; }
+  kbd { background: #eee; border-radius: 4px; padding: 0 5px; font-size: .8rem; border: 1px solid #ccc; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Strings in TypeScript Quiz</h1>
+    <p>Multiple-choice practice for: declaring strings, template literals, common string methods, immutability, multi-line strings</p>
+  </header>
+
+  <!-- START -->
+  <section id="start" class="card">
+    <details class="ref">
+      <summary>Quick reference (open to revise before starting)</summary>
+      <p style="margin:10px 0 4px">Examples use <code>let greeting: string = "Hello, TypeScript!";</code></p>
+      <table>
+        <thead><tr><th>Method</th><th>Purpose</th><th>Example → Result</th></tr></thead>
+        <tbody>
+          <tr><td><code>.length</code></td><td>Number of characters</td><td><code>greeting.length</code> → <code>18</code></td></tr>
+          <tr><td><code>toUpperCase()</code> / <code>toLowerCase()</code></td><td>Change case</td><td><code>HELLO, TYPESCRIPT!</code></td></tr>
+          <tr><td><code>charAt(i)</code> / <code>indexOf(s)</code></td><td>Character at index / position of substring</td><td><code>charAt(4)</code> → <code>o</code>, <code>indexOf("Type")</code> → <code>7</code></td></tr>
+          <tr><td><code>substring(start, end)</code></td><td>Extract part (end excluded)</td><td><code>substring(7, 11)</code> → <code>Type</code></td></tr>
+          <tr><td><code>includes()</code></td><td>Substring exists?</td><td><code>includes("Script")</code> → <code>true</code></td></tr>
+          <tr><td><code>startsWith()</code> / <code>endsWith()</code></td><td>Check start / end</td><td><code>startsWith("Hello")</code> → <code>true</code></td></tr>
+          <tr><td><code>replace(old, new)</code></td><td>Replace part of the string</td><td><code>Hello, World!</code></td></tr>
+          <tr><td><code>split(delim)</code></td><td>Split into an array</td><td><code>['Hello,', 'TypeScript!']</code></td></tr>
+          <tr><td><code>trim()</code> / <code>trimStart()</code> / <code>trimEnd()</code></td><td>Remove extra spaces</td><td>both ends / start / end</td></tr>
+        </tbody>
+      </table>
+    </details>
+
+    <h2 style="margin-top:0">Choose topics to practice</h2>
+    <div class="chips" id="chips"></div>
+    <div class="row" style="margin-bottom:20px">
+      <label class="check"><input type="checkbox" id="shuffle" checked> Shuffle questions</label>
+      <span id="countInfo" style="color:var(--muted)"></span>
+    </div>
+    <button class="btn btn-primary" id="startBtn">Start Quiz</button>
+    <p style="color:var(--muted);font-size:.8rem;margin:18px 0 0">Based on notes from <a href="https://www.pavanonlinetrainings.com" target="_blank" rel="noopener">pavanonlinetrainings.com</a> · <a href="https://www.youtube.com/@sdetpavan" target="_blank" rel="noopener">@sdetpavan</a></p>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz" class="card hidden">
+    <div class="topbar">
+      <span id="qCounter"></span>
+      <span id="liveScore"></span>
+    </div>
+    <div class="progress"><div id="progressFill"></div></div>
+    <span class="tag" id="qTag"></span>
+    <p class="question" id="qText"></p>
+    <pre class="code hidden" id="qCode"></pre>
+    <div class="options" id="options"></div>
+    <div id="feedback" class="feedback hidden"></div>
+    <div class="nav">
+      <button class="btn btn-ghost" id="prevBtn">&larr; Previous</button>
+      <button class="btn btn-primary" id="nextBtn">Next &rarr;</button>
+    </div>
+    <p style="color:var(--muted);font-size:.8rem;margin:14px 0 0">Tip: press <kbd>1</kbd>–<kbd>4</kbd> to answer, <kbd>Enter</kbd> for next.</p>
+  </section>
+
+  <!-- RESULTS -->
+  <section id="results" class="card hidden">
+    <h2 style="margin-top:0">Your Results</h2>
+    <p class="score-big" id="finalScore"></p>
+    <p id="finalMsg" style="margin-top:0;color:var(--muted)"></p>
+    <table>
+      <thead><tr><th>Topic</th><th>Score</th><th style="width:40%">Accuracy</th></tr></thead>
+      <tbody id="breakdown"></tbody>
+    </table>
+    <div class="row">
+      <button class="btn btn-primary" id="retryBtn">Retry Same Set</button>
+      <button class="btn btn-ghost" id="retryWrongBtn">Retry Wrong Only</button>
+      <button class="btn btn-ghost" id="homeBtn">Change Topics</button>
+    </div>
+    <div id="reviewWrap">
+      <h3 style="margin-top:28px">Review incorrect answers</h3>
+      <div id="review"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+const METHODS = ["declare","template","methods","immutable"];
+const LABELS = { declare: "Declaring strings", template: "Template literals & multi-line", methods: "String methods", immutable: "Immutability" };
+const label = m => LABELS[m];
+
+const G = 'let greeting: string = "Hello, TypeScript!";\n';
+
+// answer = index of correct option
+const QUESTIONS = [
+  // ---------- declaring ----------
+  { m: "declare", q: "Which delimiters can be used to declare a string in TypeScript?",
+    o: ["Only double quotes", "Single and double quotes only", "Single quotes, double quotes and backticks", "Only backticks"],
+    a: 2, e: "All three work: <code>'single'</code>, <code>\"double\"</code> and <code>`backtick`</code>. Backticks additionally allow interpolation and multiple lines." },
+  { m: "declare", q: "In this declaration, what does the ': string' part do?", c: "let str1: string = 'Single quote';",
+    o: ["Converts the value to a string at runtime", "Nothing — it's a comment", "Creates a String object", "Declares that the variable's type is string"],
+    a: 3, e: "<code>: string</code> is a <b>type annotation</b>. The compiler will reject assigning a non-string to <code>str1</code>; it has no runtime effect." },
+  { m: "declare", q: "What is a string in TypeScript?",
+    o: ["A sequence of characters used to represent text", "An array of numbers", "A special kind of object that must be created with new", "A single character only"],
+    a: 0, e: "A string is a sequence of characters representing text. Primitive strings are written as literals — no <code>new</code> needed." },
+  { m: "declare", q: "Which of these lines causes a compile error?", c: "let a: string = 'hi';\nlet b: string = \"hi\";\nlet c: string = `hi`;\nlet d: string = 42;",
+    o: ["let a", "let b", "let c", "let d"],
+    a: 3, e: "<code>42</code> is a <code>number</code>, which isn't assignable to <code>string</code>. The other three are all valid string literals." },
+
+  // ---------- template literals ----------
+  { m: "template", q: "What are strings written with backticks called?",
+    o: ["Raw strings", "Template literals", "Char arrays", "Verbatim strings"],
+    a: 1, e: "Backtick strings are <b>template literals</b>. They support <code>${...}</code> interpolation and can span multiple lines." },
+  { m: "template", q: "What is printed?", c: "let num: number = 10;\nconsole.log(`Number is: ${num}`);",
+    o: ["Number is: 10", "Number is: ${num}", "Error", "Number is: num"],
+    a: 0, e: "Inside backticks, <code>${num}</code> is evaluated and replaced with its value: <code>Number is: 10</code>." },
+  { m: "template", q: "What is printed?", c: "let num: number = 10;\nconsole.log('Number is: ${num}');",
+    o: ["Number is: ${num}", "Number is: 10", "Error", "Number is: "],
+    a: 0, e: "Single (and double) quotes don't interpolate — <code>${num}</code> is printed literally. Only backticks evaluate <code>${}</code>." },
+  { m: "template", q: "Which syntax embeds an expression inside a template literal?",
+    o: ["#{expr}", "${expr}", "{{expr}}", "%expr%"],
+    a: 1, e: "Template literals use <code>${expression}</code>. Any expression works, e.g. <code>`Total: ${a + b}`</code>." },
+  { m: "template", q: "What is printed?", c: "let a: number = 2, b: number = 3;\nconsole.log(`Sum: ${a + b}`);",
+    o: ["Sum: 23", "Sum: ${a + b}", "Sum: 5", "Sum: a + b"],
+    a: 2, e: "<code>${...}</code> evaluates the full expression <code>a + b</code> (both numbers) → <code>5</code>." },
+  { m: "template", q: "Which is the simplest way to write a multi-line string?",
+    o: ["Single quotes across lines", "Double quotes across lines", "Backticks across lines", "It's not possible in TypeScript"],
+    a: 2, e: "Template literals (backticks) can span lines directly. A regular quoted string broken across lines is a syntax error." },
+  { m: "template", q: "How many lines does this print?", c: "let multiLine = `Line one\nLine two\nLine three`;\nconsole.log(multiLine);",
+    o: ["1", "2", "3", "Error"],
+    a: 2, e: "The line breaks inside the backticks are part of the string, so it prints three lines." },
+
+  // ---------- string methods ----------
+  { m: "methods", q: "What is the value of greeting.length?", c: G + "console.log(greeting.length);",
+    o: ["16", "17", "18", "19"],
+    a: 2, e: "<code>Hello,</code> (6) + space (1) + <code>TypeScript</code> (10) + <code>!</code> (1) = <b>18</b>. Spaces and punctuation count." },
+  { m: "methods", q: "What does this print?", c: G + "console.log(greeting.toUpperCase());",
+    o: ["Hello, TypeScript!", "HELLO, TYPESCRIPT!", "hello, typescript!", "HELLO, TypeScript!"],
+    a: 1, e: "Every letter becomes uppercase; punctuation is unchanged." },
+  { m: "methods", q: "What does this print?", c: G + "console.log(greeting.charAt(4));",
+    o: ["l", "H", ",", "o"],
+    a: 3, e: "Indexes start at 0: H(0) e(1) l(2) l(3) <b>o(4)</b>." },
+  { m: "methods", q: "What does this print?", c: G + 'console.log(greeting.indexOf("Type"));',
+    o: ["6", "7", "8", "-1"],
+    a: 1, e: "<code>Hello,</code> is indexes 0–5, the space is 6, so <code>\"Type\"</code> starts at <b>7</b>." },
+  { m: "methods", q: "What does this print?", c: G + "console.log(greeting.substring(7, 11));",
+    o: ["Type", "TypeS", " Type", "ypeS"],
+    a: 0, e: "<code>substring(7, 11)</code> takes indexes 7, 8, 9, 10 — the end index 11 is excluded → <code>Type</code>." },
+  { m: "methods", q: "In substring(start, end), the character at index end is:",
+    o: ["Included", "Excluded", "Duplicated", "Replaced"],
+    a: 1, e: "The end index is <b>exclusive</b>, so the result length is <code>end - start</code>." },
+  { m: "methods", q: "What does this print?", c: G + 'console.log(greeting.includes("script"));',
+    o: ["true", "11", "false", "undefined"],
+    a: 2, e: "<code>includes()</code> is <b>case-sensitive</b>. The string contains <code>\"Script\"</code> (capital S), not <code>\"script\"</code>, so the result is <code>false</code>." },
+  { m: "methods", q: "What does this print?", c: G + 'console.log(greeting.startsWith("Hello"), greeting.endsWith("!"));',
+    o: ["true false", "false true", "true true", "false false"],
+    a: 2, e: "The string starts with <code>\"Hello\"</code> and ends with <code>\"!\"</code>, so both checks are <code>true</code>." },
+  { m: "methods", q: "What does this print?", c: G + 'console.log(greeting.replace("TypeScript", "World"));',
+    o: ["Hello, World!", "World, TypeScript!", "Hello, TypeScript!", "Hello, TypeScriptWorld!"],
+    a: 0, e: "<code>replace(old, new)</code> returns a new string with <code>\"TypeScript\"</code> swapped for <code>\"World\"</code>." },
+  { m: "methods", q: "What does this print?", c: G + 'console.log(greeting.split(" "));',
+    o: ["['Hello', 'TypeScript']", "['Hello,', 'TypeScript!']", "'Hello, TypeScript!'", "['H','e','l','l','o']"],
+    a: 1, e: "Splitting on a space gives two pieces; punctuation stays attached: <code>['Hello,', 'TypeScript!']</code>." },
+  { m: "methods", q: "What is the return type of split()?",
+    o: ["string[]", "string", "number", "boolean"],
+    a: 0, e: "<code>split()</code> always returns an array of strings, <code>string[]</code>." },
+  { m: "methods", q: "Which method removes whitespace from BOTH ends of a string?",
+    o: ["trimStart()", "trimEnd()", "trim()", "strip()"],
+    a: 2, e: "<code>trim()</code> handles both ends; <code>trimStart()</code>/<code>trimEnd()</code> handle one side each. There is no <code>strip()</code> in TypeScript/JavaScript." },
+  { m: "methods", q: "What does this return?", c: '"  hi  ".trimStart()',
+    o: ['"hi"', '"hi  "', '"  hi"', '"  hi  "'],
+    a: 1, e: "Only the <b>leading</b> spaces are removed; the trailing ones remain: <code>\"hi  \"</code>." },
+  { m: "methods", q: "What does this return?", c: '"Hello".indexOf("z")',
+    o: ["0", "undefined", "-1", "null"],
+    a: 2, e: "When the substring isn't found, <code>indexOf()</code> returns <code>-1</code>." },
+  { m: "methods", q: "What does this return?", c: '"Hello".charAt(10)',
+    o: ["undefined", "It throws an error", "null", "\"\" (empty string)"],
+    a: 3, e: "<code>charAt()</code> with an out-of-range index returns an empty string <code>\"\"</code>. (Bracket access <code>\"Hello\"[10]</code> would give <code>undefined</code>.)" },
+
+  // ---------- immutability ----------
+  { m: "immutable", q: "What does it mean that strings are immutable?",
+    o: ["They can't be reassigned to a variable", "Once created, a string value can't be changed — methods return new strings", "They can only hold letters", "They are automatically constant (const)"],
+    a: 1, e: "The string value itself never changes. String methods produce new strings, and a <code>let</code> variable can still be reassigned to a different string." },
+  { m: "immutable", q: "What is printed?", c: 'let original = "Hello";\nlet modified = original.concat(", World!");\nconsole.log(original);',
+    o: ["Hello, World!", ", World!", "Hello", "undefined"],
+    a: 2, e: "<code>concat()</code> returns a new string; <code>original</code> is still <code>\"Hello\"</code>." },
+  { m: "immutable", q: "What is printed?", c: 'let original = "Hello";\nlet modified = original.concat(", World!");\nconsole.log(modified);',
+    o: ["Hello", "Hello, World!", "Hello , World!", ", World!Hello"],
+    a: 1, e: "The new string returned by <code>concat()</code> is stored in <code>modified</code>: <code>\"Hello, World!\"</code>." },
+  { m: "immutable", q: "What is printed?", c: G + 'greeting.replace("TypeScript", "World");\nconsole.log(greeting);',
+    o: ["Hello, TypeScript!", "Hello, World!", "undefined", "World"],
+    a: 0, e: "The result of <code>replace()</code> was never stored. Since strings are immutable, <code>greeting</code> is unchanged. To keep the change: <code>greeting = greeting.replace(...)</code>." },
+  { m: "immutable", q: "What is printed?", c: 'let name: string = "ts";\nname.toUpperCase();\nconsole.log(name);',
+    o: ["TS", "ts", "Ts", "undefined"],
+    a: 1, e: "<code>toUpperCase()</code> returns a new string that's discarded here. <code>name</code> is still <code>\"ts\"</code>." },
+];
+
+// ---------- State ----------
+let selected = new Set(METHODS);
+let set = [];        // questions in current run
+let answers = [];    // chosen option index per question (or null)
+let idx = 0;
+
+const $ = id => document.getElementById(id);
+const show = id => ["start","quiz","results"].forEach(s => $(s).classList.toggle("hidden", s !== id));
+
+// ---------- Start screen ----------
+function renderChips() {
+  const chips = $("chips");
+  chips.innerHTML = "";
+  const all = document.createElement("span");
+  all.className = "chip" + (selected.size === METHODS.length ? " active" : "");
+  all.textContent = "All";
+  all.onclick = () => { selected = selected.size === METHODS.length ? new Set() : new Set(METHODS); renderChips(); };
+  chips.appendChild(all);
+  METHODS.forEach(m => {
+    const c = document.createElement("span");
+    c.className = "chip" + (selected.has(m) ? " active" : "");
+    c.textContent = label(m);
+    c.onclick = () => { selected.has(m) ? selected.delete(m) : selected.add(m); renderChips(); };
+    chips.appendChild(c);
+  });
+  const n = QUESTIONS.filter(q => selected.has(q.m)).length;
+  $("countInfo").textContent = `${n} question${n === 1 ? "" : "s"} selected`;
+  $("startBtn").disabled = n === 0;
+}
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startQuiz(questions) {
+  set = $("shuffle").checked ? shuffle(questions) : questions.slice();
+  answers = new Array(set.length).fill(null);
+  idx = 0;
+  show("quiz");
+  renderQuestion();
+}
+
+// ---------- Quiz screen ----------
+function renderQuestion() {
+  const q = set[idx];
+  const chosen = answers[idx];
+  const answeredCount = answers.filter(a => a !== null).length;
+  const correctCount = answers.filter((a, i) => a === set[i].a).length;
+
+  $("qCounter").textContent = `Question ${idx + 1} of ${set.length}`;
+  $("liveScore").textContent = `Score: ${correctCount} / ${answeredCount}`;
+  $("progressFill").style.width = `${(answeredCount / set.length) * 100}%`;
+  $("qTag").textContent = label(q.m);
+  $("qText").textContent = q.q;
+
+  const code = $("qCode");
+  if (q.c) { code.textContent = q.c; code.classList.remove("hidden"); }
+  else code.classList.add("hidden");
+
+  const opts = $("options");
+  opts.innerHTML = "";
+  q.o.forEach((text, i) => {
+    const b = document.createElement("button");
+    b.className = "option";
+    const key = document.createElement("span");
+    key.className = "key";
+    key.textContent = "ABCD"[i];
+    const lbl = document.createElement("code");
+    lbl.textContent = text;
+    b.append(key, lbl);
+    if (chosen !== null) {
+      b.disabled = true;
+      if (i === q.a) b.classList.add("correct");
+      else if (i === chosen) b.classList.add("wrong");
+    }
+    b.onclick = () => choose(i);
+    opts.appendChild(b);
+  });
+
+  const fb = $("feedback");
+  if (chosen !== null) {
+    const ok = chosen === q.a;
+    fb.className = "feedback " + (ok ? "ok" : "bad");
+    fb.innerHTML = (ok ? "<b>✅ Correct!</b> " : `<b>❌ Incorrect.</b> Correct answer: <b>${"ABCD"[q.a]}</b>. `) + q.e;
+  } else {
+    fb.className = "feedback hidden";
+  }
+
+  $("prevBtn").disabled = idx === 0;
+  $("nextBtn").disabled = chosen === null;
+  $("nextBtn").innerHTML = idx === set.length - 1 ? "See Results" : "Next &rarr;";
+}
+
+function choose(i) {
+  if (answers[idx] !== null || i >= set[idx].o.length) return;
+  answers[idx] = i;
+  renderQuestion();
+}
+
+function next() {
+  if (answers[idx] === null) return;
+  if (idx < set.length - 1) { idx++; renderQuestion(); }
+  else renderResults();
+}
+
+// ---------- Results ----------
+function renderResults() {
+  show("results");
+  const correct = answers.filter((a, i) => a === set[i].a).length;
+  const pct = Math.round((correct / set.length) * 100);
+  $("finalScore").textContent = `${correct} / ${set.length}  (${pct}%)`;
+  $("finalMsg").textContent =
+    pct === 100 ? "Perfect score! You've mastered this topic. 🏆" :
+    pct >= 80 ? "Great job! Just a few to polish up. 🎉" :
+    pct >= 50 ? "Good effort — review the explanations below and retry. 💪" :
+    "Keep practicing — revisit the notes and try again. 📘";
+
+  const tbody = $("breakdown");
+  tbody.innerHTML = "";
+  METHODS.forEach(m => {
+    const qs = set.map((q, i) => ({ q, i })).filter(x => x.q.m === m);
+    if (!qs.length) return;
+    const ok = qs.filter(x => answers[x.i] === x.q.a).length;
+    const p = Math.round((ok / qs.length) * 100);
+    const color = p === 100 ? "var(--ok)" : p >= 50 ? "#f59f00" : "var(--bad)";
+    tbody.insertAdjacentHTML("beforeend",
+      `<tr><td class="m">${label(m)}</td><td>${ok} / ${qs.length}</td>
+       <td><div class="bar"><div style="width:${p}%;background:${color}"></div></div></td></tr>`);
+  });
+
+  const review = $("review");
+  review.innerHTML = "";
+  const wrong = set.map((q, i) => ({ q, i })).filter(x => answers[x.i] !== x.q.a);
+  $("reviewWrap").classList.toggle("hidden", wrong.length === 0);
+  $("retryWrongBtn").classList.toggle("hidden", wrong.length === 0);
+  wrong.forEach(({ q, i }) => {
+    const div = document.createElement("div");
+    div.className = "review-item";
+    const title = document.createElement("div");
+    title.innerHTML = `<span class="tag">${label(q.m)}</span>`;
+    const qt = document.createElement("p");
+    qt.className = "question"; qt.style.fontSize = "1rem"; qt.textContent = q.q;
+    div.append(title, qt);
+    if (q.c) { const pre = document.createElement("pre"); pre.className = "code"; pre.textContent = q.c; div.appendChild(pre); }
+    const yours = document.createElement("div");
+    yours.className = "yours"; yours.textContent = `Your answer: ${q.o[answers[i]]}`;
+    const right = document.createElement("div");
+    right.className = "right"; right.textContent = `Correct answer: ${q.o[q.a]}`;
+    const exp = document.createElement("div");
+    exp.className = "feedback ok"; exp.innerHTML = q.e;
+    div.append(yours, right, exp);
+    review.appendChild(div);
+  });
+}
+
+// ---------- Events ----------
+$("startBtn").onclick = () => startQuiz(QUESTIONS.filter(q => selected.has(q.m)));
+$("prevBtn").onclick = () => { if (idx > 0) { idx--; renderQuestion(); } };
+$("nextBtn").onclick = next;
+$("retryBtn").onclick = () => startQuiz(set);
+$("retryWrongBtn").onclick = () => startQuiz(set.filter((q, i) => answers[i] !== q.a));
+$("homeBtn").onclick = () => { show("start"); renderChips(); };
+
+document.addEventListener("keydown", e => {
+  if ($("quiz").classList.contains("hidden")) return;
+  if (["1","2","3","4"].includes(e.key)) choose(Number(e.key) - 1);
+  else if (e.key === "Enter") next();
+  else if (e.key === "ArrowLeft" && idx > 0) { idx--; renderQuestion(); }
+  else if (e.key === "ArrowRight") next();
+});
+
+renderChips();
+</script>
+</body>
+</html>

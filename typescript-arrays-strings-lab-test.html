@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TypeScript Lab Test — Arrays &amp; Strings (auto-graded)</title>
+<style>
+  :root {
+    --bg: #fbfbfa; --surface: #fff; --surface-2: #f4f4f2; --border: #e4e4e0;
+    --text: #1f1f1d; --dim: #6b6b66;
+    --accent: #2f6f4f; --accent-soft: #eaf3ed;
+    --ok-bg: #e7f4ec; --ok-br: #7fba97; --ok-tx: #1c5c38;
+    --no-bg: #fbeaea; --no-br: #d99b9b; --no-tx: #8d2b2b;
+    --warn-bg: #fdf3e3; --warn-br: #dfc08a; --warn-tx: #8a5a15;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17181a; --surface: #1e2022; --surface-2: #24262a; --border: #33363a;
+      --text: #e8e8e6; --dim: #9a9a96;
+      --accent: #7fc4a0; --accent-soft: #22302a;
+      --ok-bg: #1b2f23; --ok-br: #3f7a57; --ok-tx: #8fd5aa;
+      --no-bg: #331d1d; --no-br: #7a4040; --no-tx: #e69b9b;
+      --warn-bg: #332a18; --warn-br: #6b5527; --warn-tx: #d6a55f;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 92px; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.62 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  header.top {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    backdrop-filter: blur(10px); border-bottom: 1px solid var(--border);
+  }
+  .top-inner { max-width: 1120px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .brand { font-weight: 650; font-size: 15px; letter-spacing: -.01em; }
+  .brand span { color: var(--dim); font-weight: 400; }
+  .scoreboard { display: flex; gap: 8px; margin-left: auto; align-items: center; flex-wrap: wrap; }
+  .stat { font-size: 12.5px; padding: 4px 11px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); color: var(--dim); white-space: nowrap; }
+  .stat b { color: var(--text); font-weight: 650; font-variant-numeric: tabular-nums; }
+  .stat.good b { color: var(--ok-tx); }
+  a.ctl, button.ctl {
+    font: inherit; font-size: 12.5px; font-weight: 600; padding: 6px 13px;
+    border-radius: 7px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text); cursor: pointer; text-decoration: none;
+  }
+  a.ctl:hover, button.ctl:hover { background: var(--surface-2); border-color: var(--dim); }
+  button.ctl.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  @media (prefers-color-scheme: dark) { button.ctl.primary { color: #10201a; } }
+  button.ctl.primary:hover { filter: brightness(1.08); }
+  .toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--dim); cursor: pointer; user-select: none; }
+  .toggle input { accent-color: var(--accent); cursor: pointer; }
+  .progress-wrap { height: 3px; background: var(--border); }
+  .progress-bar { height: 100%; width: 0; background: var(--accent); transition: width .25s; }
+
+  .shell { max-width: 1120px; margin: 0 auto; padding: 0 24px 90px; display: flex; gap: 34px; }
+  nav.toc { width: 224px; flex: none; position: sticky; top: 76px; align-self: flex-start; padding-top: 30px; max-height: calc(100vh - 110px); overflow-y: auto; }
+  nav.toc h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .09em; color: var(--dim); margin: 0 0 8px; }
+  nav.toc h2:not(:first-child) { margin-top: 14px; }
+  nav.toc a { display: flex; gap: 8px; align-items: baseline; padding: 5px 9px; margin-bottom: 1px; border-radius: 6px; font-size: 13px; color: var(--dim); text-decoration: none; }
+  nav.toc a:hover { background: var(--surface-2); color: var(--text); }
+  nav.toc a .dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--border); margin-top: 6px; }
+  nav.toc a.done .dot { background: var(--ok-br); }
+  nav.toc a.bad .dot { background: var(--no-br); }
+  nav.toc a .tt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  main { flex: 1; min-width: 0; padding-top: 30px; }
+
+  .hero { margin-bottom: 26px; }
+  .hero h1 { font-size: 28px; line-height: 1.24; margin: 0 0 10px; letter-spacing: -.02em; }
+  .hero .sub { color: var(--dim); font-size: 15px; margin: 0 0 16px; max-width: 66ch; }
+  .chips { display: flex; gap: 9px; flex-wrap: wrap; margin-bottom: 16px; }
+  .chip { font-size: 12.5px; padding: 5px 11px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); color: var(--dim); }
+  .chip b { color: var(--text); font-weight: 650; }
+  .howto { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--warn-br); border-radius: 10px; padding: 14px 18px; font-size: 14.5px; margin-bottom: 12px; }
+  .howto h3 { margin: 0 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .07em; color: var(--warn-tx); }
+  .howto ul { margin: 0; padding-left: 20px; color: var(--dim); }
+  .howto li { margin-bottom: 5px; }
+  .howto li:last-child { margin-bottom: 0; }
+  .howto strong { color: var(--text); }
+  .credit { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 10px; padding: 13px 17px; font-size: 14px; color: var(--dim); margin-bottom: 26px; }
+  .credit a { color: var(--accent); text-decoration: none; font-weight: 550; }
+  .credit p { margin: 0 0 5px; }
+  .credit p:last-child { margin: 0; }
+
+  section.grp { margin-bottom: 40px; }
+  .grp-head { display: flex; align-items: baseline; gap: 12px; padding-bottom: 9px; border-bottom: 2px solid var(--border); margin-bottom: 18px; }
+  .grp-head h2 { font-size: 19.5px; margin: 0; letter-spacing: -.015em; }
+  .grp-head h2 code { font-size: .88em; }
+  .grp-head .n { font-size: 13px; color: var(--dim); margin-left: auto; white-space: nowrap; }
+
+  .task { background: var(--surface); border: 1px solid var(--border); border-radius: 11px; padding: 18px 20px; margin-bottom: 16px; scroll-margin-top: 92px; }
+  .task.pass { border-color: var(--ok-br); }
+  .task.fail { border-color: var(--no-br); }
+  .t-head { display: flex; gap: 11px; align-items: flex-start; margin-bottom: 10px; }
+  .t-num { flex: none; font: 650 12px/1.55 var(--mono); color: var(--accent); background: var(--accent-soft); border-radius: 6px; padding: 2px 8px; margin-top: 3px; }
+  .t-title { flex: 1; min-width: 0; font-weight: 600; font-size: 16.5px; }
+  .pill { flex: none; font-size: 11.5px; font-weight: 650; padding: 3px 10px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); color: var(--dim); white-space: nowrap; margin-top: 3px; }
+  .pill.pass { background: var(--ok-bg); border-color: var(--ok-br); color: var(--ok-tx); }
+  .pill.fail { background: var(--no-bg); border-color: var(--no-br); color: var(--no-tx); }
+  .t-prompt { margin: 0 0 12px; color: var(--text); }
+  .t-sig { font: 13.5px/1.5 var(--mono); background: var(--surface-2); border: 1px solid var(--border); border-radius: 7px; padding: 8px 12px; margin-bottom: 12px; overflow-x: auto; white-space: pre; }
+
+  textarea.editor {
+    width: 100%; min-height: 160px; resize: vertical;
+    font: 13.5px/1.6 var(--mono);
+    background: var(--surface-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; tab-size: 2;
+  }
+  textarea.editor:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
+
+  .t-actions { display: flex; gap: 8px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
+  .t-actions .spacer { flex: 1; }
+  .t-actions .hint { font-size: 12.5px; color: var(--dim); }
+
+  .t-result { display: none; margin-top: 12px; }
+  .t-result.show { display: block; }
+  .rbanner { font-size: 14px; font-weight: 600; padding: 9px 13px; border-radius: 8px; margin-bottom: 9px; border: 1px solid var(--border); background: var(--surface-2); }
+  .rbanner.pass { background: var(--ok-bg); border-color: var(--ok-br); color: var(--ok-tx); }
+  .rbanner.fail { background: var(--no-bg); border-color: var(--no-br); color: var(--no-tx); }
+  .rbanner.err  { background: var(--warn-bg); border-color: var(--warn-br); color: var(--warn-tx); font-family: var(--mono); font-size: 13px; font-weight: 500; white-space: pre-wrap; }
+  table.cases { border-collapse: collapse; width: 100%; font-size: 13.5px; margin: 0; }
+  table.cases th, table.cases td { text-align: left; padding: 6px 10px; border: 1px solid var(--border); }
+  table.cases th { background: var(--surface-2); font-weight: 600; font-size: 12px; }
+  table.cases td { font-family: var(--mono); font-size: 12.5px; word-break: break-word; }
+  table.cases td.st { width: 28px; text-align: center; font-weight: 700; color: var(--no-tx); }
+
+  details.sol { margin-top: 10px; border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; background: var(--surface-2); }
+  details.sol summary { cursor: pointer; font-weight: 600; font-size: 13.5px; color: var(--accent); }
+  details.sol[aria-disabled="true"] summary { color: var(--dim); cursor: not-allowed; }
+  details.sol pre { margin: 10px 0 0; background: var(--surface); }
+
+  .results { display: none; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 30px; scroll-margin-top: 92px; }
+  .results.show { display: block; }
+  .results h2 { margin: 0 0 4px; font-size: 22px; }
+  .big-score { font: 700 42px/1.1 -apple-system, "Segoe UI", sans-serif; letter-spacing: -.03em; margin: 12px 0 6px; font-variant-numeric: tabular-nums; }
+  .band { display: inline-block; font-size: 13px; font-weight: 650; padding: 4px 12px; border-radius: 999px; margin-bottom: 6px; }
+  .band.pass { background: var(--ok-bg); color: var(--ok-tx); border: 1px solid var(--ok-br); }
+  .band.fail { background: var(--no-bg); color: var(--no-tx); border: 1px solid var(--no-br); }
+  .subscore { color: var(--dim); font-size: 14px; margin-bottom: 18px; }
+  .bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 9px; font-size: 14px; }
+  .bar-row .nm { width: 190px; flex: none; color: var(--dim); }
+  .bar-track { flex: 1; height: 9px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--accent); }
+  .bar-row .sc { width: 52px; flex: none; text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .advice { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 14.5px; }
+  .advice h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .07em; color: var(--dim); margin: 0 0 10px; }
+  .advice p { margin: 0 0 9px; }
+  .advice a { color: var(--accent); font-weight: 600; }
+  .failist { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .failist a { font-size: 12.5px; font-weight: 600; padding: 3px 10px; border-radius: 999px; text-decoration: none; background: var(--no-bg); border: 1px solid var(--no-br); color: var(--no-tx); }
+
+  pre { background: var(--surface-2); border: 1px solid var(--border); border-radius: 7px; padding: 11px 13px; overflow-x: auto; }
+  pre code { background: none; border: none; padding: 0; font-size: 13px; line-height: 1.55; white-space: pre; font-family: var(--mono); }
+  code { font: .875em/1.4 var(--mono); background: var(--surface-2); padding: 1.5px 5px; border-radius: 4px; border: 1px solid var(--border); }
+  footer.end { border-top: 1px solid var(--border); margin-top: 42px; padding-top: 18px; color: var(--dim); font-size: 13.5px; }
+  footer.end a { color: var(--accent); }
+
+  @media (max-width: 960px) {
+    .shell { display: block; padding: 0 17px 60px; }
+    nav.toc { display: none; }
+    main { padding-top: 22px; }
+    .hero h1 { font-size: 22px; }
+    .bar-row .nm { width: 110px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">Lab Test <span>· TypeScript Arrays &amp; Strings</span></div>
+    <div class="scoreboard">
+      <span class="stat">Attempted <b id="s-attempted">0</b>/<b id="s-total">28</b></span>
+      <span class="stat good">Passed <b id="s-passed">—</b></span>
+      <label class="toggle"><input type="checkbox" id="practice"> Practice mode</label>
+      <a class="ctl" href="typescript-arrays-strings-quiz.html">← MCQ quiz</a>
+      <button class="ctl" id="btn-reset">Reset all</button>
+      <button class="ctl primary" id="btn-submit">Submit &amp; evaluate</button>
+    </div>
+  </div>
+  <div class="progress-wrap"><div class="progress-bar" id="progress"></div></div>
+</header>
+
+<div class="shell">
+  <nav class="toc" id="toc"></nav>
+
+  <main>
+    <div class="hero">
+      <h1>Lab Assignments — auto-graded</h1>
+      <p class="sub">Twenty-eight array and string exercises. Write each function in the editor, then hit <strong>Submit &amp; evaluate</strong> — every assignment runs against hidden test cases and is scored automatically.</p>
+      <div class="chips">
+        <span class="chip"><b>28</b> assignments</span>
+        <span class="chip"><b id="c-cases">—</b> checks</span>
+        <span class="chip">~<b>75</b> minutes</span>
+        <span class="chip">Suggested pass <b>21/28</b></span>
+      </div>
+      <div class="howto">
+        <h3>How this works</h3>
+        <ul>
+          <li><strong>Keep the given function name and parameter order</strong> — the grader calls it by name.</li>
+          <li><strong>Return</strong> the answer; don't just <code>console.log</code> it. The only exception is assignment 11, which is graded on what it prints.</li>
+          <li><strong>Use the method the assignment names</strong> (e.g. <code>push()</code> for assignment 1). Each card includes a code check for it, counted as one of its test cases.</li>
+          <li>Some assignments also check that you <strong>didn't modify the input array</strong> — <code>concat</code>, <code>slice</code> and <code>map</code> return new arrays.</li>
+          <li>Strings are compared <strong>exactly</strong> — case and spaces matter.</li>
+          <li>TypeScript annotations are fine — they're stripped before running. Plain JavaScript works too.</li>
+          <li>Infinite loops are caught by a guard and reported as a failed test, so a runaway loop won't freeze the page.</li>
+          <li>Your code is <strong>saved in this browser</strong> as you type, so a refresh won't lose it.</li>
+          <li>Tick <strong>Practice mode</strong> to check one assignment at a time instead of waiting for the final submit.</li>
+        </ul>
+      </div>
+      <div class="credit">
+        <p><strong>Source:</strong> lab assignments from SDET Pavan.</p>
+        <p><a href="https://www.pavanonlinetrainings.com" target="_blank" rel="noopener">pavanonlinetrainings.com</a> · <a href="https://www.youtube.com/@sdetpavan" target="_blank" rel="noopener">youtube.com/@sdetpavan</a></p>
+      </div>
+    </div>
+
+    <div class="results" id="results">
+      <h2>Results</h2>
+      <div class="big-score" id="r-score">—</div>
+      <div id="r-band"></div>
+      <div class="subscore" id="r-sub"></div>
+      <div id="r-bars"></div>
+      <div class="advice" id="r-advice"></div>
+    </div>
+
+    <div id="tasks"></div>
+
+    <footer class="end">
+      28 auto-graded assignments · single-file HTML, no dependencies, runs offline.
+      Content credit: <a href="https://www.pavanonlinetrainings.com" target="_blank" rel="noopener">pavanonlinetrainings.com</a> ·
+      <a href="https://www.youtube.com/@sdetpavan" target="_blank" rel="noopener">@sdetpavan</a>
+    </footer>
+  </main>
+</div>
+
+<script>
+/* ------------------------------------------------------------------ *
+ *  Assignment definitions
+ *  tests: { args, exp }            — return value must equal exp
+ *         { args, logs }           — console.log lines must equal logs
+ *         keep: true               — first argument must not be mutated
+ *  uses:  method names that must appear in the code, e.g. "push" → .push(
+ * ------------------------------------------------------------------ */
+var GROUPS = [
+  {
+    id: "addremove", title: "Group 1 — Adding &amp; removing elements", short: "push / pop / shift / unshift",
+    tasks: [
+      { n: 1, fn: "addToEnd", uses: ["push"],
+        title: "Add an element to the end using push()",
+        prompt: "Add <code>item</code> to the end of <code>arr</code> using <strong>push()</strong>, then return the updated array.",
+        sig: "function addToEnd(arr: number[], item: number): number[]",
+        starter: "function addToEnd(arr: number[], item: number): number[] {\n  // your code here\n\n}",
+        tests: [ {args:[[1,2,3],4],exp:[1,2,3,4]}, {args:[[],7],exp:[7]}, {args:[[5],5],exp:[5,5]} ],
+        solution: "function addToEnd(arr: number[], item: number): number[] {\n  arr.push(item);\n  return arr;\n}" },
+
+      { n: 2, fn: "removeLast", uses: ["pop"],
+        title: "Remove the last element using pop()",
+        prompt: "Remove the last element of <code>arr</code> using <strong>pop()</strong>, then return the updated array. Calling it on an empty array should return <code>[]</code>.",
+        sig: "function removeLast(arr: number[]): number[]",
+        starter: "function removeLast(arr: number[]): number[] {\n  // your code here\n\n}",
+        tests: [ {args:[[1,2,3]],exp:[1,2]}, {args:[[9]],exp:[]}, {args:[[]],exp:[]} ],
+        solution: "function removeLast(arr: number[]): number[] {\n  arr.pop();\n  return arr;\n}" },
+
+      { n: 3, fn: "removeFirst", uses: ["shift"],
+        title: "Remove the first element using shift()",
+        prompt: "Remove the first element of <code>arr</code> using <strong>shift()</strong>, then return the updated array.",
+        sig: "function removeFirst(arr: string[]): string[]",
+        starter: "function removeFirst(arr: string[]): string[] {\n  // your code here\n\n}",
+        tests: [ {args:[["a","b","c"]],exp:["b","c"]}, {args:[["x"]],exp:[]}, {args:[["red","green"]],exp:["green"]} ],
+        solution: "function removeFirst(arr: string[]): string[] {\n  arr.shift();\n  return arr;\n}" },
+
+      { n: 4, fn: "addToStart", uses: ["unshift"],
+        title: "Add elements at the beginning using unshift()",
+        prompt: "Add all of <code>items</code> to the beginning of <code>arr</code> (keeping their order) using <strong>unshift()</strong>, then return the updated array. <code>items</code> is a rest parameter, so <code>addToStart([3, 4], 1, 2)</code> should give <code>[1, 2, 3, 4]</code>.",
+        sig: "function addToStart(arr: number[], ...items: number[]): number[]",
+        starter: "function addToStart(arr: number[], ...items: number[]): number[] {\n  // your code here\n\n}",
+        tests: [ {args:[[3,4],1,2],exp:[1,2,3,4]}, {args:[[2],1],exp:[1,2]}, {args:[[],0],exp:[0]} ],
+        solution: "function addToStart(arr: number[], ...items: number[]): number[] {\n  arr.unshift(...items);\n  return arr;\n}" }
+    ]
+  },
+  {
+    id: "combine", title: "Group 2 — Combining &amp; extracting", short: "concat / slice / splice",
+    tasks: [
+      { n: 5, fn: "mergeArrays", uses: ["concat"],
+        title: "Concatenate two arrays using concat()",
+        prompt: "Return a <strong>new</strong> array containing the elements of <code>first</code> followed by the elements of <code>second</code>, using <strong>concat()</strong>. <code>first</code> must not be modified.",
+        sig: "function mergeArrays(first: number[], second: number[]): number[]",
+        starter: "function mergeArrays(first: number[], second: number[]): number[] {\n  // your code here\n\n}",
+        tests: [ {args:[[1,2],[3,4]],exp:[1,2,3,4],keep:true}, {args:[[],[5,6]],exp:[5,6],keep:true}, {args:[[1],[]],exp:[1],keep:true} ],
+        solution: "function mergeArrays(first: number[], second: number[]): number[] {\n  return first.concat(second);\n}" },
+
+      { n: 6, fn: "getSubarray", uses: ["slice"],
+        title: "Extract a subarray using slice()",
+        prompt: "Return the elements of <code>arr</code> from index <code>start</code> up to <strong>but not including</strong> <code>end</code>, using <strong>slice()</strong>. The original array must stay unchanged.",
+        sig: "function getSubarray(arr: number[], start: number, end: number): number[]",
+        starter: "function getSubarray(arr: number[], start: number, end: number): number[] {\n  // your code here\n\n}",
+        tests: [ {args:[[10,20,30,40,50],1,3],exp:[20,30],keep:true}, {args:[[10,20,30,40,50],0,5],exp:[10,20,30,40,50],keep:true}, {args:[[1,2,3],2,2],exp:[],keep:true} ],
+        solution: "function getSubarray(arr: number[], start: number, end: number): number[] {\n  return arr.slice(start, end);\n}" },
+
+      { n: 7, fn: "insertAndDelete", uses: ["splice"],
+        title: "Insert and delete elements using splice()",
+        prompt: "Starting at index <code>start</code>, delete <code>deleteCount</code> elements and insert all of <code>items</code> in their place, using <strong>splice()</strong>. Return the <strong>modified array</strong> — not the removed elements that <code>splice()</code> itself returns.",
+        sig: "function insertAndDelete(arr: string[], start: number, deleteCount: number, ...items: string[]): string[]",
+        starter: "function insertAndDelete(arr: string[], start: number, deleteCount: number, ...items: string[]): string[] {\n  // your code here\n\n}",
+        tests: [ {args:[["a","b","c","d"],1,2,"x","y"],exp:["a","x","y","d"]}, {args:[["a","b"],1,0,"z"],exp:["a","z","b"]}, {args:[["a","b","c"],0,1],exp:["b","c"]} ],
+        solution: "function insertAndDelete(arr: string[], start: number, deleteCount: number, ...items: string[]): string[] {\n  arr.splice(start, deleteCount, ...items);\n  return arr;\n}" }
+    ]
+  },
+  {
+    id: "search", title: "Group 3 — Searching &amp; converting arrays", short: "indexOf / includes / toString",
+    tasks: [
+      { n: 8, fn: "findPosition", uses: ["indexOf"],
+        title: "Find the index of an element using indexOf()",
+        prompt: "Return the index of <code>item</code> in <code>arr</code> using <strong>indexOf()</strong>, or <code>-1</code> if it isn't there.",
+        sig: "function findPosition(arr: string[], item: string): number",
+        starter: "function findPosition(arr: string[], item: string): number {\n  // your code here\n\n}",
+        tests: [ {args:[["apple","banana","cherry"],"banana"],exp:1}, {args:[["apple","banana","cherry"],"apple"],exp:0}, {args:[["apple","banana","cherry"],"mango"],exp:-1} ],
+        solution: "function findPosition(arr: string[], item: string): number {\n  return arr.indexOf(item);\n}" },
+
+      { n: 9, fn: "hasElement", uses: ["includes"],
+        title: "Check if an element exists using includes()",
+        prompt: "Return <code>true</code> if <code>item</code> is in <code>arr</code>, otherwise <code>false</code>, using <strong>includes()</strong>.",
+        sig: "function hasElement(arr: string[], item: string): boolean",
+        starter: "function hasElement(arr: string[], item: string): boolean {\n  // your code here\n\n}",
+        tests: [ {args:[["apple","kiwi"],"kiwi"],exp:true}, {args:[["apple","kiwi"],"grape"],exp:false}, {args:[[],"a"],exp:false} ],
+        solution: "function hasElement(arr: string[], item: string): boolean {\n  return arr.includes(item);\n}" },
+
+      { n: 10, fn: "arrayToString", uses: ["toString"],
+        title: "Convert an array to a string using toString()",
+        prompt: "Return <code>arr</code> as a comma-separated string using <strong>toString()</strong>. For example <code>[1, 2, 3]</code> → <code>\"1,2,3\"</code>.",
+        sig: "function arrayToString(arr: number[]): string",
+        starter: "function arrayToString(arr: number[]): string {\n  // your code here\n\n}",
+        tests: [ {args:[[1,2,3]],exp:"1,2,3"}, {args:[[42]],exp:"42"}, {args:[[]],exp:""} ],
+        solution: "function arrayToString(arr: number[]): string {\n  return arr.toString();\n}" }
+    ]
+  },
+  {
+    id: "iterate", title: "Group 4 — Iteration methods", short: "forEach / map / filter / reduce / some / every",
+    tasks: [
+      { n: 11, fn: "printEach", uses: ["forEach"],
+        title: "Iterate with forEach() and print each element",
+        prompt: "Use <strong>forEach()</strong> to <code>console.log</code> each element of <code>arr</code> on its own line — just the element, nothing else. This one is graded on what it <strong>prints</strong>; it doesn't need to return anything.",
+        sig: "function printEach(arr: string[]): void",
+        starter: "function printEach(arr: string[]): void {\n  // your code here\n\n}",
+        tests: [ {args:[["red","green","blue"]],logs:["red","green","blue"]}, {args:[["solo"]],logs:["solo"]}, {args:[[]],logs:[]} ],
+        solution: "function printEach(arr: string[]): void {\n  arr.forEach((item: string) => {\n    console.log(item);\n  });\n}" },
+
+      { n: 12, fn: "doubleValues", uses: ["map"],
+        title: "Double the values using map()",
+        prompt: "Return a <strong>new</strong> array with every number doubled, using <strong>map()</strong>. Don't modify <code>arr</code>.",
+        sig: "function doubleValues(arr: number[]): number[]",
+        starter: "function doubleValues(arr: number[]): number[] {\n  // your code here\n\n}",
+        tests: [ {args:[[1,2,3]],exp:[2,4,6],keep:true}, {args:[[-1,0,5]],exp:[-2,0,10],keep:true}, {args:[[]],exp:[],keep:true} ],
+        solution: "function doubleValues(arr: number[]): number[] {\n  return arr.map((n: number) => n * 2);\n}" },
+
+      { n: 13, fn: "getEvenNumbers", uses: ["filter"],
+        title: "Filter out the even numbers using filter()",
+        prompt: "Return a new array containing <strong>only the even numbers</strong> from <code>arr</code>, in their original order, using <strong>filter()</strong>.",
+        sig: "function getEvenNumbers(arr: number[]): number[]",
+        starter: "function getEvenNumbers(arr: number[]): number[] {\n  // your code here\n\n}",
+        tests: [ {args:[[1,2,3,4,5,6]],exp:[2,4,6],keep:true}, {args:[[1,3,5]],exp:[],keep:true}, {args:[[0,7,10]],exp:[0,10],keep:true} ],
+        solution: "function getEvenNumbers(arr: number[]): number[] {\n  return arr.filter((n: number) => n % 2 === 0);\n}" },
+
+      { n: 14, fn: "sumAll", uses: ["reduce"],
+        title: "Find the sum of all numbers using reduce()",
+        prompt: "Return the sum of all numbers in <code>arr</code> using <strong>reduce()</strong>. An empty array should return <code>0</code> — think about the initial value.",
+        sig: "function sumAll(arr: number[]): number",
+        starter: "function sumAll(arr: number[]): number {\n  // your code here\n\n}",
+        tests: [ {args:[[1,2,3,4]],exp:10}, {args:[[10]],exp:10}, {args:[[-5,5,20]],exp:20}, {args:[[]],exp:0} ],
+        solution: "function sumAll(arr: number[]): number {\n  return arr.reduce((sum: number, n: number) => sum + n, 0);\n}" },
+
+      { n: 15, fn: "hasEven", uses: ["some"],
+        title: "Check if at least one element is even using some()",
+        prompt: "Return <code>true</code> if <strong>at least one</strong> number in <code>arr</code> is even, using <strong>some()</strong>.",
+        sig: "function hasEven(arr: number[]): boolean",
+        starter: "function hasEven(arr: number[]): boolean {\n  // your code here\n\n}",
+        tests: [ {args:[[1,3,4]],exp:true}, {args:[[1,3,5]],exp:false}, {args:[[]],exp:false} ],
+        solution: "function hasEven(arr: number[]): boolean {\n  return arr.some((n: number) => n % 2 === 0);\n}" },
+
+      { n: 16, fn: "allPositive", uses: ["every"],
+        title: "Check if all elements are positive using every()",
+        prompt: "Return <code>true</code> if <strong>every</strong> number in <code>arr</code> is positive (greater than <code>0</code>), using <strong>every()</strong>. Note that <code>0</code> is not positive.",
+        sig: "function allPositive(arr: number[]): boolean",
+        starter: "function allPositive(arr: number[]): boolean {\n  // your code here\n\n}",
+        tests: [ {args:[[1,2,3]],exp:true}, {args:[[1,-2,3]],exp:false}, {args:[[0,5]],exp:false} ],
+        solution: "function allPositive(arr: number[]): boolean {\n  return arr.every((n: number) => n > 0);\n}" }
+    ]
+  },
+  {
+    id: "challenge", title: "Group 5 — Array challenges", short: "Dedupe / reverse",
+    tasks: [
+      { n: 17, fn: "removeDuplicates", uses: ["filter", "indexOf"],
+        title: "Remove duplicates using filter() and indexOf()",
+        prompt: "Return a new array with duplicates removed, keeping the <strong>first</strong> occurrence of each value, using <strong>filter()</strong> together with <strong>indexOf()</strong>. Hint: an element is the first of its kind when <code>arr.indexOf(item) === index</code>.",
+        sig: "function removeDuplicates(arr: number[]): number[]",
+        starter: "function removeDuplicates(arr: number[]): number[] {\n  // your code here\n\n}",
+        tests: [ {args:[[1,2,2,3,1]],exp:[1,2,3],keep:true}, {args:[[5,5,5]],exp:[5],keep:true}, {args:[[4,3]],exp:[4,3],keep:true} ],
+        solution: "function removeDuplicates(arr: number[]): number[] {\n  return arr.filter((item: number, index: number) => arr.indexOf(item) === index);\n}" },
+
+      { n: 18, fn: "reverseArray",
+        title: "Reverse an array",
+        prompt: "Return the elements of <code>arr</code> in reverse order. Any approach is accepted — <code>reverse()</code> or a loop.",
+        sig: "function reverseArray(arr: number[]): number[]",
+        starter: "function reverseArray(arr: number[]): number[] {\n  // your code here\n\n}",
+        tests: [ {args:[[1,2,3]],exp:[3,2,1]}, {args:[[7]],exp:[7]}, {args:[[]],exp:[]}, {args:[[1,2,3,4]],exp:[4,3,2,1]} ],
+        solution: "function reverseArray(arr: number[]): number[] {\n  return arr.reverse();\n}" }
+    ]
+  },
+  {
+    id: "strbasic", title: "Group 6 — String basics", short: "length / case / charAt",
+    tasks: [
+      { n: 19, fn: "getLength", uses: ["length"],
+        title: "Find the length of a string",
+        prompt: "Return the number of characters in <code>str</code> using the <strong>length</strong> property. Spaces and punctuation count.",
+        sig: "function getLength(str: string): number",
+        starter: "function getLength(str: string): number {\n  // your code here\n\n}",
+        tests: [ {args:["hello"],exp:5}, {args:["Hello, TypeScript!"],exp:18}, {args:[""],exp:0} ],
+        solution: "function getLength(str: string): number {\n  return str.length;\n}" },
+
+      { n: 20, fn: "toUpper", uses: ["toUpperCase"],
+        title: "Convert a string to uppercase using toUpperCase()",
+        prompt: "Return <code>str</code> converted to uppercase using <strong>toUpperCase()</strong>.",
+        sig: "function toUpper(str: string): string",
+        starter: "function toUpper(str: string): string {\n  // your code here\n\n}",
+        tests: [ {args:["hello"],exp:"HELLO"}, {args:["TypeScript 5"],exp:"TYPESCRIPT 5"}, {args:["ABC"],exp:"ABC"} ],
+        solution: "function toUpper(str: string): string {\n  return str.toUpperCase();\n}" },
+
+      { n: 21, fn: "toLower", uses: ["toLowerCase"],
+        title: "Convert a string to lowercase using toLowerCase()",
+        prompt: "Return <code>str</code> converted to lowercase using <strong>toLowerCase()</strong>.",
+        sig: "function toLower(str: string): string",
+        starter: "function toLower(str: string): string {\n  // your code here\n\n}",
+        tests: [ {args:["WORLD"],exp:"world"}, {args:["TypeScript"],exp:"typescript"}, {args:["abc"],exp:"abc"} ],
+        solution: "function toLower(str: string): string {\n  return str.toLowerCase();\n}" },
+
+      { n: 22, fn: "getCharAt", uses: ["charAt"],
+        title: "Get a character at a specific index using charAt()",
+        prompt: "Return the character of <code>str</code> at position <code>index</code> using <strong>charAt()</strong>. For an index past the end, <code>charAt()</code> returns an empty string — return that as-is.",
+        sig: "function getCharAt(str: string, index: number): string",
+        starter: "function getCharAt(str: string, index: number): string {\n  // your code here\n\n}",
+        tests: [ {args:["TypeScript",4],exp:"S"}, {args:["abc",0],exp:"a"}, {args:["abc",10],exp:""} ],
+        solution: "function getCharAt(str: string, index: number): string {\n  return str.charAt(index);\n}" }
+    ]
+  },
+  {
+    id: "strsearch", title: "Group 7 — Searching strings", short: "indexOf / includes / startsWith / endsWith",
+    tasks: [
+      { n: 23, fn: "findWordPosition", uses: ["indexOf"],
+        title: "Find the position of a word using indexOf()",
+        prompt: "Return the index where <code>word</code> first appears in <code>sentence</code> using <strong>indexOf()</strong>, or <code>-1</code> if it doesn't appear.",
+        sig: "function findWordPosition(sentence: string, word: string): number",
+        starter: "function findWordPosition(sentence: string, word: string): number {\n  // your code here\n\n}",
+        tests: [ {args:["Hello, TypeScript!","Type"],exp:7}, {args:["hello world","world"],exp:6}, {args:["hello world","xyz"],exp:-1} ],
+        solution: "function findWordPosition(sentence: string, word: string): number {\n  return sentence.indexOf(word);\n}" },
+
+      { n: 24, fn: "containsWord", uses: ["includes"],
+        title: "Check if a string includes a word using includes()",
+        prompt: "Return <code>true</code> if <code>sentence</code> contains <code>word</code>, using <strong>includes()</strong>. The check is case-sensitive.",
+        sig: "function containsWord(sentence: string, word: string): boolean",
+        starter: "function containsWord(sentence: string, word: string): boolean {\n  // your code here\n\n}",
+        tests: [ {args:["I love TypeScript","love"],exp:true}, {args:["I love TypeScript","hate"],exp:false}, {args:["I love TypeScript","typescript"],exp:false} ],
+        solution: "function containsWord(sentence: string, word: string): boolean {\n  return sentence.includes(word);\n}" },
+
+      { n: 25, fn: "startsWithWord", uses: ["startsWith"],
+        title: "Check if a string starts with a word using startsWith()",
+        prompt: "Return <code>true</code> if <code>sentence</code> begins with <code>word</code>, using <strong>startsWith()</strong>.",
+        sig: "function startsWithWord(sentence: string, word: string): boolean",
+        starter: "function startsWithWord(sentence: string, word: string): boolean {\n  // your code here\n\n}",
+        tests: [ {args:["JavaScript and TypeScript","Java"],exp:true}, {args:["JavaScript and TypeScript","Type"],exp:false}, {args:["Hello","hello"],exp:false} ],
+        solution: "function startsWithWord(sentence: string, word: string): boolean {\n  return sentence.startsWith(word);\n}" },
+
+      { n: 26, fn: "endsWithWord", uses: ["endsWith"],
+        title: "Check if a string ends with a word using endsWith()",
+        prompt: "Return <code>true</code> if <code>sentence</code> ends with <code>word</code>, using <strong>endsWith()</strong>.",
+        sig: "function endsWithWord(sentence: string, word: string): boolean",
+        starter: "function endsWithWord(sentence: string, word: string): boolean {\n  // your code here\n\n}",
+        tests: [ {args:["app.test.ts",".ts"],exp:true}, {args:["index.js",".ts"],exp:false}, {args:["Hello, TypeScript!","!"],exp:true} ],
+        solution: "function endsWithWord(sentence: string, word: string): boolean {\n  return sentence.endsWith(word);\n}" }
+    ]
+  },
+  {
+    id: "strtransform", title: "Group 8 — Transforming strings", short: "replace / split / trim",
+    tasks: [
+      { n: 27, fn: "replaceWord", uses: ["replace"],
+        title: "Replace a word in a sentence using replace()",
+        prompt: "Return <code>sentence</code> with the first occurrence of <code>oldWord</code> replaced by <code>newWord</code>, using <strong>replace()</strong>. If <code>oldWord</code> isn't found, the sentence comes back unchanged.",
+        sig: "function replaceWord(sentence: string, oldWord: string, newWord: string): string",
+        starter: "function replaceWord(sentence: string, oldWord: string, newWord: string): string {\n  // your code here\n\n}",
+        tests: [ {args:["I like Java","Java","TypeScript"],exp:"I like TypeScript"}, {args:["foo bar","bar","baz"],exp:"foo baz"}, {args:["no match here","xyz","abc"],exp:"no match here"} ],
+        solution: "function replaceWord(sentence: string, oldWord: string, newWord: string): string {\n  return sentence.replace(oldWord, newWord);\n}" },
+
+      { n: 28, fn: "splitIntoWords", uses: ["trim", "split"],
+        title: "Split a sentence into words using split() and trim()",
+        prompt: "Remove leading and trailing spaces with <strong>trim()</strong>, then split the sentence into an array of words with <strong>split()</strong>. Words are separated by single spaces. Example: <code>\"  TypeScript is awesome  \"</code> → <code>[\"TypeScript\", \"is\", \"awesome\"]</code>.",
+        sig: "function splitIntoWords(sentence: string): string[]",
+        starter: "function splitIntoWords(sentence: string): string[] {\n  // your code here\n\n}",
+        tests: [ {args:["  TypeScript is awesome  "],exp:["TypeScript","is","awesome"]}, {args:["hello"],exp:["hello"]}, {args:[" a b "],exp:["a","b"]} ],
+        solution: "function splitIntoWords(sentence: string): string[] {\n  return sentence.trim().split(\" \");\n}" }
+    ]
+  }
+];
+
+/* ------------------------------------------------------------------ *
+ *  Type stripping, loop instrumentation, evaluation
+ * ------------------------------------------------------------------ */
+
+// Conservative TypeScript annotation remover: only strips a ":" followed by a
+// recognised type name and then a delimiter, so ternaries, object literals and
+// switch case labels are left alone.
+var TYPE_RE = (function () {
+  var T = "(?:number|string|boolean|any|unknown|never|void|object|null|undefined|bigint|symbol|Array\\s*<[^>]*>)";
+  var ARR = "(?:\\s*\\[\\s*\\])*";
+  var UNION = "(?:\\s*\\|\\s*" + T + ARR + ")*";
+  return new RegExp(":\\s*" + T + ARR + UNION + "\\s*(?=[,)=;{\\]]|$)", "gm");
+})();
+
+function stripTypes(src) { return src.replace(TYPE_RE, ""); }
+
+// Injects a guard call at the top of every braced loop body so a runaway loop
+// aborts with an error instead of hanging the tab.
+function instrument(src) {
+  return src
+    .replace(/\bdo\s*\{/g, "do { __g();")
+    .replace(/\bwhile\s*\(([^{;]*)\)\s*\{/g, "while ($1) { __g();")
+    .replace(/\bfor\s*\(([^{]*)\)\s*\{/g, "for ($1) { __g();");
+}
+
+var GUARD_SRC =
+  "var __n = 0, __t = 0;\n" +
+  "function __reset() { __n = 0; __t = Date.now(); }\n" +
+  "function __g() {\n" +
+  "  __n++;\n" +
+  "  if (__n > 20000000) { throw new Error('Aborted: the loop ran more than 20 million times — check your loop condition and increment.'); }\n" +
+  "  if ((__n & 8191) === 0 && Date.now() - __t > 2000) { throw new Error('Aborted after 2 seconds — this looks like an infinite loop. Make sure the loop variable actually changes.'); }\n" +
+  "}\n";
+
+function fmt(v) {
+  if (typeof v === "string") return JSON.stringify(v);
+  if (v === undefined) return "undefined";
+  if (v === null) return "null";
+  if (typeof v === "number" && !isFinite(v)) return String(v);
+  try { return JSON.stringify(v); } catch (e) { return String(v); }
+}
+function fmtArgs(args) { return args.map(fmt).join(", "); }
+function clone(v) { return JSON.parse(JSON.stringify(v)); }
+
+// Arrays compare element-by-element; everything else strictly (strings are case-sensitive).
+function same(got, exp) {
+  if (Array.isArray(exp)) {
+    if (!Array.isArray(got) || got.length !== exp.length) return false;
+    for (var i = 0; i < exp.length; i++) { if (!same(got[i], exp[i])) return false; }
+    return true;
+  }
+  return got === exp;
+}
+
+function caseCount(task) { return task.tests.length + (task.uses ? task.uses.length : 0); }
+
+function stripComments(src) {
+  return src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
+}
+function usesCheck(code, m) {
+  var re = m === "length" ? /\.length\b/ : new RegExp("\\." + m + "\\s*\\(");
+  var ok = re.test(stripComments(code));
+  var shown = m === "length" ? ".length" : "." + m + "()";
+  return { call: "Code check", expText: "uses " + shown, gotText: ok ? "found" : shown + " not found in your code", ok: ok };
+}
+
+function evaluateTask(task, code) {
+  if (!code || !code.trim()) return { error: "No code written yet.", cases: [] };
+  var sink = [];
+  var fakeConsole = {
+    log: function () {
+      sink.push(Array.prototype.map.call(arguments, function (a) { return typeof a === "string" ? a : fmt(a); }).join(" "));
+    }
+  };
+  fakeConsole.info = fakeConsole.warn = fakeConsole.error = fakeConsole.log;
+  var handle;
+  try {
+    var body = GUARD_SRC + instrument(stripTypes(code)) +
+      "\n;return { fn: (typeof " + task.fn + " === 'function' ? " + task.fn + " : null), reset: __reset };";
+    handle = new Function("console", body)(fakeConsole);
+  } catch (e) {
+    return { error: (e && e.name ? e.name : "Error") + ": " + (e && e.message ? e.message : String(e)), cases: [] };
+  }
+  if (typeof handle.fn !== "function") {
+    return { error: "No function named `" + task.fn + "` was found. Keep the function name exactly as given.", cases: [] };
+  }
+  var cases = task.tests.map(function (t) {
+    var got, err = null, args = clone(t.args);
+    sink = [];
+    try {
+      handle.reset();
+      got = handle.fn.apply(null, args);
+    } catch (e) {
+      err = (e && e.message ? e.message : String(e));
+    }
+    var c = { args: t.args, exp: t.logs ? t.logs : t.exp, got: got, err: err };
+    if (t.logs) {
+      c.call = task.fn + "(" + fmtArgs(t.args) + ")  → printed lines";
+      c.got = sink.slice();
+      c.ok = err === null && same(c.got, t.logs);
+    } else {
+      c.ok = err === null && same(got, t.exp);
+    }
+    if (c.ok && t.keep && !same(args[0], t.args[0])) {
+      c.ok = false;
+      c.err = "Returned the right value, but the input array was modified (it is now " + fmt(args[0]) + "). Return a new array instead.";
+    }
+    return c;
+  });
+  (task.uses || []).forEach(function (m) { cases.push(usesCheck(code, m)); });
+  return { error: null, cases: cases };
+}
+
+/* ------------------------------------------------------------------ *
+ *  UI
+ * ------------------------------------------------------------------ */
+(function () {
+  var STORE = "ts-arrays-strings-lab-v1";
+  var tasksEl = document.getElementById("tasks");
+  var tocEl = document.getElementById("toc");
+  var ALL = [];
+  GROUPS.forEach(function (g) { g.tasks.forEach(function (t) { t.group = g.id; ALL.push(t); }); });
+  var TOTAL = ALL.length;
+  var TOTAL_CASES = ALL.reduce(function (s, t) { return s + caseCount(t); }, 0);
+  var PASS = 21;
+  var lastResults = {};
+
+  document.getElementById("s-total").textContent = TOTAL;
+  document.getElementById("c-cases").textContent = TOTAL_CASES;
+
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(STORE) || "{}") || {}; } catch (e) { saved = {}; }
+
+  function save() {
+    var out = {};
+    ALL.forEach(function (t) {
+      var ta = document.getElementById("ed-" + t.n);
+      if (ta) out[t.n] = ta.value;
+    });
+    try { localStorage.setItem(STORE, JSON.stringify(out)); } catch (e) {}
+  }
+
+  GROUPS.forEach(function (g) {
+    tocEl.insertAdjacentHTML("beforeend", "<h2>" + g.short + "</h2>");
+    g.tasks.forEach(function (t) {
+      tocEl.insertAdjacentHTML("beforeend",
+        '<a href="#t' + t.n + '" id="toc-' + t.n + '"><span class="dot"></span><span class="tt">' + t.n + '. ' + t.title + '</span></a>');
+    });
+
+    var sec = document.createElement("section");
+    sec.className = "grp";
+    sec.innerHTML = '<div class="grp-head"><h2>' + g.title + '</h2><span class="n">' +
+      g.tasks.length + ' assignment' + (g.tasks.length > 1 ? 's' : '') + '</span></div>';
+
+    g.tasks.forEach(function (t) {
+      var card = document.createElement("div");
+      card.className = "task";
+      card.id = "t" + t.n;
+      card.innerHTML =
+        '<div class="t-head">' +
+          '<span class="t-num">' + t.n + '</span>' +
+          '<span class="t-title">' + t.title + '</span>' +
+          '<span class="pill" id="pill-' + t.n + '">Not attempted</span>' +
+        '</div>' +
+        '<p class="t-prompt">' + t.prompt + '</p>' +
+        '<div class="t-sig">' + t.sig.replace(/&/g, "&amp;").replace(/</g, "&lt;") + '</div>' +
+        '<textarea class="editor" id="ed-' + t.n + '" spellcheck="false"></textarea>' +
+        '<div class="t-actions">' +
+          '<button class="ctl run" data-n="' + t.n + '" style="display:none">Run tests</button>' +
+          '<button class="ctl revert" data-n="' + t.n + '">Reset code</button>' +
+          '<span class="spacer"></span>' +
+          '<span class="hint">' + caseCount(t) + ' hidden check' + (caseCount(t) > 1 ? 's' : '') + '</span>' +
+        '</div>' +
+        '<div class="t-result" id="res-' + t.n + '"></div>' +
+        '<details class="sol" id="sol-' + t.n + '" aria-disabled="true">' +
+          '<summary>Model solution — unlocks after you submit</summary>' +
+          '<pre><code>' + t.solution.replace(/&/g, "&amp;").replace(/</g, "&lt;") + '</code></pre>' +
+        '</details>';
+      sec.appendChild(card);
+      sec.querySelector("#ed-" + t.n).value =
+        (saved[t.n] !== undefined && saved[t.n] !== null) ? saved[t.n] : t.starter;
+    });
+
+    tasksEl.appendChild(sec);
+  });
+
+  function setSolutionLock(locked) {
+    ALL.forEach(function (t) {
+      var d = document.getElementById("sol-" + t.n);
+      d.setAttribute("aria-disabled", locked ? "true" : "false");
+      d.querySelector("summary").textContent = locked
+        ? "Model solution — unlocks after you submit"
+        : "Model solution (one of several valid answers)";
+      if (locked) d.open = false;
+    });
+  }
+  setSolutionLock(true);
+  tasksEl.addEventListener("click", function (e) {
+    var sum = e.target.closest && e.target.closest("details.sol > summary");
+    if (sum && sum.parentElement.getAttribute("aria-disabled") === "true") e.preventDefault();
+  });
+
+  var saveTimer = null;
+  tasksEl.addEventListener("input", function (e) {
+    if (!e.target.classList.contains("editor")) return;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(save, 250);
+    updateAttempted();
+  });
+
+  tasksEl.addEventListener("keydown", function (e) {
+    if (e.key !== "Tab" || !e.target.classList.contains("editor")) return;
+    e.preventDefault();
+    var ta = e.target, s = ta.selectionStart, en = ta.selectionEnd;
+    ta.value = ta.value.slice(0, s) + "  " + ta.value.slice(en);
+    ta.selectionStart = ta.selectionEnd = s + 2;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(save, 250);
+  });
+
+  tasksEl.addEventListener("click", function (e) {
+    var btn = e.target.closest && e.target.closest("button");
+    if (!btn) return;
+    var n = parseInt(btn.dataset.n, 10);
+    if (isNaN(n)) return;
+    var task = ALL.filter(function (t) { return t.n === n; })[0];
+    if (btn.classList.contains("revert")) {
+      document.getElementById("ed-" + n).value = task.starter;
+      document.getElementById("res-" + n).classList.remove("show");
+      setPill(n, null);
+      save();
+      updateAttempted();
+    } else if (btn.classList.contains("run")) {
+      runOne(task, true);
+    }
+  });
+
+  var practiceBox = document.getElementById("practice");
+  practiceBox.addEventListener("change", function () {
+    var show = practiceBox.checked;
+    document.querySelectorAll("button.run").forEach(function (b) { b.style.display = show ? "" : "none"; });
+  });
+
+  function setPill(n, res) {
+    var pill = document.getElementById("pill-" + n);
+    var card = document.getElementById("t" + n);
+    var toc = document.getElementById("toc-" + n);
+    card.classList.remove("pass", "fail");
+    pill.classList.remove("pass", "fail");
+    toc.classList.remove("done", "bad");
+    if (!res) { pill.textContent = "Not attempted"; return; }
+    if (res.error) {
+      pill.textContent = "Error"; pill.classList.add("fail");
+      card.classList.add("fail"); toc.classList.add("bad");
+      return;
+    }
+    var passed = res.cases.filter(function (c) { return c.ok; }).length;
+    var all = res.cases.length;
+    pill.textContent = passed + "/" + all + " passed";
+    if (passed === all) { pill.classList.add("pass"); card.classList.add("pass"); toc.classList.add("done"); }
+    else { pill.classList.add("fail"); card.classList.add("fail"); toc.classList.add("bad"); }
+  }
+
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+
+  function renderResult(task, res) {
+    var box = document.getElementById("res-" + task.n);
+    if (res.error) {
+      box.innerHTML = '<div class="rbanner err">' + esc(res.error) + '</div>';
+      box.classList.add("show");
+      return;
+    }
+    var passed = res.cases.filter(function (c) { return c.ok; }).length;
+    var all = res.cases.length;
+    var ok = passed === all;
+    var html = '<div class="rbanner ' + (ok ? "pass" : "fail") + '">' +
+      (ok ? "✓ All " + all + " test case" + (all > 1 ? "s" : "") + " passed."
+          : "✕ " + passed + " of " + all + " test case" + (all > 1 ? "s" : "") + " passed.") + '</div>';
+    var rows = res.cases.filter(function (c) { return !c.ok; });
+    if (rows.length) {
+      html += '<table class="cases"><tr><th></th><th>Call</th><th>Expected</th><th>Got</th></tr>';
+      rows.forEach(function (c) {
+        html += '<tr><td class="st">✕</td>' +
+          '<td>' + esc(c.call || (task.fn + "(" + fmtArgs(c.args) + ")")) + '</td>' +
+          '<td>' + esc(c.expText || fmt(c.exp)) + '</td>' +
+          '<td>' + esc(c.err ? c.err : (c.gotText || fmt(c.got))) + '</td></tr>';
+      });
+      html += '</table>';
+    }
+    box.innerHTML = html;
+    box.classList.add("show");
+  }
+
+  function runOne(task, render) {
+    var res = evaluateTask(task, document.getElementById("ed-" + task.n).value);
+    lastResults[task.n] = res;
+    setPill(task.n, res);
+    if (render) renderResult(task, res);
+    return res;
+  }
+
+  function isAttempted(t) {
+    var v = document.getElementById("ed-" + t.n).value;
+    return v.trim() !== "" && v.trim() !== t.starter.trim();
+  }
+  function updateAttempted() {
+    var n = ALL.filter(isAttempted).length;
+    document.getElementById("s-attempted").textContent = n;
+    document.getElementById("progress").style.width = (n / TOTAL * 100) + "%";
+  }
+
+  document.getElementById("btn-submit").addEventListener("click", function () {
+    save();
+    var passedTasks = 0, passedCases = 0;
+    var byGroup = {};
+    GROUPS.forEach(function (g) { byGroup[g.id] = { c: 0, t: 0, short: g.short }; });
+
+    ALL.forEach(function (t) {
+      var res = runOne(t, true);
+      byGroup[t.group].t += 1;
+      if (!res.error) {
+        var p = res.cases.filter(function (c) { return c.ok; }).length;
+        passedCases += p;
+        if (p === res.cases.length) { passedTasks++; byGroup[t.group].c += 1; }
+      }
+    });
+
+    setSolutionLock(false);
+
+    var pct = Math.round(passedTasks / TOTAL * 100);
+    document.getElementById("s-passed").textContent = passedTasks + "/" + TOTAL;
+    document.getElementById("r-score").textContent = passedTasks + " / " + TOTAL + "  ·  " + pct + "%";
+
+    var bandText, verdict;
+    if (passedTasks === TOTAL)    { bandText = "Perfect";    verdict = "Every assignment passes every test case. Move on to the next topic."; }
+    else if (pct >= 86)           { bandText = "Strong";     verdict = "Fix the last few and you're done."; }
+    else if (passedTasks >= PASS) { bandText = "Pass";       verdict = "Solid work. Open the failing assignments below and compare against the model solutions."; }
+    else if (pct >= 45)           { bandText = "Shaky";      verdict = "Rework the failing assignments, then resubmit."; }
+    else                          { bandText = "Needs work"; verdict = "Revisit the notes on array and string methods, then attempt these again."; }
+
+    document.getElementById("r-band").innerHTML =
+      '<span class="band ' + (passedTasks >= PASS ? "pass" : "fail") + '">' + bandText +
+      ' · suggested pass mark ' + PASS + '/' + TOTAL + '</span>';
+    document.getElementById("r-sub").textContent =
+      passedCases + " of " + TOTAL_CASES + " individual test cases passed.";
+
+    document.getElementById("r-bars").innerHTML = GROUPS.map(function (g) {
+      var st = byGroup[g.id];
+      var p = Math.round(st.c / st.t * 100);
+      return '<div class="bar-row"><span class="nm">' + st.short + '</span>' +
+             '<span class="bar-track"><span class="bar-fill" style="width:' + p + '%"></span></span>' +
+             '<span class="sc">' + st.c + '/' + st.t + '</span></div>';
+    }).join("");
+
+    var failed = ALL.filter(function (t) {
+      var r = lastResults[t.n];
+      return r && (r.error || r.cases.some(function (c) { return !c.ok; }));
+    });
+    var advice = "<h3>What to fix</h3>";
+    if (!failed.length) {
+      advice += "<p>Nothing — all " + TOTAL + " assignments pass. Model solutions are unlocked below if you want to compare approaches.</p>";
+    } else {
+      advice += '<p>Jump to the assignments that need work:</p><div class="failist">' +
+        failed.map(function (t) { return '<a href="#t' + t.n + '">' + t.n + '. ' + t.title + '</a>'; }).join("") +
+        '</div><p style="margin-top:12px">Each failing card lists the exact calls that went wrong, with what was expected and what your code returned. Model solutions are now unlocked.</p>';
+    }
+    advice += '<p style="color:var(--dim)"><b>The three that catch most people here:</b> returning what a mutating method returns instead of the array — <code>push()</code> returns the new length and <code>splice()</code> returns the <em>removed</em> items; modifying the input when a new array is expected (use <code>concat</code>, <code>slice</code>, <code>map</code>, <code>filter</code>); and forgetting the <code>0</code> initial value in <code>reduce()</code>, which makes an empty array throw.</p>';
+    advice += '<p><a href="typescript-arrays-strings-quiz.html">← back to the MCQ quiz</a></p>';
+    document.getElementById("r-advice").innerHTML = advice;
+
+    document.getElementById("results").classList.add("show");
+    document.getElementById("results").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  document.getElementById("btn-reset").addEventListener("click", function () {
+    if (!confirm("Clear all " + TOTAL + " editors and your saved work? This cannot be undone.")) return;
+    ALL.forEach(function (t) {
+      document.getElementById("ed-" + t.n).value = t.starter;
+      document.getElementById("res-" + t.n).classList.remove("show");
+      setPill(t.n, null);
+    });
+    lastResults = {};
+    setSolutionLock(true);
+    document.getElementById("results").classList.remove("show");
+    document.getElementById("s-passed").textContent = "—";
+    try { localStorage.removeItem(STORE); } catch (e) {}
+    updateAttempted();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  updateAttempted();
+})();
+</script>
+</body>
+</html>

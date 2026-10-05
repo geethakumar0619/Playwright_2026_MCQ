@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TypeScript Arrays &amp; Strings – MCQ Quiz</title>
+<style>
+  :root {
+    --bg: #f4f6fb; --card: #fff; --text: #1e2333; --muted: #6b7280;
+    --primary: #7048e8; --primary-light: #f0ebff;
+    --ok: #2f9e44; --ok-bg: #ebfbee; --bad: #e03131; --bad-bg: #fff5f5;
+    --code-bg: #1e1e2e; --code-text: #e4e4f0; --border: #dde2ee;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.5;
+  }
+  .wrap { max-width: 820px; margin: 0 auto; padding: 24px 16px 48px; }
+  header h1 { margin: 0 0 4px; font-size: 1.6rem; }
+  header p { margin: 0 0 20px; color: var(--muted); }
+  .card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+    padding: 24px; box-shadow: 0 2px 10px rgba(30, 35, 51, .05);
+  }
+  .hidden { display: none !important; }
+
+  /* Reference table */
+  details.ref { margin-bottom: 20px; }
+  details.ref summary { cursor: pointer; font-weight: 600; color: var(--primary); }
+  .ref table { font-size: .88rem; }
+  .ref td code { font-family: Consolas, monospace; font-size: .85rem; }
+
+  /* Start screen */
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 20px; }
+  .chip {
+    border: 1px solid var(--border); background: #fff; border-radius: 999px;
+    padding: 6px 14px; cursor: pointer; font-family: Consolas, monospace; font-size: .9rem;
+    user-select: none; transition: all .15s;
+  }
+  .chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  label.check { display: flex; gap: 6px; align-items: center; cursor: pointer; color: var(--muted); }
+
+  button.btn {
+    border: none; border-radius: 10px; padding: 10px 20px; font-size: 1rem;
+    cursor: pointer; font-weight: 600; transition: opacity .15s, transform .05s;
+  }
+  button.btn:active { transform: scale(.98); }
+  button.btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-ghost { background: var(--primary-light); color: var(--primary); }
+
+  /* Quiz screen */
+  .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: .9rem; color: var(--muted); }
+  .progress { height: 8px; background: var(--primary-light); border-radius: 99px; overflow: hidden; margin-bottom: 20px; }
+  .progress > div { height: 100%; background: var(--primary); width: 0; transition: width .3s; }
+  .tag {
+    display: inline-block; background: var(--primary-light); color: var(--primary);
+    font-family: Consolas, monospace; font-size: .85rem; padding: 2px 10px; border-radius: 6px; margin-bottom: 10px;
+  }
+  .question { font-size: 1.1rem; font-weight: 600; margin: 0 0 12px; }
+  pre.code {
+    background: var(--code-bg); color: var(--code-text); padding: 14px 16px; border-radius: 10px;
+    overflow-x: auto; font-family: Consolas, "Courier New", monospace; font-size: .92rem; margin: 0 0 16px;
+  }
+  .options { display: grid; gap: 10px; }
+  .option {
+    display: flex; gap: 12px; align-items: flex-start; text-align: left;
+    border: 2px solid var(--border); background: #fff; border-radius: 10px; padding: 12px 14px;
+    cursor: pointer; font-size: .98rem; color: var(--text); transition: border-color .15s, background .15s;
+  }
+  .option:hover:not(:disabled) { border-color: var(--primary); background: #fbfaff; }
+  .option:disabled { cursor: default; }
+  .option .key {
+    flex: 0 0 26px; height: 26px; border-radius: 50%; background: var(--primary-light); color: var(--primary);
+    display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .85rem;
+  }
+  .option code { font-family: Consolas, monospace; white-space: pre-wrap; }
+  .option.correct { border-color: var(--ok); background: var(--ok-bg); }
+  .option.correct .key { background: var(--ok); color: #fff; }
+  .option.wrong { border-color: var(--bad); background: var(--bad-bg); }
+  .option.wrong .key { background: var(--bad); color: #fff; }
+  .feedback { margin-top: 16px; padding: 12px 14px; border-radius: 10px; font-size: .95rem; }
+  .feedback.ok { background: var(--ok-bg); border-left: 4px solid var(--ok); }
+  .feedback.bad { background: var(--bad-bg); border-left: 4px solid var(--bad); }
+  .feedback code { font-family: Consolas, monospace; background: rgba(0,0,0,.06); padding: 0 4px; border-radius: 4px; }
+  .nav { display: flex; justify-content: space-between; margin-top: 20px; }
+
+  /* Results */
+  .score-big { font-size: 3rem; font-weight: 800; margin: 0; color: var(--primary); }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: .95rem; }
+  th, td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; }
+  td.m { font-family: Consolas, monospace; }
+  .bar { height: 8px; border-radius: 99px; background: #eee; overflow: hidden; min-width: 80px; }
+  .bar > div { height: 100%; }
+  .review-item { border-top: 1px solid var(--border); padding: 14px 0; }
+  .review-item .yours { color: var(--bad); }
+  .review-item .right { color: var(--ok); }
+  .review-item pre.code { margin-top: 8px; font-size: .85rem; }
+  kbd { background: #eee; border-radius: 4px; padding: 0 5px; font-size: .8rem; border: 1px solid #ccc; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>TypeScript Arrays &amp; Strings Quiz</h1>
+    <p>50 multiple-choice questions: array methods, string methods, and string immutability</p>
+  </header>
+
+  <!-- START -->
+  <section id="start" class="card">
+    <details class="ref">
+      <summary>Quick reference (open to revise before starting)</summary>
+      <table>
+        <thead><tr><th>Method</th><th>What it does</th><th>Mutates?</th></tr></thead>
+        <tbody>
+          <tr><td><code>push()</code> / <code>pop()</code></td><td>Add to / remove from the <b>end</b></td><td>Yes</td></tr>
+          <tr><td><code>unshift()</code> / <code>shift()</code></td><td>Add to / remove from the <b>beginning</b></td><td>Yes</td></tr>
+          <tr><td><code>concat()</code></td><td>Joins arrays into a new array</td><td>No</td></tr>
+          <tr><td><code>slice(start, end)</code></td><td>Copies a portion (end excluded) into a new array</td><td>No</td></tr>
+          <tr><td><code>splice(start, count, ...items)</code></td><td>Removes/inserts in place; returns removed items</td><td>Yes</td></tr>
+          <tr><td><code>indexOf()</code> / <code>includes()</code></td><td>Position (or -1) / <code>true</code>·<code>false</code></td><td>No</td></tr>
+          <tr><td><code>map()</code> / <code>filter()</code> / <code>reduce()</code></td><td>New array / subset array / single value</td><td>No</td></tr>
+          <tr><td><code>some()</code> / <code>every()</code></td><td>Any match? / all match?</td><td>No</td></tr>
+          <tr><td>String methods</td><td><code>toUpperCase</code>, <code>trim</code>, <code>replace</code>, <code>split</code>… always return a <b>new</b> value</td><td>Never (strings are immutable)</td></tr>
+        </tbody>
+      </table>
+    </details>
+
+    <h2 style="margin-top:0">Choose topics to practice</h2>
+    <div class="chips" id="chips"></div>
+    <div class="row" style="margin-bottom:20px">
+      <label class="check"><input type="checkbox" id="shuffle" checked> Shuffle questions</label>
+      <span id="countInfo" style="color:var(--muted)"></span>
+    </div>
+    <button class="btn btn-primary" id="startBtn">Start Quiz</button>
+    <p style="color:var(--muted);font-size:.8rem;margin:18px 0 0">Source: <a href="https://www.pavanonlinetrainings.com" target="_blank" rel="noopener">pavanonlinetrainings.com</a> · <a href="https://www.youtube.com/@sdetpavan" target="_blank" rel="noopener">@sdetpavan</a></p>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz" class="card hidden">
+    <div class="topbar">
+      <span id="qCounter"></span>
+      <span id="liveScore"></span>
+    </div>
+    <div class="progress"><div id="progressFill"></div></div>
+    <span class="tag" id="qTag"></span>
+    <p class="question" id="qText"></p>
+    <pre class="code hidden" id="qCode"></pre>
+    <div class="options" id="options"></div>
+    <div id="feedback" class="feedback hidden"></div>
+    <div class="nav">
+      <button class="btn btn-ghost" id="prevBtn">&larr; Previous</button>
+      <button class="btn btn-primary" id="nextBtn">Next &rarr;</button>
+    </div>
+    <p style="color:var(--muted);font-size:.8rem;margin:14px 0 0">Tip: press <kbd>1</kbd>–<kbd>4</kbd> to answer, <kbd>Enter</kbd> for next.</p>
+  </section>
+
+  <!-- RESULTS -->
+  <section id="results" class="card hidden">
+    <h2 style="margin-top:0">Your Results</h2>
+    <p class="score-big" id="finalScore"></p>
+    <p id="finalMsg" style="margin-top:0;color:var(--muted)"></p>
+    <table>
+      <thead><tr><th>Topic</th><th>Score</th><th style="width:40%">Accuracy</th></tr></thead>
+      <tbody id="breakdown"></tbody>
+    </table>
+    <div class="row">
+      <button class="btn btn-primary" id="retryBtn">Retry Same Set</button>
+      <button class="btn btn-ghost" id="retryWrongBtn">Retry Wrong Only</button>
+      <button class="btn btn-ghost" id="homeBtn">Change Topics</button>
+    </div>
+    <div id="reviewWrap">
+      <h3 style="margin-top:28px">Review incorrect answers</h3>
+      <div id="review"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+const METHODS = ["addremove","combine","search","iterate","strmethods","immutable","chaining"];
+const LABELS = {
+  addremove: "push / pop / shift / unshift", combine: "concat / slice / splice", search: "indexOf / includes / toString",
+  iterate: "forEach / map / filter / reduce / some / every", strmethods: "String methods", immutable: "String immutability", chaining: "Chaining"
+};
+const label = m => LABELS[m];
+
+// answer = index of correct option
+const QUESTIONS = [
+  // ---------- push / pop / shift / unshift ----------
+  { m: "addremove", q: "What does the push() method do in TypeScript?",
+    o: ["Removes the last element of an array", "Adds one or more elements to the end of an array", "Adds one or more elements to the beginning of an array", "Removes the first element of an array"],
+    a: 1, e: "<code>push()</code> appends one or more elements to the <b>end</b> of the array (mutating it) and returns the new length." },
+  { m: "addremove", q: "What is the output of this expression?", c: '["a", "b"].pop()',
+    o: ['"a"', '"b"', '["a"]', '["b"]'],
+    a: 1, e: "<code>pop()</code> removes the <b>last</b> element and returns that element itself (not an array): <code>\"b\"</code>." },
+  { m: "addremove", q: "What does the shift() method do?",
+    o: ["Adds an element to the end", "Removes the first element", "Removes the last element", "Adds an element to the beginning"],
+    a: 1, e: "<code>shift()</code> removes the <b>first</b> element and returns it. Every remaining element moves down one index." },
+  { m: "addremove", q: "Which method adds an element to the beginning of an array?",
+    o: ["push()", "shift()", "pop()", "unshift()"],
+    a: 3, e: "<code>unshift()</code> inserts at the <b>start</b>. Memory trick: <code>shift</code> removes from the front, <code>unshift</code> undoes that by adding to the front." },
+  { m: "addremove", q: "Which method is best to add an item to the end of an array?",
+    o: ["push()", "unshift()", "pop()", "shift()"],
+    a: 0, e: "<code>push()</code> adds to the end. <code>unshift()</code> adds to the beginning; <code>pop()</code>/<code>shift()</code> remove." },
+  { m: "addremove", q: "How do you remove the last item of an array?",
+    o: ["shift()", "pop()", "splice()", "slice()"],
+    a: 1, e: "<code>pop()</code> is the dedicated method. <code>splice(-1, 1)</code> also works, but <code>pop()</code> is the direct answer; <code>slice()</code> never modifies the array." },
+
+  // ---------- concat / slice / splice ----------
+  { m: "combine", q: "What is the output of this expression?", c: '["a"].concat(["b", "c"])',
+    o: ['["a", ["b", "c"]]', '["a", "b", "c"]', '["a", "c", "b"]', '["b", "c", "a"]'],
+    a: 1, e: "<code>concat()</code> spreads array arguments one level and keeps the order: <code>[\"a\", \"b\", \"c\"]</code>. It returns a new array." },
+  { m: "combine", q: "The slice() method:",
+    o: ["Modifies the original array", "Returns a new array", "Deletes the selected elements", "None of the above"],
+    a: 1, e: "<code>slice()</code> is non-destructive: it copies the selected portion into a <b>new</b> array and leaves the original untouched." },
+  { m: "combine", q: "What is returned by slice(1, 3) on this array?", c: "[1, 2, 3, 4, 5].slice(1, 3)",
+    o: ["[2, 3]", "[1, 2, 3]", "[2, 3, 4]", "[3, 4]"],
+    a: 0, e: "Start index 1 is <b>included</b>, end index 3 is <b>excluded</b> → indexes 1 and 2 → <code>[2, 3]</code>." },
+  { m: "combine", q: "What does splice() do?",
+    o: ["Extracts a part of the array without modifying it", "Adds/removes items from an array", "Converts array to string", "Sorts the array"],
+    a: 1, e: "<code>splice(start, deleteCount, ...items)</code> removes and/or inserts elements <b>in place</b>. Option A describes <code>slice()</code>." },
+  { m: "combine", q: "What is the result of this expression?", c: '["a", "b", "c"].splice(1, 1)',
+    o: ['["b"]', '["a", "b", "c"]', '["a", "c"]', '["b", "c"]'],
+    a: 0, e: "<code>splice()</code> <b>returns the removed elements</b> as an array: <code>[\"b\"]</code>. The original array becomes <code>[\"a\", \"c\"]</code> — that's the trap in option C." },
+  { m: "combine", q: "What happens to the original array after calling splice()?",
+    o: ["Nothing", "It's modified", "It's reversed", "It becomes a string"],
+    a: 1, e: "<code>splice()</code> mutates the array it's called on. If you need the original intact, use <code>slice()</code> (or copy first)." },
+
+  // ---------- indexOf / includes / toString ----------
+  { m: "search", q: "What is the result of this expression?", c: '["a", "b", "c"].indexOf("b")',
+    o: ["0", "1", "2", "-1"],
+    a: 1, e: "Indexes start at 0: <code>\"a\"</code> is 0, <code>\"b\"</code> is <b>1</b>. <code>-1</code> is returned only when the item is not found." },
+  { m: "search", q: "The includes() method returns:",
+    o: ["The position of the item", "true or false", "The last element", "None"],
+    a: 1, e: "<code>includes()</code> returns a <b>boolean</b>. Use <code>indexOf()</code> when you need the position." },
+  { m: "search", q: "What does toString() return for this array?", c: "[1, 2, 3].toString()",
+    o: ["1+2+3", '"1,2,3"', "[1,2,3]", '"123"'],
+    a: 1, e: "<code>toString()</code> joins elements with commas and no spaces: <code>\"1,2,3\"</code>." },
+  { m: "search", q: "What is returned by this expression?", c: '["x", "y", "z"].includes("y")',
+    o: ["1", "true", "false", '"y"'],
+    a: 1, e: "<code>\"y\"</code> is in the array, so <code>includes()</code> returns <code>true</code>. (<code>1</code> would be what <code>indexOf</code> returns.)" },
+  { m: "search", q: "Which method converts an array to a comma-separated string?",
+    o: ["join()", "toString()", "split()", "Both A & B"],
+    a: 3, e: "<code>toString()</code> always uses commas; <code>join()</code> uses a comma by default (<code>join(\",\")</code>) but lets you pick another separator. <code>split()</code> goes the other way — string to array." },
+
+  // ---------- iteration ----------
+  { m: "iterate", q: "Which method is used to loop through every array item?",
+    o: ["map()", "forEach()", "reduce()", "indexOf()"],
+    a: 1, e: "<code>forEach()</code> runs a callback once per element and returns <code>undefined</code>. <code>map()</code> also visits every element, but its purpose is to build a new array." },
+  { m: "iterate", q: "What does map() return?",
+    o: ["A single value", "A string", "A new array", "The original array"],
+    a: 2, e: "<code>map()</code> returns a <b>new array</b> of the same length, containing each callback result." },
+  { m: "iterate", q: "Which method is used to filter array elements based on a condition?",
+    o: ["map()", "filter()", "forEach()", "reduce()"],
+    a: 1, e: "<code>filter()</code> keeps only the elements for which the callback returns <code>true</code>, in a new array." },
+  { m: "iterate", q: "What does reduce() return?",
+    o: ["A new array", "A single value", "A string", "A boolean"],
+    a: 1, e: "<code>reduce()</code> combines all elements into one accumulated value — a sum, a max, an object, anything." },
+  { m: "iterate", q: "Which method checks if ANY array element matches a condition?",
+    o: ["every()", "some()", "map()", "includes()"],
+    a: 1, e: "<code>some()</code> returns <code>true</code> as soon as one element passes. <code>includes()</code> checks for an exact value, not a condition." },
+  { m: "iterate", q: "Which method checks if ALL array elements match a condition?",
+    o: ["some()", "every()", "filter()", "find()"],
+    a: 1, e: "<code>every()</code> returns <code>true</code> only if the callback passes for every element (and stops at the first failure)." },
+  { m: "iterate", q: "How do you return only the uppercase strings from this array?", c: 'let arr = ["one", "TWO", "three"];',
+    o: ["arr.filter(x => x === x.toUpperCase())", "arr.map(x => x.toUpperCase())", "arr.forEach(x => x.toUpperCase())", "arr.includes(x => x.toUpperCase())"],
+    a: 0, e: "A string is all-uppercase if it equals its own uppercase version, so <code>filter</code> with that test returns <code>[\"TWO\"]</code>. Option B converts everything; C returns <code>undefined</code>; D compares against a function." },
+  { m: "iterate", q: "Which array method is used for accumulating a value?",
+    o: ["reduce()", "map()", "filter()", "every()"],
+    a: 0, e: "<code>reduce((acc, item) => ..., initial)</code> carries an accumulator through every element." },
+  { m: "iterate", q: 'How do you check whether ANY string in an array contains the word "error"?',
+    o: ['arr.map(x => x.includes("error"))', 'arr.some(x => x.includes("error"))', 'arr.every(x => x.includes("error"))', 'arr.find(x => x.includes("error"))'],
+    a: 1, e: "<code>some()</code> returns a single boolean. <code>map</code> gives an array of booleans, <code>every</code> requires all to match, and <code>find</code> returns the matching string (or <code>undefined</code>)." },
+
+  // ---------- string methods ----------
+  { m: "strmethods", q: "What is the output of this expression?", c: '"hello".length',
+    o: ["4", "5", "6", "length"],
+    a: 1, e: "<code>\"hello\"</code> has 5 characters. Note <code>length</code> is a property — no parentheses." },
+  { m: "strmethods", q: "What does toUpperCase() do?",
+    o: ["Converts all characters to lowercase", "Converts all characters to uppercase", "Capitalizes only the first letter", "Adds uppercase letters"],
+    a: 1, e: "<code>toUpperCase()</code> returns a new string with <b>every</b> letter in uppercase." },
+  { m: "strmethods", q: "What does this return?", c: '"WORLD".toLowerCase()',
+    o: ['"WORLD"', '"world"', "WORLD", '"World"'],
+    a: 1, e: "All letters become lowercase: <code>\"world\"</code>." },
+  { m: "strmethods", q: "What does this return?", c: '"abc".charAt(1)',
+    o: ['"a"', '"b"', '"c"', "undefined"],
+    a: 1, e: "Index 1 is the second character, <code>\"b\"</code>. (An out-of-range index returns an empty string <code>\"\"</code>, not <code>undefined</code>.)" },
+  { m: "strmethods", q: "What is returned by this expression?", c: '"hello world".indexOf("world")',
+    o: ["0", "5", "6", "-1"],
+    a: 2, e: "<code>h e l l o</code> are indexes 0–4, the space is index 5, so <code>\"world\"</code> starts at <b>6</b>. <i>Note: the original answer key lists B (5) — that is incorrect; you can verify it in any console.</i>" },
+  { m: "strmethods", q: "What does this return?", c: '"typescript".includes("script")',
+    o: ["true", "false", '"script"', "undefined"],
+    a: 0, e: "<code>\"script\"</code> is a substring of <code>\"typescript\"</code>, so the result is <code>true</code>." },
+  { m: "strmethods", q: "What does this return?", c: '"JavaScript".startsWith("Java")',
+    o: ["true", "false", '"Java"', "0"],
+    a: 0, e: "The string begins with <code>\"Java\"</code>, so <code>startsWith</code> returns <code>true</code>. It's case-sensitive." },
+  { m: "strmethods", q: "What does this return?", c: '"test.ts".endsWith(".ts")',
+    o: ["false", '".ts"', "true", "undefined"],
+    a: 2, e: "The string ends with <code>\".ts\"</code> → <code>true</code>." },
+  { m: "strmethods", q: "What does this give?", c: '"foo bar".replace("bar", "baz")',
+    o: ['"foo bar"', '"foo baz"', '"baz foo"', '"foobar"'],
+    a: 1, e: "<code>replace()</code> returns a new string with the first match replaced: <code>\"foo baz\"</code>." },
+  { m: "strmethods", q: "What does this return?", c: '"a,b,c".split(",")',
+    o: ['"a b c"', '["a", "b", "c"]', '"abc"', '["a b c"]'],
+    a: 1, e: "<code>split()</code> breaks the string at each separator and returns an <b>array</b> of the pieces." },
+  { m: "strmethods", q: "What does this return?", c: '" space ".trim()',
+    o: ['"space"', '" space"', '"space "', '" space "'],
+    a: 0, e: "<code>trim()</code> removes whitespace from <b>both</b> ends." },
+  { m: "strmethods", q: "What does this return?", c: '" start".trimStart()',
+    o: ['"start"', '" start"', '"start "', '" start "'],
+    a: 0, e: "<code>trimStart()</code> removes leading whitespace only; there is no trailing whitespace here, so the result is <code>\"start\"</code>." },
+  { m: "strmethods", q: "What does this return?", c: '"end ".trimEnd()',
+    o: ['"end"', '" end"', '"end "', '" end "'],
+    a: 0, e: "<code>trimEnd()</code> removes trailing whitespace only → <code>\"end\"</code>." },
+  { m: "strmethods", q: "What is the type of the value returned by split()?",
+    o: ["String", "Number", "Array", "Boolean"],
+    a: 2, e: "<code>split()</code> returns <code>string[]</code> — an array of strings." },
+
+  // ---------- immutability ----------
+  { m: "immutable", q: "toUpperCase() and toLowerCase():",
+    o: ["Mutate the original string", "Return new strings", "Return a boolean", "Only work on arrays"],
+    a: 1, e: "Strings are immutable, so every string method returns a <b>new</b> string. The original is unchanged." },
+  { m: "immutable", q: "What does it mean when we say strings are immutable in TypeScript?",
+    o: ["You can change characters directly", "Strings can't be deleted", "String values cannot be changed after creation", "Strings can be changed in place"],
+    a: 2, e: "Once created, a string value never changes. You can <b>reassign</b> a <code>let</code> variable to a new string, but you can't alter the existing one." },
+  { m: "immutable", q: "What is the value of s after running this code?", c: 'let s = "hi";\ns[0] = "H";',
+    o: ['"Hi"', '"hi"', '"hi" with error', '"H"'],
+    a: 1, e: "Index assignment on a string has no effect — <code>s</code> stays <code>\"hi\"</code>. Strictly speaking, the TypeScript compiler flags this line (<i>Index signature in type 'String' only permits reading</i>), and in strict-mode JavaScript it throws a TypeError — but the string itself is never changed." },
+  { m: "immutable", q: 'How can you "change" a string in TypeScript?',
+    o: ["Using replace()", "Modifying the character directly", "splice()", "split()"],
+    a: 0, e: "You create a new, modified string with a method such as <code>replace()</code> and store the result: <code>s = s.replace(\"h\", \"H\")</code>. <code>splice()</code> exists only on arrays." },
+  { m: "immutable", q: "Which of the following statements is true?",
+    o: ["Strings are mutable like arrays", "trim() modifies the original string", "String methods return new strings", "String values can be reassigned by index"],
+    a: 2, e: "Every string method returns a new string; none mutate the original." },
+  { m: "immutable", q: 'What is a correct way to convert the string "typescript" to "TypeScript"?',
+    o: ['"typescript".toUpperCase()', '"typescript".replace("typescript", "TypeScript")', 'Modify "t" to "T"', '"typescript"[0] = "T"'],
+    a: 1, e: "<code>replace()</code> returns the new string <code>\"TypeScript\"</code>. Option A gives <code>\"TYPESCRIPT\"</code>; C and D try to mutate the string, which isn't possible." },
+
+  // ---------- chaining ----------
+  { m: "chaining", q: "What does this return?", c: '"hello".split("").reverse().join("")',
+    o: ['"hello"', '"olleh"', '["h", "e", "l", "l", "o"]', "Error"],
+    a: 1, e: "<code>split(\"\")</code> → <code>[\"h\",\"e\",\"l\",\"l\",\"o\"]</code>, <code>reverse()</code> flips it, <code>join(\"\")</code> glues it back: <code>\"olleh\"</code>. This is the classic string-reverse idiom." },
+  { m: "chaining", q: "What does this return?", c: '" spaced string ".trimStart().length',
+    o: ["Same as original", "Less than original", "More than original", "Error"],
+    a: 1, e: "The leading space is removed, so the length drops from 15 to 14 — <b>less</b> than the original." },
+  { m: "chaining", q: "What does this return?", c: '"abc".toUpperCase().charAt(0)',
+    o: ['"A"', '"a"', '"ABC"', '"b"'],
+    a: 0, e: "<code>\"abc\".toUpperCase()</code> is <code>\"ABC\"</code>; its character at index 0 is <code>\"A\"</code>." },
+  { m: "chaining", q: "What does this return?", c: '" x ".trim().toUpperCase()',
+    o: ['" X "', '"X"', '" x "', '" x"'],
+    a: 1, e: "<code>trim()</code> gives <code>\"x\"</code>, then <code>toUpperCase()</code> gives <code>\"X\"</code>." },
+];
+
+// ---------- State ----------
+let selected = new Set(METHODS);
+let set = [];        // questions in current run
+let answers = [];    // chosen option index per question (or null)
+let idx = 0;
+
+const $ = id => document.getElementById(id);
+const show = id => ["start","quiz","results"].forEach(s => $(s).classList.toggle("hidden", s !== id));
+
+// ---------- Start screen ----------
+function renderChips() {
+  const chips = $("chips");
+  chips.innerHTML = "";
+  const all = document.createElement("span");
+  all.className = "chip" + (selected.size === METHODS.length ? " active" : "");
+  all.textContent = "All";
+  all.onclick = () => { selected = selected.size === METHODS.length ? new Set() : new Set(METHODS); renderChips(); };
+  chips.appendChild(all);
+  METHODS.forEach(m => {
+    const c = document.createElement("span");
+    c.className = "chip" + (selected.has(m) ? " active" : "");
+    c.textContent = label(m);
+    c.onclick = () => { selected.has(m) ? selected.delete(m) : selected.add(m); renderChips(); };
+    chips.appendChild(c);
+  });
+  const n = QUESTIONS.filter(q => selected.has(q.m)).length;
+  $("countInfo").textContent = `${n} question${n === 1 ? "" : "s"} selected`;
+  $("startBtn").disabled = n === 0;
+}
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startQuiz(questions) {
+  set = $("shuffle").checked ? shuffle(questions) : questions.slice();
+  answers = new Array(set.length).fill(null);
+  idx = 0;
+  show("quiz");
+  renderQuestion();
+}
+
+// ---------- Quiz screen ----------
+function renderQuestion() {
+  const q = set[idx];
+  const chosen = answers[idx];
+  const answeredCount = answers.filter(a => a !== null).length;
+  const correctCount = answers.filter((a, i) => a === set[i].a).length;
+
+  $("qCounter").textContent = `Question ${idx + 1} of ${set.length}`;
+  $("liveScore").textContent = `Score: ${correctCount} / ${answeredCount}`;
+  $("progressFill").style.width = `${(answeredCount / set.length) * 100}%`;
+  $("qTag").textContent = label(q.m);
+  $("qText").textContent = q.q;
+
+  const code = $("qCode");
+  if (q.c) { code.textContent = q.c; code.classList.remove("hidden"); }
+  else code.classList.add("hidden");
+
+  const opts = $("options");
+  opts.innerHTML = "";
+  q.o.forEach((text, i) => {
+    const b = document.createElement("button");
+    b.className = "option";
+    const key = document.createElement("span");
+    key.className = "key";
+    key.textContent = "ABCD"[i];
+    const lbl = document.createElement("code");
+    lbl.textContent = text;
+    b.append(key, lbl);
+    if (chosen !== null) {
+      b.disabled = true;
+      if (i === q.a) b.classList.add("correct");
+      else if (i === chosen) b.classList.add("wrong");
+    }
+    b.onclick = () => choose(i);
+    opts.appendChild(b);
+  });
+
+  const fb = $("feedback");
+  if (chosen !== null) {
+    const ok = chosen === q.a;
+    fb.className = "feedback " + (ok ? "ok" : "bad");
+    fb.innerHTML = (ok ? "<b>✅ Correct!</b> " : `<b>❌ Incorrect.</b> Correct answer: <b>${"ABCD"[q.a]}</b>. `) + q.e;
+  } else {
+    fb.className = "feedback hidden";
+  }
+
+  $("prevBtn").disabled = idx === 0;
+  $("nextBtn").disabled = chosen === null;
+  $("nextBtn").innerHTML = idx === set.length - 1 ? "See Results" : "Next &rarr;";
+}
+
+function choose(i) {
+  if (answers[idx] !== null || i >= set[idx].o.length) return;
+  answers[idx] = i;
+  renderQuestion();
+}
+
+function next() {
+  if (answers[idx] === null) return;
+  if (idx < set.length - 1) { idx++; renderQuestion(); }
+  else renderResults();
+}
+
+// ---------- Results ----------
+function renderResults() {
+  show("results");
+  const correct = answers.filter((a, i) => a === set[i].a).length;
+  const pct = Math.round((correct / set.length) * 100);
+  $("finalScore").textContent = `${correct} / ${set.length}  (${pct}%)`;
+  $("finalMsg").textContent =
+    pct === 100 ? "Perfect score! You've mastered this topic. 🏆" :
+    pct >= 80 ? "Great job! Just a few to polish up. 🎉" :
+    pct >= 50 ? "Good effort — review the explanations below and retry. 💪" :
+    "Keep practicing — revisit the notes and try again. 📘";
+
+  const tbody = $("breakdown");
+  tbody.innerHTML = "";
+  METHODS.forEach(m => {
+    const qs = set.map((q, i) => ({ q, i })).filter(x => x.q.m === m);
+    if (!qs.length) return;
+    const ok = qs.filter(x => answers[x.i] === x.q.a).length;
+    const p = Math.round((ok / qs.length) * 100);
+    const color = p === 100 ? "var(--ok)" : p >= 50 ? "#f59f00" : "var(--bad)";
+    tbody.insertAdjacentHTML("beforeend",
+      `<tr><td class="m">${label(m)}</td><td>${ok} / ${qs.length}</td>
+       <td><div class="bar"><div style="width:${p}%;background:${color}"></div></div></td></tr>`);
+  });
+
+  const review = $("review");
+  review.innerHTML = "";
+  const wrong = set.map((q, i) => ({ q, i })).filter(x => answers[x.i] !== x.q.a);
+  $("reviewWrap").classList.toggle("hidden", wrong.length === 0);
+  $("retryWrongBtn").classList.toggle("hidden", wrong.length === 0);
+  wrong.forEach(({ q, i }) => {
+    const div = document.createElement("div");
+    div.className = "review-item";
+    const title = document.createElement("div");
+    title.innerHTML = `<span class="tag">${label(q.m)}</span>`;
+    const qt = document.createElement("p");
+    qt.className = "question"; qt.style.fontSize = "1rem"; qt.textContent = q.q;
+    div.append(title, qt);
+    if (q.c) { const pre = document.createElement("pre"); pre.className = "code"; pre.textContent = q.c; div.appendChild(pre); }
+    const yours = document.createElement("div");
+    yours.className = "yours"; yours.textContent = `Your answer: ${q.o[answers[i]]}`;
+    const right = document.createElement("div");
+    right.className = "right"; right.textContent = `Correct answer: ${q.o[q.a]}`;
+    const exp = document.createElement("div");
+    exp.className = "feedback ok"; exp.innerHTML = q.e;
+    div.append(yours, right, exp);
+    review.appendChild(div);
+  });
+}
+
+// ---------- Events ----------
+$("startBtn").onclick = () => startQuiz(QUESTIONS.filter(q => selected.has(q.m)));
+$("prevBtn").onclick = () => { if (idx > 0) { idx--; renderQuestion(); } };
+$("nextBtn").onclick = next;
+$("retryBtn").onclick = () => startQuiz(set);
+$("retryWrongBtn").onclick = () => startQuiz(set.filter((q, i) => answers[i] !== q.a));
+$("homeBtn").onclick = () => { show("start"); renderChips(); };
+
+document.addEventListener("keydown", e => {
+  if ($("quiz").classList.contains("hidden")) return;
+  if (["1","2","3","4"].includes(e.key)) choose(Number(e.key) - 1);
+  else if (e.key === "Enter") next();
+  else if (e.key === "ArrowLeft" && idx > 0) { idx--; renderQuestion(); }
+  else if (e.key === "ArrowRight") next();
+});
+
+renderChips();
+</script>
+</body>
+</html>
