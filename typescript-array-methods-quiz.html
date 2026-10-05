@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TypeScript Array Methods – MCQ Quiz (1–10)</title>
+<style>
+  :root {
+    --bg: #f4f6fb; --card: #fff; --text: #1e2333; --muted: #6b7280;
+    --primary: #3b5bdb; --primary-light: #e7ecff;
+    --ok: #2f9e44; --ok-bg: #ebfbee; --bad: #e03131; --bad-bg: #fff5f5;
+    --code-bg: #1e1e2e; --code-text: #e4e4f0; --border: #dde2ee;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.5;
+  }
+  .wrap { max-width: 820px; margin: 0 auto; padding: 24px 16px 48px; }
+  header h1 { margin: 0 0 4px; font-size: 1.6rem; }
+  header p { margin: 0 0 20px; color: var(--muted); }
+  .card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+    padding: 24px; box-shadow: 0 2px 10px rgba(30, 35, 51, .05);
+  }
+  .hidden { display: none !important; }
+
+  /* Start screen */
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 20px; }
+  .chip {
+    border: 1px solid var(--border); background: #fff; border-radius: 999px;
+    padding: 6px 14px; cursor: pointer; font-family: Consolas, monospace; font-size: .9rem;
+    user-select: none; transition: all .15s;
+  }
+  .chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  label.check { display: flex; gap: 6px; align-items: center; cursor: pointer; color: var(--muted); }
+
+  button.btn {
+    border: none; border-radius: 10px; padding: 10px 20px; font-size: 1rem;
+    cursor: pointer; font-weight: 600; transition: opacity .15s, transform .05s;
+  }
+  button.btn:active { transform: scale(.98); }
+  button.btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-ghost { background: var(--primary-light); color: var(--primary); }
+
+  /* Quiz screen */
+  .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: .9rem; color: var(--muted); }
+  .progress { height: 8px; background: var(--primary-light); border-radius: 99px; overflow: hidden; margin-bottom: 20px; }
+  .progress > div { height: 100%; background: var(--primary); width: 0; transition: width .3s; }
+  .tag {
+    display: inline-block; background: var(--primary-light); color: var(--primary);
+    font-family: Consolas, monospace; font-size: .85rem; padding: 2px 10px; border-radius: 6px; margin-bottom: 10px;
+  }
+  .question { font-size: 1.1rem; font-weight: 600; margin: 0 0 12px; }
+  pre.code {
+    background: var(--code-bg); color: var(--code-text); padding: 14px 16px; border-radius: 10px;
+    overflow-x: auto; font-family: Consolas, "Courier New", monospace; font-size: .92rem; margin: 0 0 16px;
+  }
+  .options { display: grid; gap: 10px; }
+  .option {
+    display: flex; gap: 12px; align-items: flex-start; text-align: left;
+    border: 2px solid var(--border); background: #fff; border-radius: 10px; padding: 12px 14px;
+    cursor: pointer; font-size: .98rem; color: var(--text); transition: border-color .15s, background .15s;
+  }
+  .option:hover:not(:disabled) { border-color: var(--primary); background: #fafbff; }
+  .option:disabled { cursor: default; }
+  .option .key {
+    flex: 0 0 26px; height: 26px; border-radius: 50%; background: var(--primary-light); color: var(--primary);
+    display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .85rem;
+  }
+  .option code { font-family: Consolas, monospace; }
+  .option.correct { border-color: var(--ok); background: var(--ok-bg); }
+  .option.correct .key { background: var(--ok); color: #fff; }
+  .option.wrong { border-color: var(--bad); background: var(--bad-bg); }
+  .option.wrong .key { background: var(--bad); color: #fff; }
+  .feedback { margin-top: 16px; padding: 12px 14px; border-radius: 10px; font-size: .95rem; }
+  .feedback.ok { background: var(--ok-bg); border-left: 4px solid var(--ok); }
+  .feedback.bad { background: var(--bad-bg); border-left: 4px solid var(--bad); }
+  .feedback code { font-family: Consolas, monospace; background: rgba(0,0,0,.06); padding: 0 4px; border-radius: 4px; }
+  .nav { display: flex; justify-content: space-between; margin-top: 20px; }
+
+  /* Results */
+  .score-big { font-size: 3rem; font-weight: 800; margin: 0; color: var(--primary); }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: .95rem; }
+  th, td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; }
+  th { color: var(--muted); font-weight: 600; }
+  td.m { font-family: Consolas, monospace; }
+  .bar { height: 8px; border-radius: 99px; background: #eee; overflow: hidden; min-width: 80px; }
+  .bar > div { height: 100%; }
+  .review-item { border-top: 1px solid var(--border); padding: 14px 0; }
+  .review-item .yours { color: var(--bad); }
+  .review-item .right { color: var(--ok); }
+  .review-item pre.code { margin-top: 8px; font-size: .85rem; }
+  kbd { background: #eee; border-radius: 4px; padding: 0 5px; font-size: .8rem; border: 1px solid #ccc; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>TypeScript Array Methods Quiz</h1>
+    <p>Multiple-choice practice for: push, pop, shift, unshift, concat, slice, splice, indexOf, includes, toString</p>
+  </header>
+
+  <!-- START -->
+  <section id="start" class="card">
+    <h2 style="margin-top:0">Choose methods to practice</h2>
+    <div class="chips" id="chips"></div>
+    <div class="row" style="margin-bottom:20px">
+      <label class="check"><input type="checkbox" id="shuffle" checked> Shuffle questions</label>
+      <span id="countInfo" style="color:var(--muted)"></span>
+    </div>
+    <button class="btn btn-primary" id="startBtn">Start Quiz</button>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz" class="card hidden">
+    <div class="topbar">
+      <span id="qCounter"></span>
+      <span id="liveScore"></span>
+    </div>
+    <div class="progress"><div id="progressFill"></div></div>
+    <span class="tag" id="qTag"></span>
+    <p class="question" id="qText"></p>
+    <pre class="code hidden" id="qCode"></pre>
+    <div class="options" id="options"></div>
+    <div id="feedback" class="feedback hidden"></div>
+    <div class="nav">
+      <button class="btn btn-ghost" id="prevBtn">&larr; Previous</button>
+      <button class="btn btn-primary" id="nextBtn">Next &rarr;</button>
+    </div>
+    <p style="color:var(--muted);font-size:.8rem;margin:14px 0 0">Tip: press <kbd>1</kbd>–<kbd>4</kbd> to answer, <kbd>Enter</kbd> for next.</p>
+  </section>
+
+  <!-- RESULTS -->
+  <section id="results" class="card hidden">
+    <h2 style="margin-top:0">Your Results</h2>
+    <p class="score-big" id="finalScore"></p>
+    <p id="finalMsg" style="margin-top:0;color:var(--muted)"></p>
+    <table>
+      <thead><tr><th>Method</th><th>Score</th><th style="width:40%">Accuracy</th></tr></thead>
+      <tbody id="breakdown"></tbody>
+    </table>
+    <div class="row">
+      <button class="btn btn-primary" id="retryBtn">Retry Same Set</button>
+      <button class="btn btn-ghost" id="retryWrongBtn">Retry Wrong Only</button>
+      <button class="btn btn-ghost" id="homeBtn">Change Methods</button>
+    </div>
+    <div id="reviewWrap">
+      <h3 style="margin-top:28px">Review incorrect answers</h3>
+      <div id="review"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+const METHODS = ["push","pop","shift","unshift","concat","slice","splice","indexOf","includes","toString"];
+
+// answer = index of correct option
+const QUESTIONS = [
+  // ---------- push ----------
+  { m: "push", q: "What does push() do?",
+    o: ["Adds elements to the beginning of an array", "Adds one or more elements to the end of an array",
+        "Removes the last element of an array", "Creates a new array with added elements"],
+    a: 1, e: "push() appends one or more elements to the <b>end</b> of the array and mutates the original array." },
+  { m: "push", q: "What is logged to the console?",
+    c: "let numbers = [1, 2, 3];\nnumbers.push(4, 5);\nconsole.log(numbers);",
+    o: ["[1, 2, 3]", "[4, 5, 1, 2, 3]", "[1, 2, 3, 4, 5]", "[1, 2, 3, [4, 5]]"],
+    a: 2, e: "Each argument passed to push() is added individually to the end, giving <code>[1, 2, 3, 4, 5]</code>." },
+  { m: "push", q: "What does push() return?",
+    c: "let numbers = [1, 2, 3];\nlet result = numbers.push(4, 5);\nconsole.log(result);",
+    o: ["[1, 2, 3, 4, 5]", "5", "4", "undefined"],
+    a: 1, e: "push() returns the <b>new length</b> of the array, not the array itself. The length is now 5." },
+
+  // ---------- pop ----------
+  { m: "pop", q: "What is the value of lastFruit?",
+    c: "let fruits = ['apple', 'banana', 'mango'];\nlet lastFruit = fruits.pop();",
+    o: ["'apple'", "['apple', 'banana']", "'mango'", "3"],
+    a: 2, e: "pop() removes the <b>last</b> element and returns it — here <code>'mango'</code>." },
+  { m: "pop", q: "What is the value of fruits after this code runs?",
+    c: "let fruits = ['apple', 'banana', 'mango'];\nfruits.pop();",
+    o: ["['apple', 'banana', 'mango']", "['banana', 'mango']", "['apple', 'banana']", "['mango']"],
+    a: 2, e: "pop() mutates the original array, so the last element is gone: <code>['apple', 'banana']</code>." },
+  { m: "pop", q: "What does pop() return when called on an empty array?",
+    c: "let empty: number[] = [];\nconsole.log(empty.pop());",
+    o: ["null", "0", "It throws an error", "undefined"],
+    a: 3, e: "Calling pop() on an empty array returns <code>undefined</code> and leaves the array unchanged." },
+
+  // ---------- shift ----------
+  { m: "shift", q: "What does shift() do?",
+    o: ["Removes the first element and returns it", "Removes the last element and returns it",
+        "Adds an element to the beginning", "Moves every element one index to the right"],
+    a: 0, e: "shift() removes the <b>first</b> element of the array and returns it. Remaining elements move down one index." },
+  { m: "shift", q: "What is logged to the console?",
+    c: "let numbers = [1, 2, 3];\nlet first = numbers.shift();\nconsole.log(numbers, first);",
+    o: ["[1, 2] 3", "[2, 3] 1", "[1, 2, 3] 1", "[2, 3] [1]"],
+    a: 1, e: "shift() removes <code>1</code> from the front and returns it, leaving <code>[2, 3]</code>." },
+  { m: "shift", q: "Which pair of methods works on the START of an array?",
+    o: ["push() and pop()", "pop() and shift()", "shift() and unshift()", "push() and unshift()"],
+    a: 2, e: "shift() removes from the start and unshift() adds to the start. push()/pop() work on the end." },
+
+  // ---------- unshift ----------
+  { m: "unshift", q: "What is logged to the console?",
+    c: "let fruits = ['banana', 'orange'];\nfruits.unshift('apple');\nconsole.log(fruits);",
+    o: ["['banana', 'orange', 'apple']", "['apple']", "['apple', 'banana', 'orange']", "['banana', 'apple', 'orange']"],
+    a: 2, e: "unshift() adds elements to the <b>beginning</b> of the array." },
+  { m: "unshift", q: "What is logged when multiple elements are passed?",
+    c: "let nums = [3];\nnums.unshift(1, 2);\nconsole.log(nums);",
+    o: ["[2, 1, 3]", "[1, 2, 3]", "[3, 1, 2]", "[3, 2, 1]"],
+    a: 1, e: "All arguments are inserted together at the front, in the same order they were passed: <code>[1, 2, 3]</code>." },
+  { m: "unshift", q: "What does unshift() return?",
+    c: "let nums = [2, 3];\nlet r = nums.unshift(0, 1);\nconsole.log(r);",
+    o: ["[0, 1, 2, 3]", "0", "4", "undefined"],
+    a: 2, e: "Like push(), unshift() returns the <b>new length</b> of the array — 4." },
+
+  // ---------- concat ----------
+  { m: "concat", q: "What is logged to the console?",
+    c: "let a = [1, 2];\nlet b = [3, 4];\nlet result = a.concat(b);\nconsole.log(result);",
+    o: ["[1, 2, [3, 4]]", "[3, 4, 1, 2]", "[1, 2, 3, 4]", "10"],
+    a: 2, e: "concat() merges the arrays into a single new array: <code>[1, 2, 3, 4]</code>." },
+  { m: "concat", q: "What is the value of a after the concat() call?",
+    c: "let a = [1, 2];\nlet b = [3, 4];\nlet result = a.concat(b);\nconsole.log(a);",
+    o: ["[1, 2]", "[1, 2, 3, 4]", "[3, 4]", "[]"],
+    a: 0, e: "concat() does <b>not</b> modify the original array — it returns a new one. <code>a</code> stays <code>[1, 2]</code>." },
+  { m: "concat", q: "What is logged to the console?",
+    c: "let x = [1];\nconsole.log(x.concat(2, [3, [4]]));",
+    o: ["[1, 2, 3, 4]", "[1, 2, [3, [4]]]", "[1, 2, 3, [4]]", "[1, [2], [3, [4]]]"],
+    a: 2, e: "concat() accepts plain values and arrays. Array arguments are flattened only <b>one level</b>, so the nested <code>[4]</code> stays an array." },
+
+  // ---------- slice ----------
+  { m: "slice", q: "What is logged to the console?",
+    c: "let fruits = ['kiwi', 'apple', 'banana', 'mango'];\nlet selected = fruits.slice(1, 3);\nconsole.log(selected);",
+    o: ["['apple', 'banana', 'mango']", "['kiwi', 'apple', 'banana']", "['apple', 'banana']", "['banana', 'mango']"],
+    a: 2, e: "slice(1, 3) takes indexes 1 and 2. The <b>endIndex is exclusive</b>, so index 3 ('mango') is not included." },
+  { m: "slice", q: "Which statement about slice() is TRUE?",
+    o: ["It removes the selected elements from the original array", "It returns a new array and does not modify the original",
+        "Its endIndex is inclusive", "It can only be used with positive indexes"],
+    a: 1, e: "slice() is non-mutating: it returns a shallow copy of the selected section and leaves the original untouched." },
+  { m: "slice", q: "What is logged to the console?",
+    c: "let nums = [10, 20, 30, 40, 50];\nconsole.log(nums.slice(-2));",
+    o: ["[10, 20]", "[40, 50]", "[30, 40, 50]", "[50]"],
+    a: 1, e: "A negative index counts from the end. <code>slice(-2)</code> returns the last two elements: <code>[40, 50]</code>." },
+
+  // ---------- splice ----------
+  { m: "splice", q: "What is logged to the console?",
+    c: "let fruits = ['apple', 'banana', 'cherry'];\nfruits.splice(1, 1);\nconsole.log(fruits);",
+    o: ["['banana']", "['apple', 'cherry']", "['apple', 'banana']", "['cherry']"],
+    a: 1, e: "splice(1, 1) starts at index 1 and deletes 1 element ('banana'). splice() mutates the original array." },
+  { m: "splice", q: "What is logged to the console?",
+    c: "let fruits = ['apple', 'cherry'];\nfruits.splice(1, 0, 'orange');\nconsole.log(fruits);",
+    o: ["['apple', 'orange']", "['orange', 'apple', 'cherry']", "['apple', 'cherry', 'orange']", "['apple', 'orange', 'cherry']"],
+    a: 3, e: "With deleteCount = 0, nothing is removed — 'orange' is inserted at index 1." },
+  { m: "splice", q: "What does splice() return here?",
+    c: "let nums = [10, 20, 30, 40];\nlet removed = nums.splice(1, 2);\nconsole.log(removed);",
+    o: ["[10, 40]", "[20, 30]", "[20]", "2"],
+    a: 1, e: "splice() returns an array of the <b>removed</b> elements. Starting at index 1, it removed 2 items: <code>[20, 30]</code>. <code>nums</code> becomes <code>[10, 40]</code>." },
+
+  // ---------- indexOf ----------
+  { m: "indexOf", q: "What is logged to the console?",
+    c: "let fruits = ['apple', 'banana', 'cherry'];\nconsole.log(fruits.indexOf('banana'));",
+    o: ["0", "1", "2", "true"],
+    a: 1, e: "Arrays are zero-indexed. 'banana' is at index <code>1</code>." },
+  { m: "indexOf", q: "What does indexOf() return when the value is NOT found?",
+    c: "let fruits = ['apple', 'banana', 'cherry'];\nconsole.log(fruits.indexOf('grape'));",
+    o: ["undefined", "null", "false", "-1"],
+    a: 3, e: "indexOf() returns <code>-1</code> when the value isn't present in the array." },
+  { m: "indexOf", q: "What is logged to the console (using fromIndex)?",
+    c: "let nums = [1, 2, 3, 2, 1];\nconsole.log(nums.indexOf(2, 2));",
+    o: ["1", "2", "3", "-1"],
+    a: 2, e: "The search starts at index 2, so the first 2 (at index 1) is skipped. The next 2 is at index <code>3</code>." },
+
+  // ---------- includes ----------
+  { m: "includes", q: "What is logged to the console?",
+    c: "let fruits = ['apple', 'banana'];\nconsole.log(fruits.includes('banana'));\nconsole.log(fruits.includes('grape'));",
+    o: ["1 and -1", "true and false", "'banana' and undefined", "true and undefined"],
+    a: 1, e: "includes() always returns a boolean: <code>true</code> if found, <code>false</code> otherwise." },
+  { m: "includes", q: "What is logged to the console?",
+    c: "let nums = [1, 2, 3];\nconsole.log(nums.includes(1, 1));",
+    o: ["true", "false", "1", "-1"],
+    a: 1, e: "The second argument is fromIndex. Searching starts at index 1, so the <code>1</code> at index 0 isn't checked → <code>false</code>." },
+  { m: "includes", q: "What is logged to the console?",
+    c: "let values = [NaN];\nconsole.log(values.includes(NaN), values.indexOf(NaN));",
+    o: ["true 0", "false -1", "true -1", "false 0"],
+    a: 2, e: "includes() can detect <code>NaN</code>, but indexOf() uses strict equality (<code>NaN !== NaN</code>), so it returns <code>-1</code>." },
+
+  // ---------- toString ----------
+  { m: "toString", q: "What is logged to the console?",
+    c: "let numbers = [1, 2, 3];\nconsole.log(numbers.toString());",
+    o: ["'[1, 2, 3]'", "'1 2 3'", "'1,2,3'", "'123'"],
+    a: 2, e: "toString() joins the elements with commas and no spaces: <code>'1,2,3'</code>." },
+  { m: "toString", q: "What is logged to the console?",
+    c: "let numbers = [1, 2, 3];\nconsole.log(typeof numbers.toString());",
+    o: ["'object'", "'array'", "'string'", "'number'"],
+    a: 2, e: "toString() converts the array into a <code>string</code>." },
+  { m: "toString", q: "What is logged to the console?",
+    c: "let nested = [1, [2, 3], 4];\nconsole.log(nested.toString());",
+    o: ["'1,[2,3],4'", "'1,2,3,4'", "'1,2 3,4'", "It throws an error"],
+    a: 1, e: "Nested arrays are converted to strings too, so everything is flattened into one comma-separated string: <code>'1,2,3,4'</code>." },
+];
+
+// ---------- State ----------
+let selected = new Set(METHODS);
+let set = [];        // questions in current run
+let answers = [];    // chosen option index per question (or null)
+let idx = 0;
+
+const $ = id => document.getElementById(id);
+const show = id => ["start","quiz","results"].forEach(s => $(s).classList.toggle("hidden", s !== id));
+
+// ---------- Start screen ----------
+function renderChips() {
+  const chips = $("chips");
+  chips.innerHTML = "";
+  const all = document.createElement("span");
+  all.className = "chip" + (selected.size === METHODS.length ? " active" : "");
+  all.textContent = "All";
+  all.onclick = () => { selected = selected.size === METHODS.length ? new Set() : new Set(METHODS); renderChips(); };
+  chips.appendChild(all);
+  METHODS.forEach((m, i) => {
+    const c = document.createElement("span");
+    c.className = "chip" + (selected.has(m) ? " active" : "");
+    c.textContent = `${i + 1}. ${m}()`;
+    c.onclick = () => { selected.has(m) ? selected.delete(m) : selected.add(m); renderChips(); };
+    chips.appendChild(c);
+  });
+  const n = QUESTIONS.filter(q => selected.has(q.m)).length;
+  $("countInfo").textContent = `${n} question${n === 1 ? "" : "s"} selected`;
+  $("startBtn").disabled = n === 0;
+}
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startQuiz(questions) {
+  set = $("shuffle").checked ? shuffle(questions) : questions.slice();
+  answers = new Array(set.length).fill(null);
+  idx = 0;
+  show("quiz");
+  renderQuestion();
+}
+
+// ---------- Quiz screen ----------
+function renderQuestion() {
+  const q = set[idx];
+  const chosen = answers[idx];
+  const answeredCount = answers.filter(a => a !== null).length;
+  const correctCount = answers.filter((a, i) => a === set[i].a).length;
+
+  $("qCounter").textContent = `Question ${idx + 1} of ${set.length}`;
+  $("liveScore").textContent = `Score: ${correctCount} / ${answeredCount}`;
+  $("progressFill").style.width = `${(answeredCount / set.length) * 100}%`;
+  $("qTag").textContent = `${METHODS.indexOf(q.m) + 1}. ${q.m}()`;
+  $("qText").textContent = q.q;
+
+  const code = $("qCode");
+  if (q.c) { code.textContent = q.c; code.classList.remove("hidden"); }
+  else code.classList.add("hidden");
+
+  const opts = $("options");
+  opts.innerHTML = "";
+  q.o.forEach((text, i) => {
+    const b = document.createElement("button");
+    b.className = "option";
+    const key = document.createElement("span");
+    key.className = "key";
+    key.textContent = "ABCD"[i];
+    const label = document.createElement("code");
+    label.textContent = text;
+    b.append(key, label);
+    if (chosen !== null) {
+      b.disabled = true;
+      if (i === q.a) b.classList.add("correct");
+      else if (i === chosen) b.classList.add("wrong");
+    }
+    b.onclick = () => choose(i);
+    opts.appendChild(b);
+  });
+
+  const fb = $("feedback");
+  if (chosen !== null) {
+    const ok = chosen === q.a;
+    fb.className = "feedback " + (ok ? "ok" : "bad");
+    fb.innerHTML = (ok ? "<b>✅ Correct!</b> " : `<b>❌ Incorrect.</b> Correct answer: <b>${"ABCD"[q.a]}</b>. `) + q.e;
+  } else {
+    fb.className = "feedback hidden";
+  }
+
+  $("prevBtn").disabled = idx === 0;
+  $("nextBtn").disabled = chosen === null;
+  $("nextBtn").innerHTML = idx === set.length - 1 ? "See Results" : "Next &rarr;";
+}
+
+function choose(i) {
+  if (answers[idx] !== null) return;
+  answers[idx] = i;
+  renderQuestion();
+}
+
+function next() {
+  if (answers[idx] === null) return;
+  if (idx < set.length - 1) { idx++; renderQuestion(); }
+  else renderResults();
+}
+
+// ---------- Results ----------
+function renderResults() {
+  show("results");
+  const correct = answers.filter((a, i) => a === set[i].a).length;
+  const pct = Math.round((correct / set.length) * 100);
+  $("finalScore").textContent = `${correct} / ${set.length}  (${pct}%)`;
+  $("finalMsg").textContent =
+    pct === 100 ? "Perfect score! You've mastered these methods. 🏆" :
+    pct >= 80 ? "Great job! Just a few to polish up. 🎉" :
+    pct >= 50 ? "Good effort — review the explanations below and retry. 💪" :
+    "Keep practicing — revisit the notes and try again. 📘";
+
+  const tbody = $("breakdown");
+  tbody.innerHTML = "";
+  METHODS.forEach(m => {
+    const qs = set.map((q, i) => ({ q, i })).filter(x => x.q.m === m);
+    if (!qs.length) return;
+    const ok = qs.filter(x => answers[x.i] === x.q.a).length;
+    const p = Math.round((ok / qs.length) * 100);
+    const color = p === 100 ? "var(--ok)" : p >= 50 ? "#f59f00" : "var(--bad)";
+    tbody.insertAdjacentHTML("beforeend",
+      `<tr><td class="m">${m}()</td><td>${ok} / ${qs.length}</td>
+       <td><div class="bar"><div style="width:${p}%;background:${color}"></div></div></td></tr>`);
+  });
+
+  const review = $("review");
+  review.innerHTML = "";
+  const wrong = set.map((q, i) => ({ q, i })).filter(x => answers[x.i] !== x.q.a);
+  $("reviewWrap").classList.toggle("hidden", wrong.length === 0);
+  $("retryWrongBtn").classList.toggle("hidden", wrong.length === 0);
+  wrong.forEach(({ q, i }) => {
+    const div = document.createElement("div");
+    div.className = "review-item";
+    const title = document.createElement("div");
+    title.innerHTML = `<span class="tag">${q.m}()</span>`;
+    const qt = document.createElement("p");
+    qt.className = "question"; qt.style.fontSize = "1rem"; qt.textContent = q.q;
+    div.append(title, qt);
+    if (q.c) { const pre = document.createElement("pre"); pre.className = "code"; pre.textContent = q.c; div.appendChild(pre); }
+    const yours = document.createElement("div");
+    yours.className = "yours"; yours.textContent = `Your answer: ${q.o[answers[i]]}`;
+    const right = document.createElement("div");
+    right.className = "right"; right.textContent = `Correct answer: ${q.o[q.a]}`;
+    const exp = document.createElement("div");
+    exp.className = "feedback ok"; exp.innerHTML = q.e;
+    div.append(yours, right, exp);
+    review.appendChild(div);
+  });
+}
+
+// ---------- Events ----------
+$("startBtn").onclick = () => startQuiz(QUESTIONS.filter(q => selected.has(q.m)));
+$("prevBtn").onclick = () => { if (idx > 0) { idx--; renderQuestion(); } };
+$("nextBtn").onclick = next;
+$("retryBtn").onclick = () => startQuiz(set);
+$("retryWrongBtn").onclick = () => startQuiz(set.filter((q, i) => answers[i] !== q.a));
+$("homeBtn").onclick = () => { show("start"); renderChips(); };
+
+document.addEventListener("keydown", e => {
+  if ($("quiz").classList.contains("hidden")) return;
+  if (["1","2","3","4"].includes(e.key)) choose(Number(e.key) - 1);
+  else if (e.key === "Enter") next();
+  else if (e.key === "ArrowLeft" && idx > 0) { idx--; renderQuestion(); }
+  else if (e.key === "ArrowRight") next();
+});
+
+renderChips();
+</script>
+</body>
+</html>
