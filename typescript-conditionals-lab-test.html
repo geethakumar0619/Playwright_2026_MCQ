@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TypeScript Lab Test — Conditional Statements (auto-graded)</title>
+<style>
+  :root {
+    --bg: #fbfbfa; --surface: #fff; --surface-2: #f4f4f2; --border: #e4e4e0;
+    --text: #1f1f1d; --dim: #6b6b66;
+    --accent: #2f6f4f; --accent-soft: #eaf3ed;
+    --ok-bg: #e7f4ec; --ok-br: #7fba97; --ok-tx: #1c5c38;
+    --no-bg: #fbeaea; --no-br: #d99b9b; --no-tx: #8d2b2b;
+    --warn-bg: #fdf3e3; --warn-br: #dfc08a; --warn-tx: #8a5a15;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17181a; --surface: #1e2022; --surface-2: #24262a; --border: #33363a;
+      --text: #e8e8e6; --dim: #9a9a96;
+      --accent: #7fc4a0; --accent-soft: #22302a;
+      --ok-bg: #1b2f23; --ok-br: #3f7a57; --ok-tx: #8fd5aa;
+      --no-bg: #331d1d; --no-br: #7a4040; --no-tx: #e69b9b;
+      --warn-bg: #332a18; --warn-br: #6b5527; --warn-tx: #d6a55f;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 92px; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.62 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  header.top {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    backdrop-filter: blur(10px); border-bottom: 1px solid var(--border);
+  }
+  .top-inner {
+    max-width: 1120px; margin: 0 auto; padding: 11px 24px;
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  }
+  .brand { font-weight: 650; font-size: 15px; letter-spacing: -.01em; }
+  .brand span { color: var(--dim); font-weight: 400; }
+  .scoreboard { display: flex; gap: 8px; margin-left: auto; align-items: center; flex-wrap: wrap; }
+  .stat {
+    font-size: 12.5px; padding: 4px 11px; border-radius: 999px;
+    background: var(--surface); border: 1px solid var(--border); color: var(--dim); white-space: nowrap;
+  }
+  .stat b { color: var(--text); font-weight: 650; font-variant-numeric: tabular-nums; }
+  .stat.good b { color: var(--ok-tx); }
+  a.ctl, button.ctl {
+    font: inherit; font-size: 12.5px; font-weight: 600; padding: 6px 13px;
+    border-radius: 7px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text); cursor: pointer; text-decoration: none;
+  }
+  a.ctl:hover, button.ctl:hover { background: var(--surface-2); border-color: var(--dim); }
+  button.ctl.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  @media (prefers-color-scheme: dark) { button.ctl.primary { color: #10201a; } }
+  button.ctl.primary:hover { filter: brightness(1.08); }
+  .toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--dim); cursor: pointer; user-select: none; }
+  .toggle input { accent-color: var(--accent); cursor: pointer; }
+  .progress-wrap { height: 3px; background: var(--border); }
+  .progress-bar { height: 100%; width: 0; background: var(--accent); transition: width .25s; }
+
+  .shell { max-width: 1120px; margin: 0 auto; padding: 0 24px 90px; display: flex; gap: 34px; }
+  nav.toc { width: 218px; flex: none; position: sticky; top: 76px; align-self: flex-start; padding-top: 30px; max-height: calc(100vh - 110px); overflow-y: auto; }
+  nav.toc h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .09em; color: var(--dim); margin: 0 0 8px; }
+  nav.toc h2:not(:first-child) { margin-top: 14px; }
+  nav.toc a {
+    display: flex; gap: 8px; align-items: baseline;
+    padding: 5px 9px; margin-bottom: 1px; border-radius: 6px; font-size: 13px;
+    color: var(--dim); text-decoration: none; border-left: 2px solid transparent;
+  }
+  nav.toc a:hover { background: var(--surface-2); color: var(--text); }
+  nav.toc a .dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--border); margin-top: 6px; }
+  nav.toc a.done .dot { background: var(--ok-br); }
+  nav.toc a.bad .dot { background: var(--no-br); }
+  nav.toc a .tt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  main { flex: 1; min-width: 0; padding-top: 30px; }
+
+  .hero { margin-bottom: 26px; }
+  .hero h1 { font-size: 28px; line-height: 1.24; margin: 0 0 10px; letter-spacing: -.02em; }
+  .hero .sub { color: var(--dim); font-size: 15px; margin: 0 0 16px; max-width: 66ch; }
+  .chips { display: flex; gap: 9px; flex-wrap: wrap; margin-bottom: 16px; }
+  .chip { font-size: 12.5px; padding: 5px 11px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); color: var(--dim); }
+  .chip b { color: var(--text); font-weight: 650; }
+
+  .howto {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 3px solid var(--warn-br); border-radius: 10px; padding: 14px 18px; font-size: 14.5px; margin-bottom: 12px;
+  }
+  .howto h3 { margin: 0 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .07em; color: var(--warn-tx); }
+  .howto ul { margin: 0; padding-left: 20px; color: var(--dim); }
+  .howto li { margin-bottom: 5px; }
+  .howto li:last-child { margin-bottom: 0; }
+  .howto strong { color: var(--text); }
+  .credit {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent); border-radius: 10px; padding: 13px 17px; font-size: 14px; color: var(--dim); margin-bottom: 26px;
+  }
+  .credit a { color: var(--accent); text-decoration: none; font-weight: 550; }
+  .credit p { margin: 0 0 5px; }
+  .credit p:last-child { margin: 0; }
+
+  section.grp { margin-bottom: 40px; }
+  .grp-head { display: flex; align-items: baseline; gap: 12px; padding-bottom: 9px; border-bottom: 2px solid var(--border); margin-bottom: 18px; }
+  .grp-head h2 { font-size: 19.5px; margin: 0; letter-spacing: -.015em; }
+  .grp-head h2 code { font-size: .88em; }
+  .grp-head .n { font-size: 13px; color: var(--dim); margin-left: auto; white-space: nowrap; }
+
+  .task {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 11px;
+    padding: 18px 20px; margin-bottom: 16px; scroll-margin-top: 92px;
+  }
+  .task.pass { border-color: var(--ok-br); }
+  .task.fail { border-color: var(--no-br); }
+  .t-head { display: flex; gap: 11px; align-items: flex-start; margin-bottom: 10px; }
+  .t-num {
+    flex: none; font: 650 12px/1.55 var(--mono); color: var(--accent);
+    background: var(--accent-soft); border-radius: 6px; padding: 2px 8px; margin-top: 3px;
+  }
+  .t-title { flex: 1; min-width: 0; font-weight: 600; font-size: 16.5px; }
+  .pill {
+    flex: none; font-size: 11.5px; font-weight: 650; padding: 3px 10px; border-radius: 999px;
+    background: var(--surface-2); border: 1px solid var(--border); color: var(--dim); white-space: nowrap; margin-top: 3px;
+  }
+  .pill.pass { background: var(--ok-bg); border-color: var(--ok-br); color: var(--ok-tx); }
+  .pill.fail { background: var(--no-bg); border-color: var(--no-br); color: var(--no-tx); }
+  .t-prompt { margin: 0 0 12px; color: var(--text); }
+  .t-sig {
+    font: 13.5px/1.5 var(--mono); background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 7px; padding: 8px 12px; margin-bottom: 12px; overflow-x: auto; white-space: pre;
+  }
+  .t-sig b { color: var(--accent); font-weight: 650; }
+
+  textarea.editor {
+    width: 100%; min-height: 150px; resize: vertical;
+    font: 13.5px/1.6 var(--mono);
+    background: var(--surface-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px;
+    tab-size: 2;
+  }
+  textarea.editor:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
+
+  .t-actions { display: flex; gap: 8px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
+  .t-actions .spacer { flex: 1; }
+  .t-actions .hint { font-size: 12.5px; color: var(--dim); }
+
+  .t-result { display: none; margin-top: 12px; }
+  .t-result.show { display: block; }
+  .rbanner {
+    font-size: 14px; font-weight: 600; padding: 9px 13px; border-radius: 8px; margin-bottom: 9px;
+    border: 1px solid var(--border); background: var(--surface-2);
+  }
+  .rbanner.pass { background: var(--ok-bg); border-color: var(--ok-br); color: var(--ok-tx); }
+  .rbanner.fail { background: var(--no-bg); border-color: var(--no-br); color: var(--no-tx); }
+  .rbanner.err  { background: var(--warn-bg); border-color: var(--warn-br); color: var(--warn-tx); font-family: var(--mono); font-size: 13px; font-weight: 500; white-space: pre-wrap; }
+  table.cases { border-collapse: collapse; width: 100%; font-size: 13.5px; margin: 0; }
+  table.cases th, table.cases td { text-align: left; padding: 6px 10px; border: 1px solid var(--border); }
+  table.cases th { background: var(--surface-2); font-weight: 600; font-size: 12px; }
+  table.cases td { font-family: var(--mono); font-size: 12.5px; }
+  table.cases tr.ok td:first-child { color: var(--ok-tx); }
+  table.cases tr.no td:first-child { color: var(--no-tx); }
+  table.cases td.st { width: 28px; text-align: center; font-weight: 700; }
+
+  details.sol { margin-top: 10px; border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; background: var(--surface-2); }
+  details.sol summary { cursor: pointer; font-weight: 600; font-size: 13.5px; color: var(--accent); }
+  details.sol[aria-disabled="true"] summary { color: var(--dim); cursor: not-allowed; }
+  details.sol pre { margin: 10px 0 0; background: var(--surface); }
+
+  .results { display: none; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 30px; scroll-margin-top: 92px; }
+  .results.show { display: block; }
+  .results h2 { margin: 0 0 4px; font-size: 22px; }
+  .big-score { font: 700 42px/1.1 -apple-system, "Segoe UI", sans-serif; letter-spacing: -.03em; margin: 12px 0 6px; font-variant-numeric: tabular-nums; }
+  .band { display: inline-block; font-size: 13px; font-weight: 650; padding: 4px 12px; border-radius: 999px; margin-bottom: 6px; }
+  .band.pass { background: var(--ok-bg); color: var(--ok-tx); border: 1px solid var(--ok-br); }
+  .band.fail { background: var(--no-bg); color: var(--no-tx); border: 1px solid var(--no-br); }
+  .subscore { color: var(--dim); font-size: 14px; margin-bottom: 18px; }
+  .bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 9px; font-size: 14px; }
+  .bar-row .nm { width: 190px; flex: none; color: var(--dim); }
+  .bar-track { flex: 1; height: 9px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--accent); }
+  .bar-row .sc { width: 52px; flex: none; text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .advice { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 14.5px; }
+  .advice h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .07em; color: var(--dim); margin: 0 0 10px; }
+  .advice p { margin: 0 0 9px; }
+  .advice a { color: var(--accent); font-weight: 600; }
+  .failist { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .failist a {
+    font-size: 12.5px; font-weight: 600; padding: 3px 10px; border-radius: 999px; text-decoration: none;
+    background: var(--no-bg); border: 1px solid var(--no-br); color: var(--no-tx);
+  }
+
+  pre { background: var(--surface-2); border: 1px solid var(--border); border-radius: 7px; padding: 11px 13px; overflow-x: auto; }
+  pre code { background: none; border: none; padding: 0; font-size: 13px; line-height: 1.55; white-space: pre; font-family: var(--mono); }
+  code { font: .875em/1.4 var(--mono); background: var(--surface-2); padding: 1.5px 5px; border-radius: 4px; border: 1px solid var(--border); }
+  footer.end { border-top: 1px solid var(--border); margin-top: 42px; padding-top: 18px; color: var(--dim); font-size: 13.5px; }
+  footer.end a { color: var(--accent); }
+
+  @media (max-width: 960px) {
+    .shell { display: block; padding: 0 17px 60px; }
+    nav.toc { display: none; }
+    main { padding-top: 22px; }
+    .hero h1 { font-size: 22px; }
+    .bar-row .nm { width: 110px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">Lab Test <span>· TypeScript Conditional Statements</span></div>
+    <div class="scoreboard">
+      <span class="stat">Attempted <b id="s-attempted">0</b>/<b id="s-total">15</b></span>
+      <span class="stat good">Passed <b id="s-passed">—</b></span>
+      <label class="toggle"><input type="checkbox" id="practice"> Practice mode</label>
+      <a class="ctl" href="typescript-conditionals-quiz.html">← MCQ quiz</a>
+      <button class="ctl" id="btn-reset">Reset all</button>
+      <button class="ctl primary" id="btn-submit">Submit &amp; evaluate</button>
+    </div>
+  </div>
+  <div class="progress-wrap"><div class="progress-bar" id="progress"></div></div>
+</header>
+
+<div class="shell">
+  <nav class="toc" id="toc"></nav>
+
+  <main>
+    <div class="hero">
+      <h1>Lab Assignments — auto-graded</h1>
+      <p class="sub">Fifteen conditional-statement exercises. Write each function in the editor, then hit <strong>Submit &amp; evaluate</strong> — every assignment is run against hidden test cases and scored automatically.</p>
+      <div class="chips">
+        <span class="chip"><b>15</b> assignments</span>
+        <span class="chip"><b>76</b> test cases</span>
+        <span class="chip">~<b>45</b> minutes</span>
+        <span class="chip">Suggested pass <b>11/15</b></span>
+      </div>
+      <div class="howto">
+        <h3>How this works</h3>
+        <ul>
+          <li><strong>Keep the given function name and parameter order</strong> — the grader calls it by name.</li>
+          <li><strong>Return</strong> the answer; don't <code>console.log</code> it. A logged value scores zero.</li>
+          <li>TypeScript annotations are fine — they're stripped before running. Plain JavaScript works too.</li>
+          <li>String answers are compared <strong>case-insensitively</strong> and trimmed, so <code>"Winter"</code> and <code>"winter"</code> both pass.</li>
+          <li>Your code is <strong>saved in this browser</strong> as you type, so a refresh won't lose it.</li>
+          <li><strong>Avoid loops</strong> — none of these need one, and an accidental infinite loop will freeze the page.</li>
+          <li>Tick <strong>Practice mode</strong> to check one assignment at a time instead of waiting for the final submit.</li>
+        </ul>
+      </div>
+      <div class="credit">
+        <p><strong>Source:</strong> lab assignments from SDET Pavan.</p>
+        <p><a href="https://www.pavanonlinetrainings.com" target="_blank" rel="noopener">pavanonlinetrainings.com</a> · <a href="https://www.youtube.com/@sdetpavan" target="_blank" rel="noopener">youtube.com/@sdetpavan</a></p>
+      </div>
+    </div>
+
+    <div class="results" id="results">
+      <h2>Results</h2>
+      <div class="big-score" id="r-score">—</div>
+      <div id="r-band"></div>
+      <div class="subscore" id="r-sub"></div>
+      <div id="r-bars"></div>
+      <div class="advice" id="r-advice"></div>
+    </div>
+
+    <div id="tasks"></div>
+
+    <footer class="end">
+      15 auto-graded assignments · single-file HTML, no dependencies, runs offline.
+      Content credit: <a href="https://www.pavanonlinetrainings.com" target="_blank" rel="noopener">pavanonlinetrainings.com</a> ·
+      <a href="https://www.youtube.com/@sdetpavan" target="_blank" rel="noopener">@sdetpavan</a>
+    </footer>
+  </main>
+</div>
+
+<script>
+/* ------------------------------------------------------------------ *
+ *  Assignment definitions
+ * ------------------------------------------------------------------ */
+var GROUPS = [
+  {
+    id: "if", title: "Group 1 — <code>if</code> condition", short: "if",
+    tasks: [
+      {
+        n: 1, fn: "isUppercase",
+        title: "Check if a character is uppercase",
+        prompt: "Return <code>true</code> when the single character <code>ch</code> is an uppercase English letter (A–Z), and <code>false</code> otherwise. Digits and lowercase letters are not uppercase.",
+        sig: "function isUppercase(ch: string): boolean",
+        starter: "function isUppercase(ch: string): boolean {\n  // your code here\n\n}",
+        tests: [
+          { args: ["A"], exp: true }, { args: ["Z"], exp: true }, { args: ["M"], exp: true },
+          { args: ["a"], exp: false }, { args: ["m"], exp: false }, { args: ["5"], exp: false }
+        ],
+        solution: "function isUppercase(ch: string): boolean {\n  if (ch >= \"A\" && ch <= \"Z\") {\n    return true;\n  }\n  return false;\n}"
+      },
+      {
+        n: 2, fn: "isMultipleOf10",
+        title: "Check if a number is a multiple of 10",
+        prompt: "Return <code>true</code> when <code>n</code> divides evenly by 10. Treat <code>0</code> as a multiple of 10, and handle negative numbers too.",
+        sig: "function isMultipleOf10(n: number): boolean",
+        starter: "function isMultipleOf10(n: number): boolean {\n  // your code here\n\n}",
+        tests: [
+          { args: [10], exp: true }, { args: [100], exp: true }, { args: [0], exp: true },
+          { args: [-20], exp: true }, { args: [7], exp: false }, { args: [25], exp: false }
+        ],
+        solution: "function isMultipleOf10(n: number): boolean {\n  if (n % 10 === 0) {\n    return true;\n  }\n  return false;\n}"
+      }
+    ]
+  },
+  {
+    id: "ifelse", title: "Group 2 — <code>if-else</code> condition", short: "if-else",
+    tasks: [
+      {
+        n: 3, fn: "isTeenager",
+        title: "Check if a person is a teenager",
+        prompt: "Return <code>true</code> when <code>age</code> is between 13 and 19 <strong>inclusive</strong>, otherwise <code>false</code>.",
+        sig: "function isTeenager(age: number): boolean",
+        starter: "function isTeenager(age: number): boolean {\n  // your code here\n\n}",
+        tests: [
+          { args: [13], exp: true }, { args: [19], exp: true }, { args: [16], exp: true },
+          { args: [12], exp: false }, { args: [20], exp: false }, { args: [0], exp: false }
+        ],
+        solution: "function isTeenager(age: number): boolean {\n  if (age >= 13 && age <= 19) {\n    return true;\n  } else {\n    return false;\n  }\n}"
+      },
+      {
+        n: 4, fn: "larger",
+        title: "Compare two numbers and return the larger one",
+        prompt: "Return whichever of <code>a</code> and <code>b</code> is larger. If they are equal, return that value.",
+        sig: "function larger(a: number, b: number): number",
+        starter: "function larger(a: number, b: number): number {\n  // your code here\n\n}",
+        tests: [
+          { args: [5, 3], exp: 5 }, { args: [3, 5], exp: 5 }, { args: [4, 4], exp: 4 },
+          { args: [-1, -9], exp: -1 }, { args: [0, 7], exp: 7 }
+        ],
+        solution: "function larger(a: number, b: number): number {\n  if (a > b) {\n    return a;\n  } else {\n    return b;\n  }\n}"
+      },
+      {
+        n: 5, fn: "signOf",
+        title: "Check if a number is positive, negative, or zero",
+        prompt: "Return the string <code>\"positive\"</code>, <code>\"negative\"</code>, or <code>\"zero\"</code> to describe <code>n</code>.",
+        sig: "function signOf(n: number): string",
+        starter: "function signOf(n: number): string {\n  // your code here\n\n}",
+        tests: [
+          { args: [5], exp: "positive" }, { args: [0.5], exp: "positive" },
+          { args: [-3], exp: "negative" }, { args: [-0.1], exp: "negative" },
+          { args: [0], exp: "zero" }
+        ],
+        solution: "function signOf(n: number): string {\n  if (n > 0) {\n    return \"positive\";\n  } else if (n < 0) {\n    return \"negative\";\n  } else {\n    return \"zero\";\n  }\n}"
+      },
+      {
+        n: 6, fn: "isSeniorCitizen",
+        title: "Check senior-citizen discount eligibility",
+        prompt: "Return <code>true</code> when <code>age</code> is 60 or over, otherwise <code>false</code>.",
+        sig: "function isSeniorCitizen(age: number): boolean",
+        starter: "function isSeniorCitizen(age: number): boolean {\n  // your code here\n\n}",
+        tests: [
+          { args: [60], exp: true }, { args: [75], exp: true }, { args: [100], exp: true },
+          { args: [59], exp: false }, { args: [0], exp: false }
+        ],
+        solution: "function isSeniorCitizen(age: number): boolean {\n  if (age >= 60) {\n    return true;\n  } else {\n    return false;\n  }\n}"
+      }
+    ]
+  },
+  {
+    id: "nested", title: "Group 3 — Nested <code>if-else</code>", short: "nested",
+    tasks: [
+      {
+        n: 7, fn: "isPositiveAndEven",
+        title: "Check if a number is positive and even",
+        prompt: "Return <code>true</code> only when <code>n</code> is <strong>both</strong> greater than 0 <strong>and</strong> even. Note that 0 is even but not positive.",
+        sig: "function isPositiveAndEven(n: number): boolean",
+        starter: "function isPositiveAndEven(n: number): boolean {\n  // your code here\n\n}",
+        tests: [
+          { args: [4], exp: true }, { args: [10], exp: true }, { args: [2], exp: true },
+          { args: [3], exp: false }, { args: [-4], exp: false }, { args: [0], exp: false }
+        ],
+        solution: "function isPositiveAndEven(n: number): boolean {\n  if (n > 0) {\n    if (n % 2 === 0) {\n      return true;\n    } else {\n      return false;\n    }\n  } else {\n    return false;\n  }\n}"
+      },
+      {
+        n: 8, fn: "isUppercaseVowel",
+        title: "Check if a character is an uppercase vowel",
+        prompt: "Return <code>true</code> when <code>ch</code> is one of <code>A</code>, <code>E</code>, <code>I</code>, <code>O</code>, <code>U</code>. Lowercase vowels and consonants return <code>false</code>.",
+        sig: "function isUppercaseVowel(ch: string): boolean",
+        starter: "function isUppercaseVowel(ch: string): boolean {\n  // your code here\n\n}",
+        tests: [
+          { args: ["A"], exp: true }, { args: ["E"], exp: true }, { args: ["U"], exp: true },
+          { args: ["a"], exp: false }, { args: ["B"], exp: false }, { args: ["z"], exp: false }
+        ],
+        solution: "function isUppercaseVowel(ch: string): boolean {\n  if (ch >= \"A\" && ch <= \"Z\") {\n    if (ch === \"A\" || ch === \"E\" || ch === \"I\" || ch === \"O\" || ch === \"U\") {\n      return true;\n    } else {\n      return false;\n    }\n  } else {\n    return false;\n  }\n}"
+      },
+      {
+        n: 9, fn: "largestOfThree",
+        title: "Find the largest of three numbers",
+        prompt: "Return the largest of <code>a</code>, <code>b</code>, and <code>c</code>. If two or more are tied for largest, return that value.",
+        sig: "function largestOfThree(a: number, b: number, c: number): number",
+        starter: "function largestOfThree(a: number, b: number, c: number): number {\n  // your code here\n\n}",
+        tests: [
+          { args: [1, 2, 3], exp: 3 }, { args: [3, 2, 1], exp: 3 }, { args: [2, 3, 1], exp: 3 },
+          { args: [5, 5, 2], exp: 5 }, { args: [-1, -2, -3], exp: -1 }, { args: [7, 7, 7], exp: 7 }
+        ],
+        solution: "function largestOfThree(a: number, b: number, c: number): number {\n  if (a >= b) {\n    if (a >= c) {\n      return a;\n    } else {\n      return c;\n    }\n  } else {\n    if (b >= c) {\n      return b;\n    } else {\n      return c;\n    }\n  }\n}"
+      },
+      {
+        n: 10, fn: "isMultipleOf5And10",
+        title: "Check if a number is a multiple of both 5 and 10",
+        prompt: "Return <code>true</code> when <code>n</code> is a multiple of 5 <strong>and</strong> a multiple of 10.",
+        sig: "function isMultipleOf5And10(n: number): boolean",
+        starter: "function isMultipleOf5And10(n: number): boolean {\n  // your code here\n\n}",
+        tests: [
+          { args: [10], exp: true }, { args: [20], exp: true }, { args: [0], exp: true },
+          { args: [5], exp: false }, { args: [15], exp: false }, { args: [7], exp: false }
+        ],
+        solution: "function isMultipleOf5And10(n: number): boolean {\n  if (n % 5 === 0) {\n    if (n % 10 === 0) {\n      return true;\n    } else {\n      return false;\n    }\n  } else {\n    return false;\n  }\n}"
+      },
+      {
+        n: 11, fn: "vowelOrConsonant",
+        title: "Check if a character is a vowel or a consonant",
+        prompt: "Return <code>\"vowel\"</code> or <code>\"consonant\"</code> for the English letter <code>ch</code>. Both cases count — <code>\"a\"</code> and <code>\"A\"</code> are both vowels.",
+        sig: "function vowelOrConsonant(ch: string): string",
+        starter: "function vowelOrConsonant(ch: string): string {\n  // your code here\n\n}",
+        tests: [
+          { args: ["a"], exp: "vowel" }, { args: ["E"], exp: "vowel" }, { args: ["i"], exp: "vowel" },
+          { args: ["b"], exp: "consonant" }, { args: ["Z"], exp: "consonant" }, { args: ["y"], exp: "consonant" }
+        ],
+        solution: "function vowelOrConsonant(ch: string): string {\n  const c: string = ch.toLowerCase();\n  if (c === \"a\" || c === \"e\" || c === \"i\" || c === \"o\" || c === \"u\") {\n    return \"vowel\";\n  } else {\n    return \"consonant\";\n  }\n}"
+      },
+      {
+        n: 12, fn: "isDivisibleBy2And3",
+        title: "Check if a number is divisible by both 2 and 3",
+        prompt: "Return <code>true</code> when <code>n</code> divides evenly by 2 <strong>and</strong> by 3.",
+        sig: "function isDivisibleBy2And3(n: number): boolean",
+        starter: "function isDivisibleBy2And3(n: number): boolean {\n  // your code here\n\n}",
+        tests: [
+          { args: [6], exp: true }, { args: [12], exp: true }, { args: [0], exp: true },
+          { args: [4], exp: false }, { args: [9], exp: false }, { args: [7], exp: false }
+        ],
+        solution: "function isDivisibleBy2And3(n: number): boolean {\n  if (n % 2 === 0) {\n    if (n % 3 === 0) {\n      return true;\n    } else {\n      return false;\n    }\n  } else {\n    return false;\n  }\n}"
+      }
+    ]
+  },
+  {
+    id: "switch", title: "Group 4 — <code>switch-case</code>", short: "switch",
+    tasks: [
+      {
+        n: 13, fn: "monthName",
+        title: "Print the month name for a month number",
+        prompt: "Return the English month name for <code>m</code> (1 = <code>\"January\"</code> … 12 = <code>\"December\"</code>). For any other number return <code>\"Invalid month\"</code>.",
+        sig: "function monthName(m: number): string",
+        starter: "function monthName(m: number): string {\n  switch (m) {\n    // your cases here\n\n  }\n}",
+        tests: [
+          { args: [1], exp: "January" }, { args: [2], exp: "February" }, { args: [3], exp: "March" },
+          { args: [6], exp: "June" }, { args: [9], exp: "September" }, { args: [12], exp: "December" },
+          { args: [0], exp: "Invalid month" }, { args: [13], exp: "Invalid month" }
+        ],
+        solution: "function monthName(m: number): string {\n  switch (m) {\n    case 1: return \"January\";\n    case 2: return \"February\";\n    case 3: return \"March\";\n    case 4: return \"April\";\n    case 5: return \"May\";\n    case 6: return \"June\";\n    case 7: return \"July\";\n    case 8: return \"August\";\n    case 9: return \"September\";\n    case 10: return \"October\";\n    case 11: return \"November\";\n    case 12: return \"December\";\n    default: return \"Invalid month\";\n  }\n}"
+      },
+      {
+        n: 14, fn: "calculate",
+        title: "Perform a basic arithmetic operation",
+        prompt: "Apply the operator <code>op</code> to <code>a</code> and <code>b</code> and return the result. Support <code>\"+\"</code>, <code>\"-\"</code>, <code>\"*\"</code>, and <code>\"/\"</code>. For any other operator return the string <code>\"Invalid operator\"</code>.",
+        sig: "function calculate(a: number, b: number, op: string): number | string",
+        starter: "function calculate(a: number, b: number, op: string): number | string {\n  switch (op) {\n    // your cases here\n\n  }\n}",
+        tests: [
+          { args: [10, 5, "+"], exp: 15 }, { args: [10, 5, "-"], exp: 5 },
+          { args: [10, 5, "*"], exp: 50 }, { args: [10, 5, "/"], exp: 2 },
+          { args: [7, 2, "-"], exp: 5 }, { args: [3, 4, "*"], exp: 12 },
+          { args: [10, 5, "^"], exp: "Invalid operator" }, { args: [10, 5, "add"], exp: "Invalid operator" }
+        ],
+        solution: "function calculate(a: number, b: number, op: string): number | string {\n  switch (op) {\n    case \"+\": return a + b;\n    case \"-\": return a - b;\n    case \"*\": return a * b;\n    case \"/\": return a / b;\n    default: return \"Invalid operator\";\n  }\n}"
+      },
+      {
+        n: 15, fn: "season",
+        title: "Print the season for a month number",
+        prompt: "Return the season for month <code>m</code> using this mapping: <strong>12, 1, 2 → <code>\"Winter\"</code></strong>; <strong>3, 4, 5 → <code>\"Spring\"</code></strong>; <strong>6, 7, 8 → <code>\"Summer\"</code></strong>; <strong>9, 10, 11 → <code>\"Autumn\"</code></strong>. Any other number returns <code>\"Invalid month\"</code>. <em>Hint: group case labels — several <code>case</code> lines can share one block.</em>",
+        sig: "function season(m: number): string",
+        starter: "function season(m: number): string {\n  switch (m) {\n    // your cases here\n\n  }\n}",
+        tests: [
+          { args: [12], exp: "Winter" }, { args: [1], exp: "Winter" }, { args: [2], exp: "Winter" },
+          { args: [4], exp: "Spring" }, { args: [7], exp: "Summer" }, { args: [10], exp: "Autumn" },
+          { args: [11], exp: "Autumn" }, { args: [13], exp: "Invalid month" }, { args: [0], exp: "Invalid month" }
+        ],
+        solution: "function season(m: number): string {\n  switch (m) {\n    case 12:\n    case 1:\n    case 2:\n      return \"Winter\";\n    case 3:\n    case 4:\n    case 5:\n      return \"Spring\";\n    case 6:\n    case 7:\n    case 8:\n      return \"Summer\";\n    case 9:\n    case 10:\n    case 11:\n      return \"Autumn\";\n    default:\n      return \"Invalid month\";\n  }\n}"
+      }
+    ]
+  }
+];
+
+/* ------------------------------------------------------------------ *
+ *  Type stripping + evaluation
+ * ------------------------------------------------------------------ */
+
+// Removes TypeScript annotations in the positions a learner actually writes them:
+// parameter types, return types, and variable declarations. Deliberately
+// conservative — it only strips a ":" that is followed by a recognised type name
+// and then a delimiter, so ternaries (`a ? b : c`), object literals and switch
+// case labels are left untouched.
+var TYPE_RE = (function () {
+  var T = "(?:number|string|boolean|any|unknown|never|void|object|null|undefined|bigint|symbol|Array\\s*<[^>]*>)";
+  var ARR = "(?:\\s*\\[\\s*\\])*";
+  var UNION = "(?:\\s*\\|\\s*" + T + ARR + ")*";
+  return new RegExp(":\\s*" + T + ARR + UNION + "\\s*(?=[,)=;{\\]]|$)", "gm");
+})();
+
+function stripTypes(src) {
+  return src.replace(TYPE_RE, "");
+}
+
+function fmt(v) {
+  if (typeof v === "string") return JSON.stringify(v);
+  if (v === undefined) return "undefined";
+  if (v === null) return "null";
+  if (typeof v === "number" && !isFinite(v)) return String(v);
+  try { return JSON.stringify(v); } catch (e) { return String(v); }
+}
+
+function fmtArgs(args) {
+  return args.map(fmt).join(", ");
+}
+
+// Strings compare case-insensitively and trimmed; everything else strictly.
+function same(got, exp) {
+  if (typeof exp === "string") {
+    return typeof got === "string" && got.trim().toLowerCase() === exp.trim().toLowerCase();
+  }
+  return got === exp;
+}
+
+function evaluateTask(task, code) {
+  if (!code || !code.trim()) {
+    return { error: "No code written yet.", cases: [], attempted: false };
+  }
+  var fn;
+  try {
+    var body = stripTypes(code) + "\n;return typeof " + task.fn + " === 'function' ? " + task.fn + " : null;";
+    fn = new Function(body)();
+  } catch (e) {
+    return { error: (e && e.name ? e.name : "Error") + ": " + (e && e.message ? e.message : String(e)), cases: [], attempted: true };
+  }
+  if (typeof fn !== "function") {
+    return { error: "No function named `" + task.fn + "` was found. Keep the function name exactly as given.", cases: [], attempted: true };
+  }
+  var cases = task.tests.map(function (t) {
+    var got, err = null;
+    try {
+      got = fn.apply(null, t.args);
+    } catch (e) {
+      err = (e && e.name ? e.name : "Error") + ": " + (e && e.message ? e.message : String(e));
+    }
+    return { args: t.args, exp: t.exp, got: got, err: err, ok: err === null && same(got, t.exp) };
+  });
+  return { error: null, cases: cases, attempted: true };
+}
+
+/* ------------------------------------------------------------------ *
+ *  UI
+ * ------------------------------------------------------------------ */
+(function () {
+  var STORE = "ts-cond-lab-v1";
+  var tasksEl = document.getElementById("tasks");
+  var tocEl = document.getElementById("toc");
+  var ALL = [];
+  GROUPS.forEach(function (g) { g.tasks.forEach(function (t) { t.group = g.id; ALL.push(t); }); });
+  var TOTAL = ALL.length;
+  var TOTAL_CASES = ALL.reduce(function (s, t) { return s + t.tests.length; }, 0);
+  var PASS = 11;
+  var evaluated = false;
+  var lastResults = {};
+
+  document.getElementById("s-total").textContent = TOTAL;
+  var totalCasesChip = document.querySelector(".chips .chip:nth-child(2) b");
+  if (totalCasesChip) totalCasesChip.textContent = TOTAL_CASES;
+
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(STORE) || "{}") || {}; } catch (e) { saved = {}; }
+
+  function save() {
+    var out = {};
+    ALL.forEach(function (t) {
+      var ta = document.getElementById("ed-" + t.n);
+      if (ta) out[t.n] = ta.value;
+    });
+    try { localStorage.setItem(STORE, JSON.stringify(out)); } catch (e) { /* quota / file:// — ignore */ }
+  }
+
+  // ---- build the sidebar + cards -------------------------------------
+  GROUPS.forEach(function (g) {
+    tocEl.insertAdjacentHTML("beforeend", "<h2>" + g.short + "</h2>");
+    g.tasks.forEach(function (t) {
+      tocEl.insertAdjacentHTML("beforeend",
+        '<a href="#t' + t.n + '" id="toc-' + t.n + '"><span class="dot"></span><span class="tt">' + t.n + '. ' + t.title + '</span></a>');
+    });
+
+    var sec = document.createElement("section");
+    sec.className = "grp";
+    sec.innerHTML = '<div class="grp-head"><h2>' + g.title + '</h2><span class="n">' +
+      g.tasks.length + ' assignment' + (g.tasks.length > 1 ? 's' : '') + '</span></div>';
+
+    g.tasks.forEach(function (t) {
+      var card = document.createElement("div");
+      card.className = "task";
+      card.id = "t" + t.n;
+      var code = (saved[t.n] !== undefined && saved[t.n] !== null) ? saved[t.n] : t.starter;
+      card.innerHTML =
+        '<div class="t-head">' +
+          '<span class="t-num">' + t.n + '</span>' +
+          '<span class="t-title">' + t.title + '</span>' +
+          '<span class="pill" id="pill-' + t.n + '">Not attempted</span>' +
+        '</div>' +
+        '<p class="t-prompt">' + t.prompt + '</p>' +
+        '<div class="t-sig">' + t.sig.replace(/&/g, "&amp;").replace(/</g, "&lt;") + '</div>' +
+        '<textarea class="editor" id="ed-' + t.n + '" spellcheck="false"></textarea>' +
+        '<div class="t-actions">' +
+          '<button class="ctl run" data-n="' + t.n + '" style="display:none">Run tests</button>' +
+          '<button class="ctl revert" data-n="' + t.n + '">Reset code</button>' +
+          '<span class="spacer"></span>' +
+          '<span class="hint">' + t.tests.length + ' hidden test cases</span>' +
+        '</div>' +
+        '<div class="t-result" id="res-' + t.n + '"></div>' +
+        '<details class="sol" id="sol-' + t.n + '" aria-disabled="true">' +
+          '<summary>Model solution — unlocks after you submit</summary>' +
+          '<pre><code>' + t.solution.replace(/&/g, "&amp;").replace(/</g, "&lt;") + '</code></pre>' +
+        '</details>';
+      sec.appendChild(card);
+      // set textarea value via property so backslashes/quotes survive intact
+      sec.querySelector("#ed-" + t.n).value = code;
+    });
+
+    tasksEl.appendChild(sec);
+  });
+
+  // lock model solutions until submission
+  function setSolutionLock(locked) {
+    ALL.forEach(function (t) {
+      var d = document.getElementById("sol-" + t.n);
+      d.setAttribute("aria-disabled", locked ? "true" : "false");
+      d.querySelector("summary").textContent = locked
+        ? "Model solution — unlocks after you submit"
+        : "Model solution (one of several valid answers)";
+      if (locked) d.open = false;
+    });
+  }
+  setSolutionLock(true);
+  tasksEl.addEventListener("click", function (e) {
+    var sum = e.target.closest && e.target.closest("details.sol > summary");
+    if (sum && sum.parentElement.getAttribute("aria-disabled") === "true") e.preventDefault();
+  });
+
+  // ---- editor behaviour ----------------------------------------------
+  var saveTimer = null;
+  tasksEl.addEventListener("input", function (e) {
+    if (!e.target.classList.contains("editor")) return;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(save, 250);
+    updateAttempted();
+  });
+
+  // Tab inserts two spaces instead of leaving the field
+  tasksEl.addEventListener("keydown", function (e) {
+    if (e.key !== "Tab" || !e.target.classList.contains("editor")) return;
+    e.preventDefault();
+    var ta = e.target, s = ta.selectionStart, en = ta.selectionEnd;
+    ta.value = ta.value.slice(0, s) + "  " + ta.value.slice(en);
+    ta.selectionStart = ta.selectionEnd = s + 2;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(save, 250);
+  });
+
+  tasksEl.addEventListener("click", function (e) {
+    var btn = e.target.closest && e.target.closest("button");
+    if (!btn) return;
+    var n = parseInt(btn.dataset.n, 10);
+    if (isNaN(n)) return;
+    var task = ALL.filter(function (t) { return t.n === n; })[0];
+    if (btn.classList.contains("revert")) {
+      document.getElementById("ed-" + n).value = task.starter;
+      document.getElementById("res-" + n).classList.remove("show");
+      setPill(n, null);
+      save();
+      updateAttempted();
+    } else if (btn.classList.contains("run")) {
+      runOne(task, true);
+    }
+  });
+
+  // ---- practice mode --------------------------------------------------
+  var practiceBox = document.getElementById("practice");
+  practiceBox.addEventListener("change", function () {
+    var show = practiceBox.checked;
+    document.querySelectorAll("button.run").forEach(function (b) { b.style.display = show ? "" : "none"; });
+  });
+
+  // ---- running --------------------------------------------------------
+  function setPill(n, res) {
+    var pill = document.getElementById("pill-" + n);
+    var card = document.getElementById("t" + n);
+    var toc = document.getElementById("toc-" + n);
+    card.classList.remove("pass", "fail");
+    pill.classList.remove("pass", "fail");
+    toc.classList.remove("done", "bad");
+    if (!res) { pill.textContent = "Not attempted"; return; }
+    if (res.error) {
+      pill.textContent = "Error"; pill.classList.add("fail");
+      card.classList.add("fail"); toc.classList.add("bad");
+      return;
+    }
+    var passed = res.cases.filter(function (c) { return c.ok; }).length;
+    var all = res.cases.length;
+    pill.textContent = passed + "/" + all + " passed";
+    if (passed === all) { pill.classList.add("pass"); card.classList.add("pass"); toc.classList.add("done"); }
+    else { pill.classList.add("fail"); card.classList.add("fail"); toc.classList.add("bad"); }
+  }
+
+  function renderResult(task, res) {
+    var box = document.getElementById("res-" + task.n);
+    if (res.error) {
+      box.innerHTML = '<div class="rbanner err">' + res.error.replace(/&/g, "&amp;").replace(/</g, "&lt;") + '</div>';
+      box.classList.add("show");
+      return;
+    }
+    var passed = res.cases.filter(function (c) { return c.ok; }).length;
+    var all = res.cases.length;
+    var ok = passed === all;
+    var html = '<div class="rbanner ' + (ok ? "pass" : "fail") + '">' +
+      (ok ? "✓ All " + all + " test cases passed." : "✕ " + passed + " of " + all + " test cases passed.") + '</div>';
+
+    var rows = res.cases.filter(function (c) { return !c.ok; });
+    if (rows.length) {
+      html += '<table class="cases"><tr><th></th><th>Call</th><th>Expected</th><th>Got</th></tr>';
+      rows.forEach(function (c) {
+        html += '<tr class="no"><td class="st">✕</td>' +
+          '<td>' + (task.fn + "(" + fmtArgs(c.args) + ")").replace(/&/g, "&amp;").replace(/</g, "&lt;") + '</td>' +
+          '<td>' + fmt(c.exp).replace(/&/g, "&amp;").replace(/</g, "&lt;") + '</td>' +
+          '<td>' + (c.err ? c.err : fmt(c.got)).replace(/&/g, "&amp;").replace(/</g, "&lt;") + '</td></tr>';
+      });
+      html += '</table>';
+    }
+    box.innerHTML = html;
+    box.classList.add("show");
+  }
+
+  function runOne(task, render) {
+    var code = document.getElementById("ed-" + task.n).value;
+    var res = evaluateTask(task, code);
+    lastResults[task.n] = res;
+    setPill(task.n, res);
+    if (render) renderResult(task, res);
+    return res;
+  }
+
+  function isAttempted(t) {
+    var v = document.getElementById("ed-" + t.n).value;
+    return v.trim() !== "" && v.trim() !== t.starter.trim();
+  }
+
+  function updateAttempted() {
+    var n = ALL.filter(isAttempted).length;
+    document.getElementById("s-attempted").textContent = n;
+    document.getElementById("progress").style.width = (n / TOTAL * 100) + "%";
+  }
+
+  // ---- submit ---------------------------------------------------------
+  document.getElementById("btn-submit").addEventListener("click", function () {
+    save();
+    var passedTasks = 0, passedCases = 0;
+    var byGroup = {};
+    GROUPS.forEach(function (g) { byGroup[g.id] = { c: 0, t: 0, short: g.short }; });
+
+    ALL.forEach(function (t) {
+      var res = runOne(t, true);
+      byGroup[t.group].t += 1;
+      if (!res.error) {
+        var p = res.cases.filter(function (c) { return c.ok; }).length;
+        passedCases += p;
+        if (p === res.cases.length) { passedTasks++; byGroup[t.group].c += 1; }
+      }
+    });
+
+    evaluated = true;
+    setSolutionLock(false);
+
+    var pct = Math.round(passedTasks / TOTAL * 100);
+    document.getElementById("s-passed").textContent = passedTasks + "/" + TOTAL;
+    document.getElementById("r-score").textContent = passedTasks + " / " + TOTAL + "  ·  " + pct + "%";
+
+    var bandText, verdict;
+    if (passedTasks === TOTAL)   { bandText = "Perfect";    verdict = "Every assignment passes every test case. Move on to loops and functions."; }
+    else if (pct >= 87)          { bandText = "Strong";     verdict = "Fix the one or two that failed and you're done."; }
+    else if (passedTasks >= PASS){ bandText = "Pass";       verdict = "Solid work. Open the failing assignments below and compare against the model solutions."; }
+    else if (pct >= 47)          { bandText = "Shaky";      verdict = "Rework the failing assignments, then resubmit."; }
+    else                         { bandText = "Needs work"; verdict = "Revisit the notes on if / if-else / switch, then attempt these again."; }
+
+    document.getElementById("r-band").innerHTML =
+      '<span class="band ' + (passedTasks >= PASS ? "pass" : "fail") + '">' + bandText +
+      ' · suggested pass mark ' + PASS + '/' + TOTAL + '</span>';
+    document.getElementById("r-sub").textContent =
+      passedCases + " of " + TOTAL_CASES + " individual test cases passed.";
+
+    document.getElementById("r-bars").innerHTML = GROUPS.map(function (g) {
+      var st = byGroup[g.id];
+      var p = Math.round(st.c / st.t * 100);
+      return '<div class="bar-row"><span class="nm">' + st.short + '</span>' +
+             '<span class="bar-track"><span class="bar-fill" style="width:' + p + '%"></span></span>' +
+             '<span class="sc">' + st.c + '/' + st.t + '</span></div>';
+    }).join("");
+
+    var failed = ALL.filter(function (t) {
+      var r = lastResults[t.n];
+      return r && (r.error || r.cases.some(function (c) { return !c.ok; }));
+    });
+    var advice = "<h3>What to fix</h3>";
+    if (!failed.length) {
+      advice += "<p>Nothing — all 15 assignments pass. Model solutions are unlocked below if you want to compare approaches.</p>";
+    } else {
+      advice += '<p>Jump to the assignments that need work:</p><div class="failist">' +
+        failed.map(function (t) { return '<a href="#t' + t.n + '">' + t.n + '. ' + t.title + '</a>'; }).join("") +
+        '</div><p style="margin-top:12px">Each failing card lists the exact calls that went wrong, with what was expected and what your code returned. Model solutions are now unlocked.</p>';
+    }
+    advice += '<p style="color:var(--dim)"><b>The three that catch most people:</b> forgetting to <code>return</code> (a <code>console.log</code> returns <code>undefined</code>); missing the boundary value — 13 and 19 are both teenagers, 0 is a multiple of 10; and omitting the <code>default</code> case so an invalid input silently returns <code>undefined</code>.</p>';
+    advice += '<p><a href="typescript-conditionals-quiz.html">← back to the MCQ quiz</a></p>';
+    document.getElementById("r-advice").innerHTML = advice;
+
+    document.getElementById("results").classList.add("show");
+    document.getElementById("results").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  // ---- reset ----------------------------------------------------------
+  document.getElementById("btn-reset").addEventListener("click", function () {
+    if (!confirm("Clear all 15 editors and your saved work? This cannot be undone.")) return;
+    ALL.forEach(function (t) {
+      document.getElementById("ed-" + t.n).value = t.starter;
+      document.getElementById("res-" + t.n).classList.remove("show");
+      setPill(t.n, null);
+    });
+    lastResults = {};
+    evaluated = false;
+    setSolutionLock(true);
+    document.getElementById("results").classList.remove("show");
+    document.getElementById("s-passed").textContent = "—";
+    try { localStorage.removeItem(STORE); } catch (e) {}
+    updateAttempted();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  updateAttempted();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz: Callback & Overloaded Functions in TypeScript</title>
+<style>
+  :root {
+    --bg: #f4f6fb;
+    --card: #ffffff;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --primary: #3178c6;
+    --primary-dark: #235a97;
+    --correct: #16a34a;
+    --correct-bg: #dcfce7;
+    --wrong: #dc2626;
+    --wrong-bg: #fee2e2;
+    --border: #e5e7eb;
+    --code-bg: #1e293b;
+    --code-text: #e2e8f0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+  header {
+    background: var(--primary);
+    color: #fff;
+    padding: 28px 20px;
+    text-align: center;
+  }
+  header h1 { margin: 0 0 6px; font-size: 1.7rem; }
+  header p { margin: 0; opacity: 0.9; }
+  main { max-width: 860px; margin: 0 auto; padding: 24px 16px 60px; }
+
+  .progress-wrap {
+    position: sticky; top: 0; z-index: 10;
+    background: var(--bg);
+    padding: 10px 0 14px;
+  }
+  .progress-label { font-size: 0.9rem; color: var(--muted); margin-bottom: 6px; }
+  .progress { height: 8px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .progress-bar { height: 100%; width: 0; background: var(--primary); transition: width 0.25s; }
+
+  .question {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 22px;
+    margin-bottom: 18px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .question.unanswered { border-color: #f59e0b; box-shadow: 0 0 0 2px #fde68a; }
+  .q-head { display: flex; gap: 10px; align-items: baseline; margin-bottom: 10px; }
+  .q-num {
+    flex-shrink: 0;
+    background: var(--primary); color: #fff;
+    font-weight: 600; font-size: 0.85rem;
+    border-radius: 6px; padding: 2px 8px;
+  }
+  .q-topic { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  .q-text { font-weight: 600; margin: 0 0 12px; }
+  pre {
+    background: var(--code-bg); color: var(--code-text);
+    padding: 14px 16px; border-radius: 8px;
+    overflow-x: auto; font-size: 0.88rem; margin: 0 0 14px;
+  }
+  code { font-family: Consolas, "Courier New", monospace; }
+  .inline-code { background: #eef2f7; padding: 1px 5px; border-radius: 4px; font-size: 0.9em; }
+
+  .option {
+    display: flex; align-items: flex-start; gap: 10px;
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px 12px; margin-bottom: 8px;
+    cursor: pointer; transition: background 0.15s, border-color 0.15s;
+  }
+  .option:hover { background: #f1f5fd; border-color: #c7d7ee; }
+  .option input { margin-top: 4px; accent-color: var(--primary); }
+  .option.correct { background: var(--correct-bg); border-color: var(--correct); }
+  .option.wrong { background: var(--wrong-bg); border-color: var(--wrong); }
+  .locked .option { cursor: default; }
+  .locked .option:hover { background: inherit; }
+  .locked .option.correct:hover { background: var(--correct-bg); }
+  .locked .option.wrong:hover { background: var(--wrong-bg); }
+
+  .explanation {
+    display: none;
+    margin-top: 10px; padding: 10px 12px;
+    border-left: 4px solid var(--primary);
+    background: #f1f5fd; border-radius: 4px;
+    font-size: 0.93rem;
+  }
+  .locked .explanation { display: block; }
+
+  .actions { display: flex; gap: 12px; justify-content: center; margin-top: 24px; flex-wrap: wrap; }
+  button {
+    font: inherit; font-weight: 600;
+    border: none; border-radius: 8px;
+    padding: 12px 26px; cursor: pointer;
+  }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-secondary { background: #fff; color: var(--primary); border: 1px solid var(--primary); }
+  .btn-secondary:hover { background: #f1f5fd; }
+
+  #result {
+    display: none;
+    text-align: center;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  #result .score { font-size: 2.4rem; font-weight: 700; color: var(--primary); margin: 4px 0; }
+  #result .msg { color: var(--muted); }
+  .warning { color: #b45309; text-align: center; margin-top: 12px; display: none; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Callback &amp; Overloaded Functions in TypeScript</h1>
+  <p>Multiple Choice Quiz &mdash; choose the best answer for each question</p>
+</header>
+
+<main>
+  <div id="result">
+    <div>Your Score</div>
+    <div class="score" id="score"></div>
+    <div class="msg" id="scoreMsg"></div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-label" id="progressLabel">Answered 0 of 0</div>
+    <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+  </div>
+
+  <form id="quiz"></form>
+
+  <p class="warning" id="warning">Please answer all highlighted questions before submitting.</p>
+  <div class="actions">
+    <button type="button" class="btn-primary" id="submitBtn">Submit Answers</button>
+    <button type="button" class="btn-secondary" id="resetBtn">Reset Quiz</button>
+  </div>
+</main>
+
+<script>
+const questions = [
+  // ---------- Callback Functions ----------
+  {
+    topic: "Callback Functions",
+    text: "What is a callback function?",
+    options: [
+      "A function that calls itself repeatedly",
+      "A function passed as an argument to another function and executed later",
+      "A function that has multiple overload signatures",
+      "A function that always returns a Promise"
+    ],
+    answer: 1,
+    explanation: "A callback is a function passed as an argument to another function, which invokes it later."
+  },
+  {
+    topic: "Callback Functions",
+    text: "Which of the following is a common use case for callback functions?",
+    options: [
+      "Declaring constants",
+      "Defining interfaces",
+      "Asynchronous operations such as API calls, file handling and event handling",
+      "Creating enums"
+    ],
+    answer: 2,
+    explanation: "Callbacks are common in asynchronous work, where code has to run only after another operation finishes."
+  },
+  {
+    topic: "Callback Functions",
+    text: "In the signature below, what does (message: string) => void describe?",
+    code: `function greet(name: string, callback: (message: string) => void) { ... }`,
+    options: [
+      "The return type of greet",
+      "The type of the callback: a function that takes a string and returns nothing",
+      "A default value for the callback parameter",
+      "An overload signature of greet"
+    ],
+    answer: 1,
+    explanation: "It's a function type annotation. The callback must accept one string parameter and returns void."
+  },
+  {
+    topic: "Callback Functions",
+    text: "What is the output of the following code?",
+    code: `function greet(name: string, callback: (message: string) => void) {
+    console.log(name);
+    callback("Hello");
+}
+
+function showMessage(message: string) {
+    console.log(message);
+}
+
+greet("Pavan", showMessage);`,
+    options: [
+      "Hello\nPavan",
+      "Pavan\nHello",
+      "Pavan",
+      "Compilation error"
+    ],
+    answer: 1,
+    explanation: "greet logs the name first (\"Pavan\") and then calls showMessage with \"Hello\"."
+  },
+  {
+    topic: "Callback Functions",
+    text: "Given the greet function above, which call is valid in TypeScript?",
+    options: [
+      `greet("Amit", "Hello")`,
+      `greet(showMessage, "Amit")`,
+      `greet("Amit", (msg) => console.log(msg.toUpperCase()))`,
+      `greet("Amit", (msg: number) => console.log(msg))`
+    ],
+    answer: 2,
+    explanation: "An arrow function that takes a string matches (message: string) => void. Passing a string, swapping the arguments, or using a number parameter causes a type error."
+  },
+  {
+    topic: "Callback Functions",
+    text: "When should you pass a callback function?",
+    options: [
+      "When a function should run only after another function finishes its work",
+      "When you want to declare a variable with multiple types",
+      "When you need to define multiple signatures for one function",
+      "When you want to stop a function from running"
+    ],
+    answer: 0,
+    explanation: "Use a callback when some code should run only after another function finishes its work."
+  },
+
+  // ---------- Function Overloading ----------
+  {
+    topic: "Function Overloading",
+    text: "What is function overloading in TypeScript?",
+    options: [
+      "Calling a function more times than allowed",
+      "Defining multiple functions with different names that do the same thing",
+      "Defining multiple signatures for a function with the same name but different parameters or return types",
+      "Passing too many arguments to a function"
+    ],
+    answer: 2,
+    explanation: "Overloading gives one function name several call signatures, each with different parameter or return types."
+  },
+  {
+    topic: "Function Overloading",
+    text: "How many implementation functions (function bodies) should an overloaded function have?",
+    options: [
+      "One per overload signature",
+      "Exactly one",
+      "Zero",
+      "At least two"
+    ],
+    answer: 1,
+    explanation: "An overloaded function has exactly one implementation, and it must handle every overload signature."
+  },
+  {
+    topic: "Function Overloading",
+    text: "Which of the following is NOT one of the basic rules of function overloading?",
+    options: [
+      "Define overload signatures listing all possible ways to call the function",
+      "Provide a single implementation signature that handles all cases",
+      "The implementation must be compatible with all overload signatures",
+      "Each overload signature must have its own function body"
+    ],
+    answer: 3,
+    explanation: "Overload signatures have no body. They end with a semicolon, and a single implementation provides the body."
+  },
+  {
+    topic: "Function Overloading",
+    text: "How does an overload signature differ from the implementation?",
+    code: `function display(value: number): string;
+function display(value: string): string;`,
+    options: [
+      "Overload signatures end with a semicolon and have no body",
+      "Overload signatures must use the arrow (=>) syntax",
+      "Overload signatures must be declared inside a class",
+      "Overload signatures must return void"
+    ],
+    answer: 0,
+    explanation: "An overload signature is only a declaration with no body, so it ends with a semicolon."
+  },
+  {
+    topic: "Different Parameter Types",
+    text: "What should the parameter type of the display implementation be?",
+    code: `function display(value: number): string;
+function display(value: string): string;
+function display(value: boolean): string;
+
+function display(value: ???): string {
+    return \`Value is: \${value}\`;
+}`,
+    options: [
+      "number",
+      "string",
+      "number | string | boolean",
+      "void"
+    ],
+    answer: 2,
+    explanation: "The implementation has to accept every type used in the overloads, so it takes the union number | string | boolean."
+  },
+  {
+    topic: "Different Parameter Types",
+    text: "Using the display function above, what does display(true) return?",
+    options: [
+      `"true"`,
+      `"Value is: true"`,
+      `true`,
+      "Compilation error"
+    ],
+    answer: 1,
+    explanation: "The template string produces \"Value is: true\"."
+  },
+  {
+    topic: "Different Number of Parameters",
+    text: "What is the output of add(2, 3, 4)?",
+    code: `function add(a: number, b: number): number;
+function add(a: number, b: number, c: number): number;
+
+function add(a: number, b: number, c?: number): number {
+    return c !== undefined ? a + b + c : a + b;
+}`,
+    options: ["5", "9", "234", "undefined"],
+    answer: 1,
+    explanation: "c is defined, so the result is 2 + 3 + 4 = 9."
+  },
+  {
+    topic: "Different Number of Parameters",
+    text: "In the add example above, why is parameter c marked optional (c?) in the implementation?",
+    options: [
+      "So the implementation is compatible with both the 2-parameter and 3-parameter overloads",
+      "Because optional parameters run faster",
+      "Because TypeScript does not allow three parameters",
+      "So that c defaults to 0 automatically"
+    ],
+    answer: 0,
+    explanation: "Making c optional lets the implementation accept 2 or 3 arguments, which matches both overloads."
+  },
+  {
+    topic: "Different Return Types",
+    text: "What do processInput(\"hello\") and processInput(10) return?",
+    code: `function processInput(input: string): string;
+function processInput(input: number): number;
+
+function processInput(input: string | number): string | number {
+    return typeof input === "string" ? input.toUpperCase() : input * 2;
+}`,
+    options: [
+      `"hello" and 10`,
+      `"HELLO" and 20`,
+      `"HELLO" and "20"`,
+      `"hello" and 20`
+    ],
+    answer: 1,
+    explanation: "A string input is uppercased, giving \"HELLO\". A number input is doubled, giving 20."
+  },
+  {
+    topic: "Incorrect Overloading",
+    text: "Why is the following code invalid?",
+    code: `function test(value: number): string;
+function test(value: string): string;`,
+    options: [
+      "Overloads cannot use the string type",
+      "There is no implementation function to handle the overloads",
+      "The return types must be different",
+      "A function cannot have two parameters named value"
+    ],
+    answer: 1,
+    explanation: "The overload signatures need an implementation after them. Without one, TypeScript reports an error."
+  },
+  {
+    topic: "Incorrect Overloading",
+    text: "Why is this overloaded function invalid?",
+    code: `function calculate(a: number): number;
+function calculate(a: string): string;
+
+function calculate(a: number | string): boolean {
+    return true;
+}`,
+    options: [
+      "The parameter should be of type any",
+      "Overloads cannot mix number and string",
+      "The implementation returns boolean, which is incompatible with the overloads' number/string return types",
+      "The implementation must be declared before the overloads"
+    ],
+    answer: 2,
+    explanation: "The overloads return number or string. An implementation that returns boolean is not compatible with them."
+  },
+  {
+    topic: "Incorrect Overloading",
+    text: "What is wrong with this fetchData implementation?",
+    code: `function fetchData(url: string): string;
+function fetchData(url: number): string;
+
+function fetchData(url: string | number): number {
+    return 42;
+}`,
+    options: [
+      "A url cannot be a number",
+      "The implementation returns number, but the overloads promise a string",
+      "There are too many overload signatures",
+      "Nothing, the code is valid"
+    ],
+    answer: 1,
+    explanation: "Both overloads return string, so the implementation must return a string too."
+  },
+  {
+    topic: "Conclusion",
+    text: "Which statement best summarizes the two concepts?",
+    options: [
+      "Callbacks define multiple signatures; overloading runs functions later",
+      "Callbacks let functions run later (useful for async code); overloading gives one function several signatures for different parameter or return types",
+      "Both concepts are only for classes",
+      "Callbacks and overloading are the same thing"
+    ],
+    answer: 1,
+    explanation: "Callbacks let code run later, which suits asynchronous work. Overloading gives one function name several typed signatures."
+  }
+];
+
+const form = document.getElementById("quiz");
+const progressBar = document.getElementById("progressBar");
+const progressLabel = document.getElementById("progressLabel");
+const warning = document.getElementById("warning");
+const resultBox = document.getElementById("result");
+let submitted = false;
+
+function render() {
+  form.innerHTML = "";
+  questions.forEach((q, qi) => {
+    const card = document.createElement("div");
+    card.className = "question";
+    card.id = "q" + qi;
+
+    const head = document.createElement("div");
+    head.className = "q-head";
+    const num = document.createElement("span");
+    num.className = "q-num";
+    num.textContent = "Q" + (qi + 1);
+    const topic = document.createElement("span");
+    topic.className = "q-topic";
+    topic.textContent = q.topic;
+    head.append(num, topic);
+
+    const text = document.createElement("p");
+    text.className = "q-text";
+    text.textContent = q.text;
+
+    card.append(head, text);
+
+    if (q.code) {
+      const pre = document.createElement("pre");
+      const code = document.createElement("code");
+      code.textContent = q.code;
+      pre.appendChild(code);
+      card.appendChild(pre);
+    }
+
+    q.options.forEach((opt, oi) => {
+      const label = document.createElement("label");
+      label.className = "option";
+      const input = document.createElement("input");
+      input.type = "radio";
+      input.name = "q" + qi;
+      input.value = oi;
+      input.addEventListener("change", () => {
+        card.classList.remove("unanswered");
+        updateProgress();
+      });
+      const span = document.createElement("span");
+      if (opt.includes("\n")) {
+        span.style.whiteSpace = "pre-line";
+      }
+      // Render options that are function calls in monospace
+      if (/^\w+\(/.test(opt)) {
+        span.className = "inline-code";
+      }
+      span.textContent = String.fromCharCode(65 + oi) + ". " + opt;
+      label.append(input, span);
+      card.appendChild(label);
+    });
+
+    const exp = document.createElement("div");
+    exp.className = "explanation";
+    exp.id = "exp" + qi;
+    card.appendChild(exp);
+
+    form.appendChild(card);
+  });
+  updateProgress();
+}
+
+function updateProgress() {
+  const answered = questions.filter((_, qi) =>
+    form.querySelector(`input[name="q${qi}"]:checked`)).length;
+  progressLabel.textContent = `Answered ${answered} of ${questions.length}`;
+  progressBar.style.width = (answered / questions.length * 100) + "%";
+}
+
+function submit() {
+  if (submitted) return;
+  let firstMissing = null;
+  questions.forEach((_, qi) => {
+    const card = document.getElementById("q" + qi);
+    if (!form.querySelector(`input[name="q${qi}"]:checked`)) {
+      card.classList.add("unanswered");
+      if (!firstMissing) firstMissing = card;
+    }
+  });
+  if (firstMissing) {
+    warning.style.display = "block";
+    firstMissing.scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+  warning.style.display = "none";
+  submitted = true;
+
+  let score = 0;
+  questions.forEach((q, qi) => {
+    const card = document.getElementById("q" + qi);
+    const chosen = Number(form.querySelector(`input[name="q${qi}"]:checked`).value);
+    const labels = card.querySelectorAll(".option");
+    labels[q.answer].classList.add("correct");
+    if (chosen === q.answer) {
+      score++;
+    } else {
+      labels[chosen].classList.add("wrong");
+    }
+    card.querySelectorAll("input").forEach(i => i.disabled = true);
+    card.classList.add("locked");
+    const exp = document.getElementById("exp" + qi);
+    exp.textContent = (chosen === q.answer ? "✔ Correct. " : "✘ Incorrect. The answer is "
+      + String.fromCharCode(65 + q.answer) + ". ") + q.explanation;
+  });
+
+  const pct = Math.round(score / questions.length * 100);
+  document.getElementById("score").textContent = `${score} / ${questions.length} (${pct}%)`;
+  document.getElementById("scoreMsg").textContent =
+    pct === 100 ? "Perfect score! You've mastered callbacks and overloading." :
+    pct >= 80 ? "Great job! Review the explanations for the ones you missed." :
+    pct >= 50 ? "Good effort. Revisit the notes and try again." :
+                "Keep practicing. Re-read the material and retry the quiz.";
+  resultBox.style.display = "block";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function reset() {
+  submitted = false;
+  resultBox.style.display = "none";
+  warning.style.display = "none";
+  render();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+document.getElementById("submitBtn").addEventListener("click", submit);
+document.getElementById("resetBtn").addEventListener("click", reset);
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz: TypeScript Arrays & Tuples</title>
+<style>
+  :root {
+    --bg: #f4f6fb;
+    --card: #ffffff;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --primary: #3178c6;
+    --primary-dark: #235a97;
+    --correct: #16a34a;
+    --correct-bg: #dcfce7;
+    --wrong: #dc2626;
+    --wrong-bg: #fee2e2;
+    --border: #e5e7eb;
+    --code-bg: #1e293b;
+    --code-text: #e2e8f0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+  header {
+    background: var(--primary);
+    color: #fff;
+    padding: 28px 20px;
+    text-align: center;
+  }
+  header h1 { margin: 0 0 6px; font-size: 1.7rem; }
+  header p { margin: 0; opacity: 0.9; }
+  main { max-width: 860px; margin: 0 auto; padding: 24px 16px 60px; }
+
+  .progress-wrap {
+    position: sticky; top: 0; z-index: 10;
+    background: var(--bg);
+    padding: 10px 0 14px;
+  }
+  .progress-label { font-size: 0.9rem; color: var(--muted); margin-bottom: 6px; }
+  .progress { height: 8px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .progress-bar { height: 100%; width: 0; background: var(--primary); transition: width 0.25s; }
+
+  .question {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 22px;
+    margin-bottom: 18px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .question.unanswered { border-color: #f59e0b; box-shadow: 0 0 0 2px #fde68a; }
+  .q-head { display: flex; gap: 10px; align-items: baseline; margin-bottom: 10px; }
+  .q-num {
+    flex-shrink: 0;
+    background: var(--primary); color: #fff;
+    font-weight: 600; font-size: 0.85rem;
+    border-radius: 6px; padding: 2px 8px;
+  }
+  .q-topic { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  .q-text { font-weight: 600; margin: 0 0 12px; }
+  pre {
+    background: var(--code-bg); color: var(--code-text);
+    padding: 14px 16px; border-radius: 8px;
+    overflow-x: auto; font-size: 0.88rem; margin: 0 0 14px;
+  }
+  code { font-family: Consolas, "Courier New", monospace; }
+  .inline-code { font-family: Consolas, "Courier New", monospace; font-size: 0.92em; }
+
+  .option {
+    display: flex; align-items: flex-start; gap: 10px;
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px 12px; margin-bottom: 8px;
+    cursor: pointer; transition: background 0.15s, border-color 0.15s;
+  }
+  .option:hover { background: #f1f5fd; border-color: #c7d7ee; }
+  .option input { margin-top: 4px; accent-color: var(--primary); }
+  .option.correct { background: var(--correct-bg); border-color: var(--correct); }
+  .option.wrong { background: var(--wrong-bg); border-color: var(--wrong); }
+  .locked .option { cursor: default; }
+  .locked .option:hover { background: inherit; }
+  .locked .option.correct:hover { background: var(--correct-bg); }
+  .locked .option.wrong:hover { background: var(--wrong-bg); }
+
+  .explanation {
+    display: none;
+    margin-top: 10px; padding: 10px 12px;
+    border-left: 4px solid var(--primary);
+    background: #f1f5fd; border-radius: 4px;
+    font-size: 0.93rem;
+  }
+  .locked .explanation { display: block; }
+
+  .actions { display: flex; gap: 12px; justify-content: center; margin-top: 24px; flex-wrap: wrap; }
+  button {
+    font: inherit; font-weight: 600;
+    border: none; border-radius: 8px;
+    padding: 12px 26px; cursor: pointer;
+  }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-secondary { background: #fff; color: var(--primary); border: 1px solid var(--primary); }
+  .btn-secondary:hover { background: #f1f5fd; }
+
+  #result {
+    display: none;
+    text-align: center;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  #result .score { font-size: 2.4rem; font-weight: 700; color: var(--primary); margin: 4px 0; }
+  #result .msg { color: var(--muted); }
+  .warning { color: #b45309; text-align: center; margin-top: 12px; display: none; }
+</style>
+</head>
+<body>
+<header>
+  <h1>TypeScript Arrays &amp; Tuples</h1>
+  <p>Multiple Choice Quiz &mdash; choose the best answer for each question</p>
+</header>
+
+<main>
+  <div id="result">
+    <div>Your Score</div>
+    <div class="score" id="score"></div>
+    <div class="msg" id="scoreMsg"></div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-label" id="progressLabel">Answered 0 of 0</div>
+    <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+  </div>
+
+  <form id="quiz"></form>
+
+  <p class="warning" id="warning">Please answer all highlighted questions before submitting.</p>
+  <div class="actions">
+    <button type="button" class="btn-primary" id="submitBtn">Submit Answers</button>
+    <button type="button" class="btn-secondary" id="resetBtn">Reset Quiz</button>
+  </div>
+</main>
+
+<script>
+const questions = [
+  // ---------- Array basics ----------
+  {
+    topic: "Arrays",
+    text: "What is an array in TypeScript?",
+    options: [
+      "A variable that can store only one value",
+      "A special type of variable that can store multiple values",
+      "A function that returns multiple values",
+      "A type that can only hold numbers"
+    ],
+    answer: 1,
+    explanation: "An array is a special type of variable that stores multiple values. They can all be one type or a mix of types."
+  },
+  {
+    topic: "Declaring Arrays",
+    text: "What are the two main ways to declare an array in TypeScript?",
+    options: [
+      "Array literal syntax (string[]) and generic syntax (Array<string>)",
+      "new List() and new Set()",
+      "string{} and Array{string}",
+      "Tuple syntax and enum syntax"
+    ],
+    answer: 0,
+    explanation: "You can declare an array with square brackets (Type[]) or with the generic Array<Type> syntax."
+  },
+  {
+    topic: "Declaring Arrays",
+    text: "Which declaration creates an array of numbers using the generic array syntax?",
+    options: [
+      "let empIds: number = [101, 102];",
+      "let empIds: [number] = [101, 102];",
+      "let empIds: Array<number> = [101, 102];",
+      "let empIds: Array(number) = [101, 102];"
+    ],
+    answer: 2,
+    explanation: "The generic syntax is Array<Type>, so an array of numbers is Array<number>."
+  },
+  {
+    topic: "Declaring Arrays",
+    text: "Which of these is equivalent to let names: string[]?",
+    options: [
+      "let names: string;",
+      "let names: Array<string>;",
+      "let names: [string];",
+      "let names: Array<any>;"
+    ],
+    answer: 1,
+    explanation: "string[] and Array<string> mean the same thing. [string] is a tuple with exactly one string element."
+  },
+  {
+    topic: "Union Type Arrays",
+    text: "What can the following array hold?",
+    code: `let data: Array<string | number> = ["john", "smith", 101, 102];`,
+    options: [
+      "Only strings",
+      "Only numbers",
+      "Strings and numbers",
+      "Any type, including booleans and null"
+    ],
+    answer: 2,
+    explanation: "The union type string | number lets the array hold both strings and numbers, and nothing else."
+  },
+  {
+    topic: "Declaring Arrays",
+    text: "Which declaration causes a TypeScript compile error?",
+    options: [
+      `let a: Array<any> = [1, "john", true, null];`,
+      `let b: Array<number> = [101, "102"];`,
+      `let c: string[] = [];`,
+      `let d: Array<string | number> = ["x", 1];`
+    ],
+    answer: 1,
+    explanation: "\"102\" is a string, and Array<number> only allows numbers. Array<any> accepts values of any type."
+  },
+
+  // ---------- Accessing ----------
+  {
+    topic: "Accessing Elements",
+    text: "What index does the first element of an array have?",
+    options: ["1", "0", "-1", "It depends on the array type"],
+    answer: 1,
+    explanation: "Array indexing starts at 0."
+  },
+  {
+    topic: "Accessing Elements",
+    text: "What is the output of the following code?",
+    code: `let names: string[] = ["john", "smith", "peter", "scott"];
+console.log(names[1]);`,
+    options: ["john", "smith", "peter", "undefined"],
+    answer: 1,
+    explanation: "Index 1 is the second element, \"smith\"."
+  },
+  {
+    topic: "Accessing Elements",
+    text: "Using the same names array, what does console.log(names[4]) print?",
+    options: ["scott", "null", "undefined", "It throws an error"],
+    answer: 2,
+    explanation: "The array has 4 elements (indexes 0–3). Index 4 is out of bounds, so the result is undefined."
+  },
+  {
+    topic: "Accessing Elements",
+    text: "What is names2.length?",
+    code: `let names2: string[] = ["john", "smith", "peter", "scott"];`,
+    options: ["3", "4", "5", "0"],
+    answer: 1,
+    explanation: "The array has 4 elements, so length is 4. The last index is length - 1, which is 3."
+  },
+
+  // ---------- Iterating ----------
+  {
+    topic: "Iterating",
+    text: "In a for...in loop over an array, what does the loop variable represent?",
+    code: `for (let i in empIds) {
+    console.log(empIds[i]);
+}`,
+    options: [
+      "The value of each element",
+      "The index of each element",
+      "The length of the array",
+      "The data type of each element"
+    ],
+    answer: 1,
+    explanation: "for...in goes through the indexes, so i is the index and empIds[i] is the value."
+  },
+  {
+    topic: "Iterating",
+    text: "In a for...of loop over an array, what does the loop variable represent?",
+    code: `for (let element of data) {
+    console.log(element);
+}`,
+    options: [
+      "The index of each element",
+      "The actual value of each element",
+      "The array's length",
+      "A copy of the whole array"
+    ],
+    answer: 1,
+    explanation: "for...of goes through the values, so element is each array value itself."
+  },
+  {
+    topic: "Iterating",
+    text: "Which for-loop condition correctly visits every element of empNames?",
+    options: [
+      "for (let i = 0; i <= empNames.length; i++)",
+      "for (let i = 1; i < empNames.length; i++)",
+      "for (let i = 0; i < empNames.length; i++)",
+      "for (let i = 1; i <= empNames.length; i++)"
+    ],
+    answer: 2,
+    explanation: "Start at index 0 and stop before length. Using <= would read one past the end, and starting at 1 would skip the first element."
+  },
+
+  // ---------- Functions ----------
+  {
+    topic: "Passing Arrays to Functions",
+    text: "What is the output of the following code?",
+    code: `function search(ele: number, arr: number[]): boolean {
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i] === ele) {
+            return true;
+        }
+    }
+    return false;
+}
+
+let arr: number[] = [10, 20, 30, 40, 50];
+console.log(search(20, arr));
+console.log(search(100, arr));`,
+    options: [
+      "true\ntrue",
+      "true\nfalse",
+      "false\ntrue",
+      "1\n-1"
+    ],
+    answer: 1,
+    explanation: "20 is in the array, so the first call returns true. 100 isn't, so the second call returns false."
+  },
+  {
+    topic: "Passing Arrays to Functions",
+    text: "In search(ele: number, arr: number[]), what does arr: number[] mean?",
+    options: [
+      "arr must be a single number",
+      "arr must be an array of numbers",
+      "arr can be an array of any type",
+      "arr is optional"
+    ],
+    answer: 1,
+    explanation: "number[] is the type annotation for an array of numbers."
+  },
+  {
+    topic: "Function Returning an Array",
+    text: "What is the output of the following code?",
+    code: `function capitalizeWords(arr: string[]): string[] {
+    let result: string[] = [];
+    for (let i = 0; i < arr.length; i++) {
+        result[i] = arr[i].toUpperCase();
+    }
+    return result;
+}
+
+let words: string[] = ["hello", "world", "typescript"];
+console.log(capitalizeWords(words));`,
+    options: [
+      `["hello", "world", "typescript"]`,
+      `["Hello", "World", "Typescript"]`,
+      `["HELLO", "WORLD", "TYPESCRIPT"]`,
+      `"HELLO WORLD TYPESCRIPT"`
+    ],
+    answer: 2,
+    explanation: "Each word is converted with toUpperCase() and stored in a new array, which the function returns."
+  },
+  {
+    topic: "Function Returning an Array",
+    text: "In capitalizeWords, what does the : string[] after the parameter list mean?",
+    options: [
+      "The function accepts an array of strings",
+      "The function returns an array of strings",
+      "The function returns a single string",
+      "The function has no return value"
+    ],
+    answer: 1,
+    explanation: "The annotation after the parameter list is the return type. Here the function returns string[]."
+  },
+
+  // ---------- Tuples ----------
+  {
+    topic: "Tuples",
+    text: "What is a tuple in TypeScript?",
+    options: [
+      "An array that can grow to any size with elements of any type",
+      "A fixed-length array where each element has a specific type",
+      "A special kind of object with named keys",
+      "Another name for Array<any>"
+    ],
+    answer: 1,
+    explanation: "A tuple is a fixed-length array in which each position has its own specific type."
+  },
+  {
+    topic: "Tuples",
+    text: "What is the output of the following code?",
+    code: `let person: [string, number] = ["Alice", 25];
+console.log(person[0]);
+console.log(person[1]);`,
+    options: [
+      "Alice\n25",
+      "25\nAlice",
+      "Alice\nundefined",
+      "[\"Alice\", 25]"
+    ],
+    answer: 0,
+    explanation: "person[0] is the string \"Alice\" and person[1] is the number 25."
+  },
+  {
+    topic: "Tuples",
+    text: "Given let person: [string, number], which assignment is valid?",
+    options: [
+      `person = [30, "Bob"];`,
+      `person = ["Bob"];`,
+      `person = ["Bob", 30];`,
+      `person = ["Bob", "30"];`
+    ],
+    answer: 2,
+    explanation: "A tuple needs the correct types in the correct order and the correct number of elements, which here is one string followed by one number."
+  },
+  {
+    topic: "Arrays vs Tuples",
+    text: "Which statement best describes the difference between an array and a tuple?",
+    options: [
+      "Arrays are fixed-length; tuples can grow to any size",
+      "Arrays hold a variable number of elements; a tuple has a fixed length with a specific type at each position",
+      "Tuples can only store strings",
+      "There is no difference"
+    ],
+    answer: 1,
+    explanation: "An array (e.g. string[]) holds any number of elements. A tuple (e.g. [string, number]) fixes both the number of elements and the type at each position."
+  }
+];
+
+const form = document.getElementById("quiz");
+const progressBar = document.getElementById("progressBar");
+const progressLabel = document.getElementById("progressLabel");
+const warning = document.getElementById("warning");
+const resultBox = document.getElementById("result");
+let submitted = false;
+
+function render() {
+  form.innerHTML = "";
+  questions.forEach((q, qi) => {
+    const card = document.createElement("div");
+    card.className = "question";
+    card.id = "q" + qi;
+
+    const head = document.createElement("div");
+    head.className = "q-head";
+    const num = document.createElement("span");
+    num.className = "q-num";
+    num.textContent = "Q" + (qi + 1);
+    const topic = document.createElement("span");
+    topic.className = "q-topic";
+    topic.textContent = q.topic;
+    head.append(num, topic);
+
+    const text = document.createElement("p");
+    text.className = "q-text";
+    text.textContent = q.text;
+
+    card.append(head, text);
+
+    if (q.code) {
+      const pre = document.createElement("pre");
+      const code = document.createElement("code");
+      code.textContent = q.code;
+      pre.appendChild(code);
+      card.appendChild(pre);
+    }
+
+    q.options.forEach((opt, oi) => {
+      const label = document.createElement("label");
+      label.className = "option";
+      const input = document.createElement("input");
+      input.type = "radio";
+      input.name = "q" + qi;
+      input.value = oi;
+      input.addEventListener("change", () => {
+        card.classList.remove("unanswered");
+        updateProgress();
+      });
+      const span = document.createElement("span");
+      if (opt.includes("\n")) span.style.whiteSpace = "pre-line";
+      // Render code-like options in monospace
+      if (/^(let |for |person |\[|"\S)/.test(opt)) span.className = "inline-code";
+      span.textContent = String.fromCharCode(65 + oi) + ". " + opt;
+      label.append(input, span);
+      card.appendChild(label);
+    });
+
+    const exp = document.createElement("div");
+    exp.className = "explanation";
+    exp.id = "exp" + qi;
+    card.appendChild(exp);
+
+    form.appendChild(card);
+  });
+  updateProgress();
+}
+
+function updateProgress() {
+  const answered = questions.filter((_, qi) =>
+    form.querySelector(`input[name="q${qi}"]:checked`)).length;
+  progressLabel.textContent = `Answered ${answered} of ${questions.length}`;
+  progressBar.style.width = (answered / questions.length * 100) + "%";
+}
+
+function submit() {
+  if (submitted) return;
+  let firstMissing = null;
+  questions.forEach((_, qi) => {
+    const card = document.getElementById("q" + qi);
+    if (!form.querySelector(`input[name="q${qi}"]:checked`)) {
+      card.classList.add("unanswered");
+      if (!firstMissing) firstMissing = card;
+    }
+  });
+  if (firstMissing) {
+    warning.style.display = "block";
+    firstMissing.scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+  warning.style.display = "none";
+  submitted = true;
+
+  let score = 0;
+  questions.forEach((q, qi) => {
+    const card = document.getElementById("q" + qi);
+    const chosen = Number(form.querySelector(`input[name="q${qi}"]:checked`).value);
+    const labels = card.querySelectorAll(".option");
+    labels[q.answer].classList.add("correct");
+    if (chosen === q.answer) {
+      score++;
+    } else {
+      labels[chosen].classList.add("wrong");
+    }
+    card.querySelectorAll("input").forEach(i => i.disabled = true);
+    card.classList.add("locked");
+    document.getElementById("exp" + qi).textContent =
+      (chosen === q.answer ? "✔ Correct. " : "✘ Incorrect. The answer is "
+        + String.fromCharCode(65 + q.answer) + ". ") + q.explanation;
+  });
+
+  const pct = Math.round(score / questions.length * 100);
+  document.getElementById("score").textContent = `${score} / ${questions.length} (${pct}%)`;
+  document.getElementById("scoreMsg").textContent =
+    pct === 100 ? "Perfect score! You've mastered arrays and tuples." :
+    pct >= 80 ? "Great job! Review the explanations for the ones you missed." :
+    pct >= 50 ? "Good effort. Revisit the notes and try again." :
+                "Keep practicing. Re-read the material and retry the quiz.";
+  resultBox.style.display = "block";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function reset() {
+  submitted = false;
+  resultBox.style.display = "none";
+  warning.style.display = "none";
+  render();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+document.getElementById("submitBtn").addEventListener("click", submit);
+document.getElementById("resetBtn").addEventListener("click", reset);
+render();
+</script>
+</body>
+</html>

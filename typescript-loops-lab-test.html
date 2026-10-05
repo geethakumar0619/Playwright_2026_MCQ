@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TypeScript Lab Test — Looping Statements (auto-graded)</title>
+<style>
+  :root {
+    --bg: #fbfbfa; --surface: #fff; --surface-2: #f4f4f2; --border: #e4e4e0;
+    --text: #1f1f1d; --dim: #6b6b66;
+    --accent: #2f6f4f; --accent-soft: #eaf3ed;
+    --ok-bg: #e7f4ec; --ok-br: #7fba97; --ok-tx: #1c5c38;
+    --no-bg: #fbeaea; --no-br: #d99b9b; --no-tx: #8d2b2b;
+    --warn-bg: #fdf3e3; --warn-br: #dfc08a; --warn-tx: #8a5a15;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17181a; --surface: #1e2022; --surface-2: #24262a; --border: #33363a;
+      --text: #e8e8e6; --dim: #9a9a96;
+      --accent: #7fc4a0; --accent-soft: #22302a;
+      --ok-bg: #1b2f23; --ok-br: #3f7a57; --ok-tx: #8fd5aa;
+      --no-bg: #331d1d; --no-br: #7a4040; --no-tx: #e69b9b;
+      --warn-bg: #332a18; --warn-br: #6b5527; --warn-tx: #d6a55f;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 92px; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.62 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  header.top {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    backdrop-filter: blur(10px); border-bottom: 1px solid var(--border);
+  }
+  .top-inner { max-width: 1120px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .brand { font-weight: 650; font-size: 15px; letter-spacing: -.01em; }
+  .brand span { color: var(--dim); font-weight: 400; }
+  .scoreboard { display: flex; gap: 8px; margin-left: auto; align-items: center; flex-wrap: wrap; }
+  .stat { font-size: 12.5px; padding: 4px 11px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); color: var(--dim); white-space: nowrap; }
+  .stat b { color: var(--text); font-weight: 650; font-variant-numeric: tabular-nums; }
+  .stat.good b { color: var(--ok-tx); }
+  a.ctl, button.ctl {
+    font: inherit; font-size: 12.5px; font-weight: 600; padding: 6px 13px;
+    border-radius: 7px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text); cursor: pointer; text-decoration: none;
+  }
+  a.ctl:hover, button.ctl:hover { background: var(--surface-2); border-color: var(--dim); }
+  button.ctl.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  @media (prefers-color-scheme: dark) { button.ctl.primary { color: #10201a; } }
+  button.ctl.primary:hover { filter: brightness(1.08); }
+  .toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--dim); cursor: pointer; user-select: none; }
+  .toggle input { accent-color: var(--accent); cursor: pointer; }
+  .progress-wrap { height: 3px; background: var(--border); }
+  .progress-bar { height: 100%; width: 0; background: var(--accent); transition: width .25s; }
+
+  .shell { max-width: 1120px; margin: 0 auto; padding: 0 24px 90px; display: flex; gap: 34px; }
+  nav.toc { width: 224px; flex: none; position: sticky; top: 76px; align-self: flex-start; padding-top: 30px; max-height: calc(100vh - 110px); overflow-y: auto; }
+  nav.toc h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .09em; color: var(--dim); margin: 0 0 8px; }
+  nav.toc h2:not(:first-child) { margin-top: 14px; }
+  nav.toc a { display: flex; gap: 8px; align-items: baseline; padding: 5px 9px; margin-bottom: 1px; border-radius: 6px; font-size: 13px; color: var(--dim); text-decoration: none; }
+  nav.toc a:hover { background: var(--surface-2); color: var(--text); }
+  nav.toc a .dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--border); margin-top: 6px; }
+  nav.toc a.done .dot { background: var(--ok-br); }
+  nav.toc a.bad .dot { background: var(--no-br); }
+  nav.toc a .tt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  main { flex: 1; min-width: 0; padding-top: 30px; }
+
+  .hero { margin-bottom: 26px; }
+  .hero h1 { font-size: 28px; line-height: 1.24; margin: 0 0 10px; letter-spacing: -.02em; }
+  .hero .sub { color: var(--dim); font-size: 15px; margin: 0 0 16px; max-width: 66ch; }
+  .chips { display: flex; gap: 9px; flex-wrap: wrap; margin-bottom: 16px; }
+  .chip { font-size: 12.5px; padding: 5px 11px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); color: var(--dim); }
+  .chip b { color: var(--text); font-weight: 650; }
+  .howto { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--warn-br); border-radius: 10px; padding: 14px 18px; font-size: 14.5px; margin-bottom: 12px; }
+  .howto h3 { margin: 0 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .07em; color: var(--warn-tx); }
+  .howto ul { margin: 0; padding-left: 20px; color: var(--dim); }
+  .howto li { margin-bottom: 5px; }
+  .howto li:last-child { margin-bottom: 0; }
+  .howto strong { color: var(--text); }
+  .credit { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 10px; padding: 13px 17px; font-size: 14px; color: var(--dim); margin-bottom: 26px; }
+  .credit a { color: var(--accent); text-decoration: none; font-weight: 550; }
+  .credit p { margin: 0 0 5px; }
+  .credit p:last-child { margin: 0; }
+
+  section.grp { margin-bottom: 40px; }
+  .grp-head { display: flex; align-items: baseline; gap: 12px; padding-bottom: 9px; border-bottom: 2px solid var(--border); margin-bottom: 18px; }
+  .grp-head h2 { font-size: 19.5px; margin: 0; letter-spacing: -.015em; }
+  .grp-head h2 code { font-size: .88em; }
+  .grp-head .n { font-size: 13px; color: var(--dim); margin-left: auto; white-space: nowrap; }
+
+  .task { background: var(--surface); border: 1px solid var(--border); border-radius: 11px; padding: 18px 20px; margin-bottom: 16px; scroll-margin-top: 92px; }
+  .task.pass { border-color: var(--ok-br); }
+  .task.fail { border-color: var(--no-br); }
+  .t-head { display: flex; gap: 11px; align-items: flex-start; margin-bottom: 10px; }
+  .t-num { flex: none; font: 650 12px/1.55 var(--mono); color: var(--accent); background: var(--accent-soft); border-radius: 6px; padding: 2px 8px; margin-top: 3px; }
+  .t-title { flex: 1; min-width: 0; font-weight: 600; font-size: 16.5px; }
+  .pill { flex: none; font-size: 11.5px; font-weight: 650; padding: 3px 10px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); color: var(--dim); white-space: nowrap; margin-top: 3px; }
+  .pill.pass { background: var(--ok-bg); border-color: var(--ok-br); color: var(--ok-tx); }
+  .pill.fail { background: var(--no-bg); border-color: var(--no-br); color: var(--no-tx); }
+  .t-prompt { margin: 0 0 12px; color: var(--text); }
+  .t-sig { font: 13.5px/1.5 var(--mono); background: var(--surface-2); border: 1px solid var(--border); border-radius: 7px; padding: 8px 12px; margin-bottom: 12px; overflow-x: auto; white-space: pre; }
+
+  textarea.editor {
+    width: 100%; min-height: 160px; resize: vertical;
+    font: 13.5px/1.6 var(--mono);
+    background: var(--surface-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; tab-size: 2;
+  }
+  textarea.editor:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
+
+  .t-actions { display: flex; gap: 8px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
+  .t-actions .spacer { flex: 1; }
+  .t-actions .hint { font-size: 12.5px; color: var(--dim); }
+
+  .t-result { display: none; margin-top: 12px; }
+  .t-result.show { display: block; }
+  .rbanner { font-size: 14px; font-weight: 600; padding: 9px 13px; border-radius: 8px; margin-bottom: 9px; border: 1px solid var(--border); background: var(--surface-2); }
+  .rbanner.pass { background: var(--ok-bg); border-color: var(--ok-br); color: var(--ok-tx); }
+  .rbanner.fail { background: var(--no-bg); border-color: var(--no-br); color: var(--no-tx); }
+  .rbanner.err  { background: var(--warn-bg); border-color: var(--warn-br); color: var(--warn-tx); font-family: var(--mono); font-size: 13px; font-weight: 500; white-space: pre-wrap; }
+  table.cases { border-collapse: collapse; width: 100%; font-size: 13.5px; margin: 0; }
+  table.cases th, table.cases td { text-align: left; padding: 6px 10px; border: 1px solid var(--border); }
+  table.cases th { background: var(--surface-2); font-weight: 600; font-size: 12px; }
+  table.cases td { font-family: var(--mono); font-size: 12.5px; word-break: break-word; }
+  table.cases td.st { width: 28px; text-align: center; font-weight: 700; color: var(--no-tx); }
+
+  details.sol { margin-top: 10px; border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; background: var(--surface-2); }
+  details.sol summary { cursor: pointer; font-weight: 600; font-size: 13.5px; color: var(--accent); }
+  details.sol[aria-disabled="true"] summary { color: var(--dim); cursor: not-allowed; }
+  details.sol pre { margin: 10px 0 0; background: var(--surface); }
+
+  .results { display: none; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 30px; scroll-margin-top: 92px; }
+  .results.show { display: block; }
+  .results h2 { margin: 0 0 4px; font-size: 22px; }
+  .big-score { font: 700 42px/1.1 -apple-system, "Segoe UI", sans-serif; letter-spacing: -.03em; margin: 12px 0 6px; font-variant-numeric: tabular-nums; }
+  .band { display: inline-block; font-size: 13px; font-weight: 650; padding: 4px 12px; border-radius: 999px; margin-bottom: 6px; }
+  .band.pass { background: var(--ok-bg); color: var(--ok-tx); border: 1px solid var(--ok-br); }
+  .band.fail { background: var(--no-bg); color: var(--no-tx); border: 1px solid var(--no-br); }
+  .subscore { color: var(--dim); font-size: 14px; margin-bottom: 18px; }
+  .bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 9px; font-size: 14px; }
+  .bar-row .nm { width: 190px; flex: none; color: var(--dim); }
+  .bar-track { flex: 1; height: 9px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--accent); }
+  .bar-row .sc { width: 52px; flex: none; text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .advice { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 14.5px; }
+  .advice h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .07em; color: var(--dim); margin: 0 0 10px; }
+  .advice p { margin: 0 0 9px; }
+  .advice a { color: var(--accent); font-weight: 600; }
+  .failist { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .failist a { font-size: 12.5px; font-weight: 600; padding: 3px 10px; border-radius: 999px; text-decoration: none; background: var(--no-bg); border: 1px solid var(--no-br); color: var(--no-tx); }
+
+  pre { background: var(--surface-2); border: 1px solid var(--border); border-radius: 7px; padding: 11px 13px; overflow-x: auto; }
+  pre code { background: none; border: none; padding: 0; font-size: 13px; line-height: 1.55; white-space: pre; font-family: var(--mono); }
+  code { font: .875em/1.4 var(--mono); background: var(--surface-2); padding: 1.5px 5px; border-radius: 4px; border: 1px solid var(--border); }
+  footer.end { border-top: 1px solid var(--border); margin-top: 42px; padding-top: 18px; color: var(--dim); font-size: 13.5px; }
+  footer.end a { color: var(--accent); }
+
+  @media (max-width: 960px) {
+    .shell { display: block; padding: 0 17px 60px; }
+    nav.toc { display: none; }
+    main { padding-top: 22px; }
+    .hero h1 { font-size: 22px; }
+    .bar-row .nm { width: 110px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">Lab Test <span>· TypeScript Looping Statements</span></div>
+    <div class="scoreboard">
+      <span class="stat">Attempted <b id="s-attempted">0</b>/<b id="s-total">22</b></span>
+      <span class="stat good">Passed <b id="s-passed">—</b></span>
+      <label class="toggle"><input type="checkbox" id="practice"> Practice mode</label>
+      <a class="ctl" href="typescript-loops-quiz.html">← MCQ quiz</a>
+      <button class="ctl" id="btn-reset">Reset all</button>
+      <button class="ctl primary" id="btn-submit">Submit &amp; evaluate</button>
+    </div>
+  </div>
+  <div class="progress-wrap"><div class="progress-bar" id="progress"></div></div>
+</header>
+
+<div class="shell">
+  <nav class="toc" id="toc"></nav>
+
+  <main>
+    <div class="hero">
+      <h1>Lab Assignments — auto-graded</h1>
+      <p class="sub">Twenty-two looping exercises. Write each function in the editor, then hit <strong>Submit &amp; evaluate</strong> — every assignment runs against hidden test cases and is scored automatically.</p>
+      <div class="chips">
+        <span class="chip"><b>22</b> assignments</span>
+        <span class="chip"><b id="c-cases">—</b> test cases</span>
+        <span class="chip">~<b>70</b> minutes</span>
+        <span class="chip">Suggested pass <b>16/22</b></span>
+      </div>
+      <div class="howto">
+        <h3>How this works</h3>
+        <ul>
+          <li><strong>Keep the given function name and parameter order</strong> — the grader calls it by name.</li>
+          <li><strong>Return</strong> the answer; don't <code>console.log</code> it. Where the original assignment says "print a sequence", <strong>return an array</strong> instead — the signature on each card tells you exactly what to return.</li>
+          <li>TypeScript annotations are fine — they're stripped before running. Plain JavaScript works too.</li>
+          <li><strong>Infinite loops are caught</strong>, not fatal: every loop is instrumented with a guard that aborts after ~2 seconds and reports it as a failed test, so a runaway <code>while</code> won't freeze the page or lose your work.</li>
+          <li>Your code is <strong>saved in this browser</strong> as you type, so a refresh won't lose it.</li>
+          <li>String answers are compared case-insensitively; arrays must match in order and length.</li>
+          <li>Tick <strong>Practice mode</strong> to check one assignment at a time instead of waiting for the final submit.</li>
+        </ul>
+      </div>
+      <div class="credit">
+        <p><strong>Source:</strong> lab assignments from SDET Pavan.</p>
+        <p><a href="https://www.pavanonlinetrainings.com" target="_blank" rel="noopener">pavanonlinetrainings.com</a> · <a href="https://www.youtube.com/@sdetpavan" target="_blank" rel="noopener">youtube.com/@sdetpavan</a></p>
+      </div>
+    </div>
+
+    <div class="results" id="results">
+      <h2>Results</h2>
+      <div class="big-score" id="r-score">—</div>
+      <div id="r-band"></div>
+      <div class="subscore" id="r-sub"></div>
+      <div id="r-bars"></div>
+      <div class="advice" id="r-advice"></div>
+    </div>
+
+    <div id="tasks"></div>
+
+    <footer class="end">
+      22 auto-graded assignments · single-file HTML, no dependencies, runs offline.
+      Content credit: <a href="https://www.pavanonlinetrainings.com" target="_blank" rel="noopener">pavanonlinetrainings.com</a> ·
+      <a href="https://www.youtube.com/@sdetpavan" target="_blank" rel="noopener">@sdetpavan</a>
+    </footer>
+  </main>
+</div>
+
+<script>
+/* ------------------------------------------------------------------ *
+ *  Assignment definitions
+ * ------------------------------------------------------------------ */
+var GROUPS = [
+  {
+    id: "while", title: "Group 1 — <code>while</code> loop", short: "while",
+    tasks: [
+      { n: 1, fn: "sumFirstN",
+        title: "Sum of the first N natural numbers",
+        prompt: "Return the sum of the first <code>n</code> natural numbers using a <strong>while</strong> loop. The original assignment fixes this at 10 (answer 55); it is parameterised here so it can be tested properly. For <code>n = 0</code> return <code>0</code>.",
+        sig: "function sumFirstN(n: number): number",
+        starter: "function sumFirstN(n: number): number {\n  let sum: number = 0;\n  let i: number = 1;\n  // your while loop here\n\n  return sum;\n}",
+        tests: [ {args:[10],exp:55}, {args:[1],exp:1}, {args:[5],exp:15}, {args:[100],exp:5050}, {args:[0],exp:0} ],
+        solution: "function sumFirstN(n: number): number {\n  let sum: number = 0;\n  let i: number = 1;\n  while (i <= n) {\n    sum = sum + i;\n    i++;\n  }\n  return sum;\n}" },
+
+      { n: 2, fn: "factorial",
+        title: "Factorial of a number",
+        prompt: "Return <code>n!</code> using a <strong>while</strong> loop. By definition <code>0! = 1</code>.",
+        sig: "function factorial(n: number): number",
+        starter: "function factorial(n: number): number {\n  // your code here\n\n}",
+        tests: [ {args:[0],exp:1}, {args:[1],exp:1}, {args:[5],exp:120}, {args:[6],exp:720}, {args:[10],exp:3628800} ],
+        solution: "function factorial(n: number): number {\n  let result: number = 1;\n  let i: number = 1;\n  while (i <= n) {\n    result = result * i;\n    i++;\n  }\n  return result;\n}" },
+
+      { n: 3, fn: "reverseNumber",
+        title: "Reverse a number",
+        prompt: "Return the digits of <code>n</code> reversed, as a number, using a <strong>while</strong> loop. Leading zeros disappear naturally: <code>1200</code> reverses to <code>21</code>. Assume <code>n</code> is not negative.",
+        sig: "function reverseNumber(n: number): number",
+        starter: "function reverseNumber(n: number): number {\n  // your code here\n  // hint: n % 10 gives the last digit, Math.floor(n / 10) drops it\n\n}",
+        tests: [ {args:[123],exp:321}, {args:[9876],exp:6789}, {args:[100],exp:1}, {args:[1200],exp:21}, {args:[5],exp:5}, {args:[0],exp:0} ],
+        solution: "function reverseNumber(n: number): number {\n  let reversed: number = 0;\n  while (n > 0) {\n    const digit: number = n % 10;\n    reversed = reversed * 10 + digit;\n    n = Math.floor(n / 10);\n  }\n  return reversed;\n}" },
+
+      { n: 4, fn: "isPrime",
+        title: "Check if a number is prime",
+        prompt: "Return <code>true</code> when <code>n</code> is prime, using a <strong>while</strong> loop. Remember that 0, 1 and negatives are <em>not</em> prime, and 2 is.",
+        sig: "function isPrime(n: number): boolean",
+        starter: "function isPrime(n: number): boolean {\n  // your code here\n\n}",
+        tests: [ {args:[2],exp:true}, {args:[3],exp:true}, {args:[17],exp:true}, {args:[29],exp:true},
+                 {args:[0],exp:false}, {args:[1],exp:false}, {args:[4],exp:false}, {args:[9],exp:false}, {args:[25],exp:false} ],
+        solution: "function isPrime(n: number): boolean {\n  if (n < 2) {\n    return false;\n  }\n  let i: number = 2;\n  while (i * i <= n) {\n    if (n % i === 0) {\n      return false;\n    }\n    i++;\n  }\n  return true;\n}" },
+
+      { n: 5, fn: "largestDigit",
+        title: "Largest digit in a number",
+        prompt: "Return the largest single digit inside <code>n</code>, using a <strong>while</strong> loop. For <code>4571</code> the answer is <code>7</code>. Assume <code>n</code> is not negative.",
+        sig: "function largestDigit(n: number): number",
+        starter: "function largestDigit(n: number): number {\n  // your code here\n\n}",
+        tests: [ {args:[4571],exp:7}, {args:[999],exp:9}, {args:[91827],exp:9}, {args:[102],exp:2}, {args:[5],exp:5}, {args:[0],exp:0} ],
+        solution: "function largestDigit(n: number): number {\n  let largest: number = 0;\n  while (n > 0) {\n    const digit: number = n % 10;\n    if (digit > largest) {\n      largest = digit;\n    }\n    n = Math.floor(n / 10);\n  }\n  return largest;\n}" },
+
+      { n: 6, fn: "isPalindrome",
+        title: "Check if a number is a palindrome",
+        prompt: "Return <code>true</code> when <code>n</code> reads the same forwards and backwards, using a <strong>while</strong> loop. Single-digit numbers count as palindromes.",
+        sig: "function isPalindrome(n: number): boolean",
+        starter: "function isPalindrome(n: number): boolean {\n  // your code here\n  // hint: reverse the number, then compare with the original\n\n}",
+        tests: [ {args:[121],exp:true}, {args:[12321],exp:true}, {args:[1221],exp:true}, {args:[7],exp:true},
+                 {args:[123],exp:false}, {args:[10],exp:false} ],
+        solution: "function isPalindrome(n: number): boolean {\n  const original: number = n;\n  let reversed: number = 0;\n  while (n > 0) {\n    reversed = reversed * 10 + (n % 10);\n    n = Math.floor(n / 10);\n  }\n  return reversed === original;\n}" }
+    ]
+  },
+  {
+    id: "dowhile", title: "Group 2 — <code>do-while</code> loop", short: "do-while",
+    tasks: [
+      { n: 7, fn: "numbers1To10",
+        title: "Numbers from 1 to 10",
+        prompt: "Return the array <code>[1, 2, …, 10]</code>, built with a <strong>do-while</strong> loop.",
+        sig: "function numbers1To10(): number[]",
+        starter: "function numbers1To10(): number[] {\n  const out: number[] = [];\n  let i: number = 1;\n  // your do-while loop here\n\n  return out;\n}",
+        tests: [ {args:[],exp:[1,2,3,4,5,6,7,8,9,10]} ],
+        solution: "function numbers1To10(): number[] {\n  const out: number[] = [];\n  let i: number = 1;\n  do {\n    out.push(i);\n    i++;\n  } while (i <= 10);\n  return out;\n}" },
+
+      { n: 8, fn: "runCalculator",
+        title: "Calculator that runs until the user exits",
+        prompt: "Apply each operator in <code>ops</code> to <code>a</code> and <code>b</code> with a <strong>do-while</strong> loop, collecting the results. Stop as soon as you reach <code>\"exit\"</code> — anything after it is ignored. Supported operators are <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>. <em>(The original assignment reads input from the user; here the \"input\" is the <code>ops</code> array.)</em>",
+        sig: "function runCalculator(a: number, b: number, ops: string[]): number[]",
+        starter: "function runCalculator(a: number, b: number, ops: string[]): number[] {\n  const results: number[] = [];\n  let i: number = 0;\n  // your do-while loop here\n\n  return results;\n}",
+        tests: [ {args:[10,5,["+","-","*","/","exit","%"]],exp:[15,5,50,2]},
+                 {args:[6,3,["exit"]],exp:[]},
+                 {args:[8,2,["/","+"]],exp:[4,10]},
+                 {args:[7,7,["*"]],exp:[49]} ],
+        solution: "function runCalculator(a: number, b: number, ops: string[]): number[] {\n  const results: number[] = [];\n  let i: number = 0;\n  if (ops.length === 0) {\n    return results;\n  }\n  do {\n    const op: string = ops[i];\n    if (op === \"exit\") {\n      break;\n    }\n    switch (op) {\n      case \"+\": results.push(a + b); break;\n      case \"-\": results.push(a - b); break;\n      case \"*\": results.push(a * b); break;\n      case \"/\": results.push(a / b); break;\n    }\n    i++;\n  } while (i < ops.length);\n  return results;\n}" }
+    ]
+  },
+  {
+    id: "for", title: "Group 3 — <code>for</code> loop", short: "for",
+    tasks: [
+      { n: 9, fn: "multiplesOf5",
+        title: "Multiples of 5 from 5 to 50",
+        prompt: "Return <code>[5, 10, 15, …, 50]</code> using a <strong>for</strong> loop.",
+        sig: "function multiplesOf5(): number[]",
+        starter: "function multiplesOf5(): number[] {\n  const out: number[] = [];\n  // your for loop here\n\n  return out;\n}",
+        tests: [ {args:[],exp:[5,10,15,20,25,30,35,40,45,50]} ],
+        solution: "function multiplesOf5(): number[] {\n  const out: number[] = [];\n  for (let i: number = 5; i <= 50; i += 5) {\n    out.push(i);\n  }\n  return out;\n}" },
+
+      { n: 10, fn: "primesUpTo50",
+        title: "Prime numbers between 1 and 50",
+        prompt: "Return every prime number from 1 to 50, in ascending order, using a <strong>for</strong> loop.",
+        sig: "function primesUpTo50(): number[]",
+        starter: "function primesUpTo50(): number[] {\n  const out: number[] = [];\n  // your for loop here\n\n  return out;\n}",
+        tests: [ {args:[],exp:[2,3,5,7,11,13,17,19,23,29,31,37,41,43,47]} ],
+        solution: "function primesUpTo50(): number[] {\n  const out: number[] = [];\n  for (let n: number = 2; n <= 50; n++) {\n    let prime: boolean = true;\n    for (let d: number = 2; d * d <= n; d++) {\n      if (n % d === 0) {\n        prime = false;\n        break;\n      }\n    }\n    if (prime) {\n      out.push(n);\n    }\n  }\n  return out;\n}" },
+
+      { n: 11, fn: "sumEvenTo20",
+        title: "Sum of even numbers between 1 and 20",
+        prompt: "Return the sum of all even numbers from 1 to 20 inclusive, using a <strong>for</strong> loop.",
+        sig: "function sumEvenTo20(): number",
+        starter: "function sumEvenTo20(): number {\n  let sum: number = 0;\n  // your for loop here\n\n  return sum;\n}",
+        tests: [ {args:[],exp:110} ],
+        solution: "function sumEvenTo20(): number {\n  let sum: number = 0;\n  for (let i: number = 1; i <= 20; i++) {\n    if (i % 2 === 0) {\n      sum = sum + i;\n    }\n  }\n  return sum;\n}" },
+
+      { n: 12, fn: "sumOddTo20",
+        title: "Sum of odd numbers between 1 and 20",
+        prompt: "Return the sum of all odd numbers from 1 to 20 inclusive, using a <strong>for</strong> loop.",
+        sig: "function sumOddTo20(): number",
+        starter: "function sumOddTo20(): number {\n  let sum: number = 0;\n  // your for loop here\n\n  return sum;\n}",
+        tests: [ {args:[],exp:100} ],
+        solution: "function sumOddTo20(): number {\n  let sum: number = 0;\n  for (let i: number = 1; i <= 20; i++) {\n    if (i % 2 !== 0) {\n      sum = sum + i;\n    }\n  }\n  return sum;\n}" },
+
+      { n: 13, fn: "tableOf7",
+        title: "Times table of 7",
+        prompt: "Return the 7 times table from 7×1 to 7×10 — that is <code>[7, 14, …, 70]</code> — using a <strong>for</strong> loop.",
+        sig: "function tableOf7(): number[]",
+        starter: "function tableOf7(): number[] {\n  const out: number[] = [];\n  // your for loop here\n\n  return out;\n}",
+        tests: [ {args:[],exp:[7,14,21,28,35,42,49,56,63,70]} ],
+        solution: "function tableOf7(): number[] {\n  const out: number[] = [];\n  for (let i: number = 1; i <= 10; i++) {\n    out.push(7 * i);\n  }\n  return out;\n}" },
+
+      { n: 14, fn: "divisibleBy3And5",
+        title: "Numbers divisible by both 3 and 5 from 1 to 100",
+        prompt: "Return every number from 1 to 100 that divides evenly by <strong>both</strong> 3 and 5, using a <strong>for</strong> loop.",
+        sig: "function divisibleBy3And5(): number[]",
+        starter: "function divisibleBy3And5(): number[] {\n  const out: number[] = [];\n  // your for loop here\n\n  return out;\n}",
+        tests: [ {args:[],exp:[15,30,45,60,75,90]} ],
+        solution: "function divisibleBy3And5(): number[] {\n  const out: number[] = [];\n  for (let i: number = 1; i <= 100; i++) {\n    if (i % 3 === 0 && i % 5 === 0) {\n      out.push(i);\n    }\n  }\n  return out;\n}" },
+
+      { n: 15, fn: "countDigits",
+        title: "Count the digits in a number",
+        prompt: "Return how many digits <code>n</code> has, using a loop. <code>0</code> has one digit. Assume <code>n</code> is not negative.",
+        sig: "function countDigits(n: number): number",
+        starter: "function countDigits(n: number): number {\n  // your code here\n\n}",
+        tests: [ {args:[12345],exp:5}, {args:[7],exp:1}, {args:[0],exp:1}, {args:[1000],exp:4}, {args:[999999],exp:6} ],
+        solution: "function countDigits(n: number): number {\n  if (n === 0) {\n    return 1;\n  }\n  let count: number = 0;\n  for (; n > 0; n = Math.floor(n / 10)) {\n    count++;\n  }\n  return count;\n}" },
+
+      { n: 16, fn: "sumOfDigits",
+        title: "Sum the digits of a number",
+        prompt: "Return the sum of the digits of <code>n</code>, using a loop. For <code>123</code> the answer is <code>6</code>. Assume <code>n</code> is not negative.",
+        sig: "function sumOfDigits(n: number): number",
+        starter: "function sumOfDigits(n: number): number {\n  // your code here\n\n}",
+        tests: [ {args:[123],exp:6}, {args:[9999],exp:36}, {args:[1010],exp:2}, {args:[5],exp:5}, {args:[0],exp:0} ],
+        solution: "function sumOfDigits(n: number): number {\n  let sum: number = 0;\n  for (; n > 0; n = Math.floor(n / 10)) {\n    sum = sum + (n % 10);\n  }\n  return sum;\n}" },
+
+      { n: 17, fn: "multiplesOf7",
+        title: "Multiples of 7 between 1 and 100",
+        prompt: "Return every multiple of 7 from 1 to 100, using a <strong>for</strong> loop.",
+        sig: "function multiplesOf7(): number[]",
+        starter: "function multiplesOf7(): number[] {\n  const out: number[] = [];\n  // your for loop here\n\n  return out;\n}",
+        tests: [ {args:[],exp:[7,14,21,28,35,42,49,56,63,70,77,84,91,98]} ],
+        solution: "function multiplesOf7(): number[] {\n  const out: number[] = [];\n  for (let i: number = 7; i <= 100; i += 7) {\n    out.push(i);\n  }\n  return out;\n}" },
+
+      { n: 18, fn: "sumEvenUpToN",
+        title: "Sum of all even numbers from 1 to N",
+        prompt: "Return the sum of every even number from 1 to <code>n</code> inclusive, using a <strong>for</strong> loop. If there are none, return <code>0</code>.",
+        sig: "function sumEvenUpToN(n: number): number",
+        starter: "function sumEvenUpToN(n: number): number {\n  // your code here\n\n}",
+        tests: [ {args:[20],exp:110}, {args:[10],exp:30}, {args:[100],exp:2550}, {args:[1],exp:0}, {args:[0],exp:0} ],
+        solution: "function sumEvenUpToN(n: number): number {\n  let sum: number = 0;\n  for (let i: number = 2; i <= n; i += 2) {\n    sum = sum + i;\n  }\n  return sum;\n}" }
+    ]
+  },
+  {
+    id: "continue", title: "Group 4 — <code>continue</code>", short: "continue",
+    tasks: [
+      { n: 19, fn: "oddNumbersTo20",
+        title: "Odd numbers from 1 to 20, skipping evens with continue",
+        prompt: "Return the odd numbers from 1 to 20 using a <strong>for</strong> loop, using <code>continue</code> to skip the even ones.",
+        sig: "function oddNumbersTo20(): number[]",
+        starter: "function oddNumbersTo20(): number[] {\n  const out: number[] = [];\n  for (let i: number = 1; i <= 20; i++) {\n    // use continue to skip even numbers\n\n  }\n  return out;\n}",
+        tests: [ {args:[],exp:[1,3,5,7,9,11,13,15,17,19]} ],
+        solution: "function oddNumbersTo20(): number[] {\n  const out: number[] = [];\n  for (let i: number = 1; i <= 20; i++) {\n    if (i % 2 === 0) {\n      continue;\n    }\n    out.push(i);\n  }\n  return out;\n}" },
+
+      { n: 20, fn: "skipMultiplesOf5",
+        title: "Numbers 1 to 30, skipping multiples of 5",
+        prompt: "Return the numbers 1 to 30 with every multiple of 5 left out, using a <strong>while</strong> loop and <code>continue</code>. <em>Careful: in a while loop, <code>continue</code> jumps past your increment unless you advance the counter first.</em>",
+        sig: "function skipMultiplesOf5(): number[]",
+        starter: "function skipMultiplesOf5(): number[] {\n  const out: number[] = [];\n  let i: number = 0;\n  while (i < 30) {\n    i++;\n    // use continue to skip multiples of 5\n\n  }\n  return out;\n}",
+        tests: [ {args:[],exp:[1,2,3,4,6,7,8,9,11,12,13,14,16,17,18,19,21,22,23,24,26,27,28,29]} ],
+        solution: "function skipMultiplesOf5(): number[] {\n  const out: number[] = [];\n  let i: number = 0;\n  while (i < 30) {\n    i++;                  // increment BEFORE the continue\n    if (i % 5 === 0) {\n      continue;\n    }\n    out.push(i);\n  }\n  return out;\n}" }
+    ]
+  },
+  {
+    id: "break", title: "Group 5 — <code>break</code>", short: "break",
+    tasks: [
+      { n: 21, fn: "firstEven",
+        title: "First even number between 1 and 10",
+        prompt: "Scan from 1 to 10 with a <strong>for</strong> loop and return the first even number you find, using <code>break</code> to leave the loop as soon as you have it.",
+        sig: "function firstEven(): number",
+        starter: "function firstEven(): number {\n  let found: number = 0;\n  for (let i: number = 1; i <= 10; i++) {\n    // find the first even number, then break\n\n  }\n  return found;\n}",
+        tests: [ {args:[],exp:2} ],
+        solution: "function firstEven(): number {\n  let found: number = 0;\n  for (let i: number = 1; i <= 10; i++) {\n    if (i % 2 === 0) {\n      found = i;\n      break;\n    }\n  }\n  return found;\n}" },
+
+      { n: 22, fn: "printUntilOver15",
+        title: "Numbers 1 to 30, stopping past 15",
+        prompt: "Walk from 1 to 30 with a <strong>for</strong> loop, collecting each number, but <code>break</code> out as soon as you reach a number greater than 15. The number that triggers the break is <em>not</em> included.",
+        sig: "function printUntilOver15(): number[]",
+        starter: "function printUntilOver15(): number[] {\n  const out: number[] = [];\n  for (let i: number = 1; i <= 30; i++) {\n    // break when i is greater than 15\n\n  }\n  return out;\n}",
+        tests: [ {args:[],exp:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]} ],
+        solution: "function printUntilOver15(): number[] {\n  const out: number[] = [];\n  for (let i: number = 1; i <= 30; i++) {\n    if (i > 15) {\n      break;\n    }\n    out.push(i);\n  }\n  return out;\n}" }
+    ]
+  }
+];
+
+/* ------------------------------------------------------------------ *
+ *  Type stripping, loop instrumentation, evaluation
+ * ------------------------------------------------------------------ */
+
+// Conservative TypeScript annotation remover: only strips a ":" followed by a
+// recognised type name and then a delimiter, so ternaries, object literals and
+// switch case labels are left alone.
+var TYPE_RE = (function () {
+  var T = "(?:number|string|boolean|any|unknown|never|void|object|null|undefined|bigint|symbol|Array\\s*<[^>]*>)";
+  var ARR = "(?:\\s*\\[\\s*\\])*";
+  var UNION = "(?:\\s*\\|\\s*" + T + ARR + ")*";
+  return new RegExp(":\\s*" + T + ARR + UNION + "\\s*(?=[,)=;{\\]]|$)", "gm");
+})();
+
+function stripTypes(src) { return src.replace(TYPE_RE, ""); }
+
+// Injects a guard call at the top of every braced loop body so a runaway loop
+// aborts with an error instead of hanging the tab. Loops written without braces
+// cannot be instrumented — the wall-clock check in __g covers the common cases.
+function instrument(src) {
+  return src
+    .replace(/\bdo\s*\{/g, "do { __g();")
+    .replace(/\bwhile\s*\(([^{;]*)\)\s*\{/g, "while ($1) { __g();")
+    .replace(/\bfor\s*\(([^{]*)\)\s*\{/g, "for ($1) { __g();");
+}
+
+var GUARD_SRC =
+  "var __n = 0, __t = 0;\n" +
+  "function __reset() { __n = 0; __t = Date.now(); }\n" +
+  "function __g() {\n" +
+  "  __n++;\n" +
+  "  if (__n > 20000000) { throw new Error('Aborted: the loop ran more than 20 million times — check your loop condition and increment.'); }\n" +
+  "  if ((__n & 8191) === 0 && Date.now() - __t > 2000) { throw new Error('Aborted after 2 seconds — this looks like an infinite loop. Make sure the loop variable actually changes.'); }\n" +
+  "}\n";
+
+function fmt(v) {
+  if (typeof v === "string") return JSON.stringify(v);
+  if (v === undefined) return "undefined";
+  if (v === null) return "null";
+  if (typeof v === "number" && !isFinite(v)) return String(v);
+  try { return JSON.stringify(v); } catch (e) { return String(v); }
+}
+function fmtArgs(args) { return args.map(fmt).join(", "); }
+
+// Arrays compare element-by-element; strings case-insensitively; rest strictly.
+function same(got, exp) {
+  if (Array.isArray(exp)) {
+    if (!Array.isArray(got) || got.length !== exp.length) return false;
+    for (var i = 0; i < exp.length; i++) { if (!same(got[i], exp[i])) return false; }
+    return true;
+  }
+  if (typeof exp === "string") {
+    return typeof got === "string" && got.trim().toLowerCase() === exp.trim().toLowerCase();
+  }
+  return got === exp;
+}
+
+function evaluateTask(task, code) {
+  if (!code || !code.trim()) return { error: "No code written yet.", cases: [] };
+  var handle;
+  try {
+    var body = GUARD_SRC + instrument(stripTypes(code)) +
+      "\n;return { fn: (typeof " + task.fn + " === 'function' ? " + task.fn + " : null), reset: __reset };";
+    handle = new Function(body)();
+  } catch (e) {
+    return { error: (e && e.name ? e.name : "Error") + ": " + (e && e.message ? e.message : String(e)), cases: [] };
+  }
+  if (typeof handle.fn !== "function") {
+    return { error: "No function named `" + task.fn + "` was found. Keep the function name exactly as given.", cases: [] };
+  }
+  var cases = task.tests.map(function (t) {
+    var got, err = null;
+    try {
+      handle.reset();
+      got = handle.fn.apply(null, t.args);
+    } catch (e) {
+      err = (e && e.message ? e.message : String(e));
+    }
+    return { args: t.args, exp: t.exp, got: got, err: err, ok: err === null && same(got, t.exp) };
+  });
+  return { error: null, cases: cases };
+}
+
+/* ------------------------------------------------------------------ *
+ *  UI
+ * ------------------------------------------------------------------ */
+(function () {
+  var STORE = "ts-loops-lab-v1";
+  var tasksEl = document.getElementById("tasks");
+  var tocEl = document.getElementById("toc");
+  var ALL = [];
+  GROUPS.forEach(function (g) { g.tasks.forEach(function (t) { t.group = g.id; ALL.push(t); }); });
+  var TOTAL = ALL.length;
+  var TOTAL_CASES = ALL.reduce(function (s, t) { return s + t.tests.length; }, 0);
+  var PASS = 16;
+  var lastResults = {};
+
+  document.getElementById("s-total").textContent = TOTAL;
+  document.getElementById("c-cases").textContent = TOTAL_CASES;
+
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(STORE) || "{}") || {}; } catch (e) { saved = {}; }
+
+  function save() {
+    var out = {};
+    ALL.forEach(function (t) {
+      var ta = document.getElementById("ed-" + t.n);
+      if (ta) out[t.n] = ta.value;
+    });
+    try { localStorage.setItem(STORE, JSON.stringify(out)); } catch (e) {}
+  }
+
+  GROUPS.forEach(function (g) {
+    tocEl.insertAdjacentHTML("beforeend", "<h2>" + g.short + "</h2>");
+    g.tasks.forEach(function (t) {
+      tocEl.insertAdjacentHTML("beforeend",
+        '<a href="#t' + t.n + '" id="toc-' + t.n + '"><span class="dot"></span><span class="tt">' + t.n + '. ' + t.title + '</span></a>');
+    });
+
+    var sec = document.createElement("section");
+    sec.className = "grp";
+    sec.innerHTML = '<div class="grp-head"><h2>' + g.title + '</h2><span class="n">' +
+      g.tasks.length + ' assignment' + (g.tasks.length > 1 ? 's' : '') + '</span></div>';
+
+    g.tasks.forEach(function (t) {
+      var card = document.createElement("div");
+      card.className = "task";
+      card.id = "t" + t.n;
+      card.innerHTML =
+        '<div class="t-head">' +
+          '<span class="t-num">' + t.n + '</span>' +
+          '<span class="t-title">' + t.title + '</span>' +
+          '<span class="pill" id="pill-' + t.n + '">Not attempted</span>' +
+        '</div>' +
+        '<p class="t-prompt">' + t.prompt + '</p>' +
+        '<div class="t-sig">' + t.sig.replace(/&/g, "&amp;").replace(/</g, "&lt;") + '</div>' +
+        '<textarea class="editor" id="ed-' + t.n + '" spellcheck="false"></textarea>' +
+        '<div class="t-actions">' +
+          '<button class="ctl run" data-n="' + t.n + '" style="display:none">Run tests</button>' +
+          '<button class="ctl revert" data-n="' + t.n + '">Reset code</button>' +
+          '<span class="spacer"></span>' +
+          '<span class="hint">' + t.tests.length + ' hidden test case' + (t.tests.length > 1 ? 's' : '') + '</span>' +
+        '</div>' +
+        '<div class="t-result" id="res-' + t.n + '"></div>' +
+        '<details class="sol" id="sol-' + t.n + '" aria-disabled="true">' +
+          '<summary>Model solution — unlocks after you submit</summary>' +
+          '<pre><code>' + t.solution.replace(/&/g, "&amp;").replace(/</g, "&lt;") + '</code></pre>' +
+        '</details>';
+      sec.appendChild(card);
+      sec.querySelector("#ed-" + t.n).value =
+        (saved[t.n] !== undefined && saved[t.n] !== null) ? saved[t.n] : t.starter;
+    });
+
+    tasksEl.appendChild(sec);
+  });
+
+  function setSolutionLock(locked) {
+    ALL.forEach(function (t) {
+      var d = document.getElementById("sol-" + t.n);
+      d.setAttribute("aria-disabled", locked ? "true" : "false");
+      d.querySelector("summary").textContent = locked
+        ? "Model solution — unlocks after you submit"
+        : "Model solution (one of several valid answers)";
+      if (locked) d.open = false;
+    });
+  }
+  setSolutionLock(true);
+  tasksEl.addEventListener("click", function (e) {
+    var sum = e.target.closest && e.target.closest("details.sol > summary");
+    if (sum && sum.parentElement.getAttribute("aria-disabled") === "true") e.preventDefault();
+  });
+
+  var saveTimer = null;
+  tasksEl.addEventListener("input", function (e) {
+    if (!e.target.classList.contains("editor")) return;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(save, 250);
+    updateAttempted();
+  });
+
+  tasksEl.addEventListener("keydown", function (e) {
+    if (e.key !== "Tab" || !e.target.classList.contains("editor")) return;
+    e.preventDefault();
+    var ta = e.target, s = ta.selectionStart, en = ta.selectionEnd;
+    ta.value = ta.value.slice(0, s) + "  " + ta.value.slice(en);
+    ta.selectionStart = ta.selectionEnd = s + 2;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(save, 250);
+  });
+
+  tasksEl.addEventListener("click", function (e) {
+    var btn = e.target.closest && e.target.closest("button");
+    if (!btn) return;
+    var n = parseInt(btn.dataset.n, 10);
+    if (isNaN(n)) return;
+    var task = ALL.filter(function (t) { return t.n === n; })[0];
+    if (btn.classList.contains("revert")) {
+      document.getElementById("ed-" + n).value = task.starter;
+      document.getElementById("res-" + n).classList.remove("show");
+      setPill(n, null);
+      save();
+      updateAttempted();
+    } else if (btn.classList.contains("run")) {
+      runOne(task, true);
+    }
+  });
+
+  var practiceBox = document.getElementById("practice");
+  practiceBox.addEventListener("change", function () {
+    var show = practiceBox.checked;
+    document.querySelectorAll("button.run").forEach(function (b) { b.style.display = show ? "" : "none"; });
+  });
+
+  function setPill(n, res) {
+    var pill = document.getElementById("pill-" + n);
+    var card = document.getElementById("t" + n);
+    var toc = document.getElementById("toc-" + n);
+    card.classList.remove("pass", "fail");
+    pill.classList.remove("pass", "fail");
+    toc.classList.remove("done", "bad");
+    if (!res) { pill.textContent = "Not attempted"; return; }
+    if (res.error) {
+      pill.textContent = "Error"; pill.classList.add("fail");
+      card.classList.add("fail"); toc.classList.add("bad");
+      return;
+    }
+    var passed = res.cases.filter(function (c) { return c.ok; }).length;
+    var all = res.cases.length;
+    pill.textContent = passed + "/" + all + " passed";
+    if (passed === all) { pill.classList.add("pass"); card.classList.add("pass"); toc.classList.add("done"); }
+    else { pill.classList.add("fail"); card.classList.add("fail"); toc.classList.add("bad"); }
+  }
+
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+
+  function renderResult(task, res) {
+    var box = document.getElementById("res-" + task.n);
+    if (res.error) {
+      box.innerHTML = '<div class="rbanner err">' + esc(res.error) + '</div>';
+      box.classList.add("show");
+      return;
+    }
+    var passed = res.cases.filter(function (c) { return c.ok; }).length;
+    var all = res.cases.length;
+    var ok = passed === all;
+    var html = '<div class="rbanner ' + (ok ? "pass" : "fail") + '">' +
+      (ok ? "✓ All " + all + " test case" + (all > 1 ? "s" : "") + " passed."
+          : "✕ " + passed + " of " + all + " test case" + (all > 1 ? "s" : "") + " passed.") + '</div>';
+    var rows = res.cases.filter(function (c) { return !c.ok; });
+    if (rows.length) {
+      html += '<table class="cases"><tr><th></th><th>Call</th><th>Expected</th><th>Got</th></tr>';
+      rows.forEach(function (c) {
+        html += '<tr><td class="st">✕</td>' +
+          '<td>' + esc(task.fn + "(" + fmtArgs(c.args) + ")") + '</td>' +
+          '<td>' + esc(fmt(c.exp)) + '</td>' +
+          '<td>' + esc(c.err ? c.err : fmt(c.got)) + '</td></tr>';
+      });
+      html += '</table>';
+    }
+    box.innerHTML = html;
+    box.classList.add("show");
+  }
+
+  function runOne(task, render) {
+    var res = evaluateTask(task, document.getElementById("ed-" + task.n).value);
+    lastResults[task.n] = res;
+    setPill(task.n, res);
+    if (render) renderResult(task, res);
+    return res;
+  }
+
+  function isAttempted(t) {
+    var v = document.getElementById("ed-" + t.n).value;
+    return v.trim() !== "" && v.trim() !== t.starter.trim();
+  }
+  function updateAttempted() {
+    var n = ALL.filter(isAttempted).length;
+    document.getElementById("s-attempted").textContent = n;
+    document.getElementById("progress").style.width = (n / TOTAL * 100) + "%";
+  }
+
+  document.getElementById("btn-submit").addEventListener("click", function () {
+    save();
+    var passedTasks = 0, passedCases = 0;
+    var byGroup = {};
+    GROUPS.forEach(function (g) { byGroup[g.id] = { c: 0, t: 0, short: g.short }; });
+
+    ALL.forEach(function (t) {
+      var res = runOne(t, true);
+      byGroup[t.group].t += 1;
+      if (!res.error) {
+        var p = res.cases.filter(function (c) { return c.ok; }).length;
+        passedCases += p;
+        if (p === res.cases.length) { passedTasks++; byGroup[t.group].c += 1; }
+      }
+    });
+
+    setSolutionLock(false);
+
+    var pct = Math.round(passedTasks / TOTAL * 100);
+    document.getElementById("s-passed").textContent = passedTasks + "/" + TOTAL;
+    document.getElementById("r-score").textContent = passedTasks + " / " + TOTAL + "  ·  " + pct + "%";
+
+    var bandText, verdict;
+    if (passedTasks === TOTAL)    { bandText = "Perfect";    verdict = "Every assignment passes every test case. Move on to functions and arrays."; }
+    else if (pct >= 86)           { bandText = "Strong";     verdict = "Fix the last few and you're done."; }
+    else if (passedTasks >= PASS) { bandText = "Pass";       verdict = "Solid work. Open the failing assignments below and compare against the model solutions."; }
+    else if (pct >= 45)           { bandText = "Shaky";      verdict = "Rework the failing assignments, then resubmit."; }
+    else                          { bandText = "Needs work"; verdict = "Revisit the notes on while / do-while / for, then attempt these again."; }
+
+    document.getElementById("r-band").innerHTML =
+      '<span class="band ' + (passedTasks >= PASS ? "pass" : "fail") + '">' + bandText +
+      ' · suggested pass mark ' + PASS + '/' + TOTAL + '</span>';
+    document.getElementById("r-sub").textContent =
+      passedCases + " of " + TOTAL_CASES + " individual test cases passed.";
+
+    document.getElementById("r-bars").innerHTML = GROUPS.map(function (g) {
+      var st = byGroup[g.id];
+      var p = Math.round(st.c / st.t * 100);
+      return '<div class="bar-row"><span class="nm">' + st.short + '</span>' +
+             '<span class="bar-track"><span class="bar-fill" style="width:' + p + '%"></span></span>' +
+             '<span class="sc">' + st.c + '/' + st.t + '</span></div>';
+    }).join("");
+
+    var failed = ALL.filter(function (t) {
+      var r = lastResults[t.n];
+      return r && (r.error || r.cases.some(function (c) { return !c.ok; }));
+    });
+    var advice = "<h3>What to fix</h3>";
+    if (!failed.length) {
+      advice += "<p>Nothing — all 22 assignments pass. Model solutions are unlocked below if you want to compare approaches.</p>";
+    } else {
+      advice += '<p>Jump to the assignments that need work:</p><div class="failist">' +
+        failed.map(function (t) { return '<a href="#t' + t.n + '">' + t.n + '. ' + t.title + '</a>'; }).join("") +
+        '</div><p style="margin-top:12px">Each failing card lists the exact calls that went wrong, with what was expected and what your code returned. Model solutions are now unlocked.</p>';
+    }
+    advice += '<p style="color:var(--dim)"><b>The three that catch most people here:</b> forgetting to <code>return</code> (a <code>console.log</code> returns <code>undefined</code>); an off-by-one on the boundary — <code>i &lt;= n</code> versus <code>i &lt; n</code>; and <code>continue</code> in a <code>while</code> loop skipping the increment, which the guard will report as an aborted infinite loop.</p>';
+    advice += '<p><a href="typescript-loops-quiz.html">← back to the MCQ quiz</a></p>';
+    document.getElementById("r-advice").innerHTML = advice;
+
+    document.getElementById("results").classList.add("show");
+    document.getElementById("results").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  document.getElementById("btn-reset").addEventListener("click", function () {
+    if (!confirm("Clear all 22 editors and your saved work? This cannot be undone.")) return;
+    ALL.forEach(function (t) {
+      document.getElementById("ed-" + t.n).value = t.starter;
+      document.getElementById("res-" + t.n).classList.remove("show");
+      setPill(t.n, null);
+    });
+    lastResults = {};
+    setSolutionLock(true);
+    document.getElementById("results").classList.remove("show");
+    document.getElementById("s-passed").textContent = "—";
+    try { localStorage.removeItem(STORE); } catch (e) {}
+    updateAttempted();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  updateAttempted();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Getting Started with TypeScript — MCQ Quiz</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#ffffff; --ink:#1b1f24; --muted:#5c6672;
+    --line:#e3e7ec; --accent:#2f6fed; --ok:#15803d; --okbg:#e8f6ec;
+    --bad:#b42318; --badbg:#fdecea; --code:#f2f4f7;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#14171c; --card:#1c2027; --ink:#e8ebef; --muted:#9aa4b0;
+           --line:#2b313a; --accent:#7ba4ff; --ok:#7bd39a; --okbg:#16301f;
+           --bad:#f2a29a; --badbg:#33191a; --code:#252b33; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:880px;margin:0 auto;padding:32px 20px 80px}
+  header{margin-bottom:24px}
+  h1{font-size:28px;margin:0 0 6px;letter-spacing:-.02em}
+  .sub{color:var(--muted);font-size:14px}
+  .bar{position:sticky;top:0;z-index:5;background:var(--bg);
+       padding:12px 0;border-bottom:1px solid var(--line);margin-bottom:20px;
+       display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .score{font-weight:600;font-variant-numeric:tabular-nums}
+  button{font:inherit;font-size:14px;padding:7px 14px;border-radius:8px;
+         border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+  button:hover{border-color:var(--accent)}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  h2.sec{font-size:13px;text-transform:uppercase;letter-spacing:.08em;
+         color:var(--muted);margin:34px 0 12px;font-weight:700}
+  .q{background:var(--card);border:1px solid var(--line);border-radius:12px;
+     padding:18px 20px;margin-bottom:14px}
+  .qt{font-weight:600;margin-bottom:12px}
+  .qt .n{color:var(--muted);font-weight:700;margin-right:6px}
+  .opts{display:flex;flex-direction:column;gap:8px}
+  .opt{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;
+       border:1px solid var(--line);border-radius:8px;cursor:pointer;
+       transition:background .12s,border-color .12s}
+  .opt:hover{border-color:var(--accent)}
+  .opt .k{font-weight:700;color:var(--muted);min-width:16px}
+  .opt.correct{background:var(--okbg);border-color:var(--ok)}
+  .opt.correct .k{color:var(--ok)}
+  .opt.wrong{background:var(--badbg);border-color:var(--bad)}
+  .opt.wrong .k{color:var(--bad)}
+  .locked .opt{cursor:default}
+  .exp{margin-top:12px;padding:10px 12px;border-left:3px solid var(--accent);
+       background:var(--code);border-radius:0 8px 8px 0;font-size:14px;color:var(--muted);display:none}
+  .exp.show{display:block}
+  .exp b{color:var(--ink)}
+  code{background:var(--code);padding:1px 5px;border-radius:4px;
+       font:14px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace}
+  footer{margin-top:40px;color:var(--muted);font-size:13px;text-align:center}
+  footer a{color:var(--accent)}
+  @media print{ .bar{display:none} .exp{display:block} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Getting Started with TypeScript</h1>
+    <div class="sub">30 multiple-choice questions &middot; Introduction, Setup &amp; First Program &middot; 1 mark each</div>
+  </header>
+
+  <div class="bar">
+    <span class="score" id="score">Answered 0 / 30 &nbsp;|&nbsp; Correct 0</span>
+    <button id="reveal">Show all answers</button>
+    <button id="reset">Reset quiz</button>
+    <button class="primary" onclick="window.print()">Print / Save as PDF</button>
+  </div>
+
+  <div id="quiz"></div>
+
+  <footer>
+    Reference material: <a href="https://www.pavanonlinetrainings.com">pavanonlinetrainings.com</a> &middot;
+    <a href="https://www.youtube.com/@sdetpavan">youtube.com/@sdetpavan</a>
+  </footer>
+</div>
+
+<script>
+const DATA = [
+ {s:"Section 1: Introduction to TypeScript",
+  q:"What is TypeScript?",
+  o:["A replacement for JavaScript that runs on its own engine",
+     "A superset of JavaScript that adds extra features to it",
+     "A subset of JavaScript with fewer features",
+     "A JavaScript testing framework"],a:1,
+  e:"TypeScript is a <b>superset</b> of JavaScript — it layers optional features on top of JS."},
+ {q:"What file extension do TypeScript files use?",
+  o:["<code>.js</code>","<code>.tsx</code> only","<code>.ts</code>","<code>.tscript</code>"],a:2,
+  e:"TypeScript files end in <code>.ts</code> instead of <code>.js</code>."},
+ {q:"What happens to TypeScript code before it runs in a browser?",
+  o:["It runs directly in the browser without any change",
+     "It is compiled (converted) into regular JavaScript",
+     "It is converted into machine code",
+     "It is interpreted by the TypeScript engine in the browser"],a:1,
+  e:"Browsers only understand JavaScript, so TypeScript must be compiled to JS first."},
+ {q:"Arrange the correct order of how TypeScript works:",
+  o:["Write <code>.js</code> → compile → <code>.ts</code> → run",
+     "Write <code>.ts</code> → compiler converts to <code>.js</code> → JS runs in browser/Node.js",
+     "Write <code>.ts</code> → run directly in browser → compile to <code>.js</code>",
+     "Write <code>.ts</code> → compile to <code>.exe</code> → run"],a:1,
+  e:"Write TS → compile to JS → run the JS anywhere JavaScript runs."},
+ {q:"Which statement is TRUE about the relationship between JavaScript and TypeScript?",
+  o:["All TypeScript code is valid JavaScript",
+     "All JavaScript code is valid TypeScript",
+     "JavaScript and TypeScript are completely incompatible",
+     "JavaScript code must be rewritten fully before using it in TypeScript"],a:1,
+  e:"The relationship is <b>one-directional</b>. JS is a subset of TS, so any working JS is valid TS — but TS-specific syntax (type annotations, interfaces) is <i>not</i> valid JavaScript."},
+ {q:"In TypeScript, types are:",
+  o:["Mandatory for every variable",
+     "Optional features added on top of JavaScript",
+     "Not supported at all",
+     "Only allowed inside classes"],a:1,
+  e:"Types are optional — which is exactly why plain JavaScript compiles as valid TypeScript."},
+ {q:"Which of the following is NOT a benefit of using TypeScript?",
+  o:["Helps catch mistakes early, before running the code",
+     "Makes large projects easier to manage",
+     "Works smoothly with existing JavaScript code",
+     "Makes the JavaScript output run faster than hand-written JavaScript"],a:3,
+  e:"TypeScript's benefits are <b>developer-side</b>. The compiled output is plain JavaScript, so there is no runtime speed gain."},
+ {q:"TypeScript helps catch mistakes:",
+  o:["Only at runtime","Before running the code (at compile time)",
+     "Only during deployment","Only when unit tests are executed"],a:1,
+  e:"Type checking happens at compile time, before the code ever runs."},
+
+ {s:"Section 2: Setting Up TypeScript",
+  q:"Which tool is required to run the TypeScript compiler?",
+  o:["Python","Node.js","Java JDK","Docker"],a:1,
+  e:"Node.js provides the runtime that executes the <code>tsc</code> compiler."},
+ {q:"Which command checks the installed Node.js version?",
+  o:["<code>node --version</code>","<code>npm -v</code>","<code>tsc -v</code>","<code>node --check</code>"],a:0,
+  e:"<code>node -v</code> / <code>node --version</code> checks Node.js; <code>npm -v</code> checks npm; <code>tsc -v</code> checks the compiler — three different tools."},
+ {q:"Which Node.js version is recommended in the setup instructions?",
+  o:["8+","12+","18+","22 only"],a:2,
+  e:"Version <b>18 or higher</b> is recommended."},
+ {q:"Which command installs the TypeScript compiler globally?",
+  o:["<code>npm install typescript</code>","<code>npm install -g typescript</code>",
+     "<code>npm -g add tsc</code>","<code>node install -g typescript</code>"],a:1,
+  e:"The <code>-g</code> flag installs the package globally."},
+ {q:"In <code>npm install -g typescript</code>, what does the <code>-g</code> flag mean?",
+  o:["Generate JavaScript files","Install globally (available system-wide)",
+     "Install the GitHub version","Install in debug/global mode"],a:1,
+  e:"<code>-g</code> = global, so <code>tsc</code> can be run from any folder."},
+ {q:"Which command verifies that the TypeScript compiler is installed?",
+  o:["<code>typescript -v</code>","<code>tsc --version</code>","<code>node tsc -v</code>","<code>npm tsc -v</code>"],a:1,
+  e:"<code>tsc -v</code> or <code>tsc --version</code> prints the compiler version, e.g. <code>Version 5.8.2</code>."},
+ {q:"On Windows, if you get the error <code>'tsc' is not recognized</code>, what is the fix?",
+  o:["Reinstall Node.js",
+     "Add <code>C:\\Users\\&lt;your-username&gt;\\AppData\\Roaming\\npm</code> to System Environment Variables",
+     "Rename <code>tsc</code> to <code>tsc.exe</code>","Run VS Code as administrator"],a:1,
+  e:"The error means Windows can't find the global npm binaries folder. Adding it to <b>PATH</b> resolves it — reinstalling Node.js does not."},
+ {q:"Which tool lets you run TypeScript files directly without compiling them first?",
+  o:["<code>tsc</code>","<code>tsx</code>","<code>npx</code>","<code>nodemon</code>"],a:1,
+  e:"<code>tsx</code> compiles and executes in one step, leaving no <code>.js</code> file behind."},
+ {q:"Which command installs TSX globally?",
+  o:["<code>npm install -g tsx</code>","<code>npm install tsx --save</code>",
+     "<code>tsc install tsx</code>","<code>npm add -g typescript-x</code>"],a:0,
+  e:"<code>npm install -g tsx</code> installs it globally."},
+ {q:"Which editor is recommended for TypeScript development?",
+  o:["Notepad","Eclipse","VS Code","IntelliJ Community Edition"],a:2,
+  e:"VS Code is free and ships with built-in TypeScript support."},
+
+ {s:"Section 3: First TypeScript Program",
+  q:"What is the correct order of steps to create your first TypeScript program?",
+  o:["Create <code>app.ts</code> → open folder in VS Code → compile → run",
+     "Create project folder → open folder in VS Code → create <code>app.ts</code> → compile → run",
+     "Compile → create folder → write code → run",
+     "Install VS Code → run <code>node app.js</code> → create <code>app.ts</code>"],a:1,
+  e:"Folder first, open it in VS Code, add the <code>.ts</code> file, then compile and run."},
+ {q:"Which shortcut opens the terminal in VS Code?",
+  o:["<code>Ctrl + T</code>","<code>Ctrl + ~</code> (backtick)","<code>Ctrl + Shift + P</code>","<code>Alt + F4</code>"],a:1,
+  e:"<code>Ctrl + ~</code> toggles the integrated terminal (or use Terminal &gt; New Terminal)."},
+ {q:"What does the command <code>tsc app.ts</code> do?",
+  o:["Runs <code>app.ts</code> directly","Generates <code>app.js</code>, the JavaScript version of the file",
+     "Deletes <code>app.ts</code> after checking types","Installs TypeScript for that file"],a:1,
+  e:"<code>tsc</code> only <b>compiles</b> — it produces <code>app.js</code> but does not execute it."},
+ {q:"After running <code>tsc app.ts</code>, how do you execute the generated file?",
+  o:["<code>node app.ts</code>","<code>node app.js</code>","<code>tsc app.js</code>","<code>run app.js</code>"],a:1,
+  e:"Node.js runs the compiled JavaScript file."},
+ {q:"What is the output of <code>console.log(\"Welcome to TypeScript!\");</code>?",
+  o:["<code>Welcome to TypeScript</code>","<code>Welcome to TypeScript!</code>",
+     "<code>console.log(\"Welcome to TypeScript!\")</code>","Nothing — <code>console.log</code> is not supported in TypeScript"],a:1,
+  e:"The exact string, including the exclamation mark, is printed."},
+ {q:"Which single command runs a <code>.ts</code> file without creating a <code>.js</code> file?",
+  o:["<code>tsc app.ts</code>","<code>tsx app.ts</code>","<code>node app.ts</code>","<code>npm run app.ts</code>"],a:1,
+  e:"<code>tsx</code> runs TypeScript directly without emitting a <code>.js</code> file."},
+ {q:"Which command fixes the Execution Policy error that appears when running <code>tsc</code> in PowerShell?",
+  o:["<code>Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned</code>",
+     "<code>Set-ExecutionPolicy -Scope AllUsers -ExecutionPolicy Unrestricted</code>",
+     "<code>npm config set execution-policy remote</code>","<code>tsc --allow-scripts</code>"],a:0,
+  e:"PowerShell blocks running scripts by default. <b>RemoteSigned</b> at <b>CurrentUser</b> scope is the recommended minimum change — safer than <code>Unrestricted</code> for all users."},
+ {q:"The Execution Policy error typically occurs on which platform?",
+  o:["macOS","Linux","Windows (PowerShell)","All platforms equally"],a:2,
+  e:"Execution policies are a Windows PowerShell security feature."},
+
+ {s:"Section 4: Quick Summary Recall",
+  q:"Which tool converts <code>.ts</code> files into <code>.js</code> files?",
+  o:["Node.js","<code>tsc</code> (TypeScript Compiler)","VS Code","<code>tsx</code>"],a:1,
+  e:"<code>tsc</code> is the TypeScript compiler."},
+ {q:"Which pair is correctly matched?",
+  o:["Node.js → best editor for TypeScript","<code>tsc</code> → runs TypeScript without compiling",
+     "<code>tsx</code> → runs TypeScript without compiling","VS Code → converts <code>.ts</code> to <code>.js</code>"],a:2,
+  e:"Node.js runs TS output, <code>tsc</code> compiles, VS Code edits, <code>tsx</code> executes <code>.ts</code> directly."},
+ {q:"You wrote a TypeScript file and want the fastest way to see its output during practice. What is the recommended approach?",
+  o:["Compile with <code>tsc</code>, then run with <code>node</code>","Run it directly with <code>tsx</code>",
+     "Paste the code into the browser console","Rename the file to <code>.js</code> and run it"],a:1,
+  e:"<code>tsx</code> is the recommended one-step approach for quick practice."},
+ {q:"Which statement about TypeScript adoption in an existing JavaScript project is TRUE?",
+  o:["The whole project must be rewritten before TypeScript can be used",
+     "TypeScript works smoothly alongside existing JavaScript code",
+     "TypeScript cannot be used with Node.js projects",
+     "TypeScript requires removing all existing <code>.js</code> files"],a:1,
+  e:"TypeScript is designed for gradual adoption in existing JS codebases."}
+];
+
+const KEYS = ["A","B","C","D"];
+const quiz = document.getElementById("quiz");
+const scoreEl = document.getElementById("score");
+const answered = new Array(DATA.length).fill(false);
+const gotRight = new Array(DATA.length).fill(false);
+
+DATA.forEach((item, i) => {
+  if (item.s) {
+    const h = document.createElement("h2");
+    h.className = "sec"; h.textContent = item.s;
+    quiz.appendChild(h);
+  }
+  const card = document.createElement("div");
+  card.className = "q";
+  card.innerHTML = '<div class="qt"><span class="n">Q' + (i+1) + '.</span>' + item.q + '</div>';
+  const opts = document.createElement("div");
+  opts.className = "opts";
+  item.o.forEach((text, j) => {
+    const o = document.createElement("div");
+    o.className = "opt";
+    o.innerHTML = '<span class="k">' + KEYS[j] + '</span><span>' + text + '</span>';
+    o.onclick = () => pick(i, j, card);
+    opts.appendChild(o);
+  });
+  card.appendChild(opts);
+  const exp = document.createElement("div");
+  exp.className = "exp";
+  exp.innerHTML = '<b>Answer: ' + KEYS[item.a] + '</b> — ' + item.e;
+  card.appendChild(exp);
+  quiz.appendChild(card);
+});
+
+function pick(i, j, card){
+  if (answered[i]) return;
+  answered[i] = true;
+  gotRight[i] = (j === DATA[i].a);
+  const nodes = card.querySelectorAll(".opt");
+  nodes[DATA[i].a].classList.add("correct");
+  if (j !== DATA[i].a) nodes[j].classList.add("wrong");
+  card.querySelector(".opts").classList.add("locked");
+  card.querySelector(".exp").classList.add("show");
+  update();
+}
+
+function update(){
+  const n = answered.filter(Boolean).length;
+  const c = gotRight.filter(Boolean).length;
+  let msg = "Answered " + n + " / " + DATA.length + " \u00a0|\u00a0 Correct " + c;
+  if (n === DATA.length) msg += " \u00a0|\u00a0 Score: " + Math.round(c / DATA.length * 100) + "%";
+  scoreEl.textContent = msg;
+}
+
+document.getElementById("reveal").onclick = () => {
+  document.querySelectorAll(".q").forEach((card, i) => {
+    if (!answered[i]) {
+      card.querySelectorAll(".opt")[DATA[i].a].classList.add("correct");
+      card.querySelector(".opts").classList.add("locked");
+    }
+    card.querySelector(".exp").classList.add("show");
+  });
+};
+
+document.getElementById("reset").onclick = () => location.reload();
+update();
+</script>
+</body>
+</html>

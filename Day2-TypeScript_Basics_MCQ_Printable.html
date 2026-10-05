@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Getting Started with TypeScript — MCQ Question Paper</title>
+<style>
+  @page{ size:A4; margin:18mm 16mm; }
+  body{font:11.5pt/1.45 Georgia,"Times New Roman",serif;color:#111;margin:0;
+       max-width:190mm;margin:0 auto;padding:14px}
+  h1{font-size:19pt;margin:0 0 4px;text-align:center;font-family:Arial,Helvetica,sans-serif}
+  .meta{text-align:center;font-size:9.5pt;color:#555;margin-bottom:6px;
+        font-family:Arial,Helvetica,sans-serif}
+  .rule{border-top:2px solid #111;margin:10px 0 4px}
+  .fields{display:flex;justify-content:space-between;font-size:10pt;
+          margin:12px 0 6px;font-family:Arial,Helvetica,sans-serif}
+  .instr{font-size:9.5pt;background:#f4f4f4;border-left:3px solid #888;
+         padding:8px 10px;margin:10px 0 18px;font-family:Arial,Helvetica,sans-serif}
+  .instr li{margin:2px 0}
+  h2{font-size:11pt;font-family:Arial,Helvetica,sans-serif;text-transform:uppercase;
+     letter-spacing:.05em;border-bottom:1px solid #bbb;padding-bottom:3px;
+     margin:20px 0 10px;page-break-after:avoid}
+  .q{margin:0 0 11px;page-break-inside:avoid}
+  .q > p{margin:0 0 4px;font-weight:bold}
+  ol.opts{list-style:upper-alpha;margin:0 0 0 22px;padding:0}
+  ol.opts li{margin:1px 0}
+  code{font-family:Consolas,"Courier New",monospace;font-size:10pt;
+       background:#f0f0f0;padding:0 3px;border-radius:2px}
+  .pb{page-break-before:always}
+  table.key{border-collapse:collapse;font-family:Arial,Helvetica,sans-serif;font-size:10pt;width:100%}
+  table.key th,table.key td{border:1px solid #999;padding:4px 8px;text-align:center}
+  table.key th{background:#eee}
+  .exp{font-size:10pt;font-family:Arial,Helvetica,sans-serif;margin:6px 0}
+  footer{margin-top:26px;font-size:9pt;color:#666;text-align:center;
+         font-family:Arial,Helvetica,sans-serif;border-top:1px solid #ccc;padding-top:8px}
+  .noprint{text-align:center;margin:0 0 16px}
+  .noprint button{font:11pt Arial,Helvetica,sans-serif;padding:8px 18px;cursor:pointer;
+                  border:1px solid #2f6fed;background:#2f6fed;color:#fff;border-radius:6px}
+  @media print{ .noprint{display:none} }
+</style>
+</head>
+<body>
+
+<div class="noprint"><button onclick="window.print()">Print / Save as PDF</button></div>
+
+<h1>Getting Started with TypeScript</h1>
+<div class="meta">Multiple Choice Question Paper &middot; Introduction &middot; Setup &middot; First Program</div>
+<div class="rule"></div>
+<div class="fields">
+  <span>Total Questions: <b>30</b></span>
+  <span>Max Marks: <b>30</b></span>
+  <span>Time: <b>30 minutes</b></span>
+</div>
+<div class="fields">
+  <span>Name: _______________________________</span>
+  <span>Date: _______________</span>
+  <span>Score: ______ / 30</span>
+</div>
+
+<div class="instr">
+  <b>Instructions</b>
+  <ul>
+    <li>All questions are compulsory. Each question carries <b>1 mark</b>.</li>
+    <li>Choose <b>only one</b> option per question.</li>
+    <li>There is no negative marking.</li>
+    <li>Write your answer as the option letter (A / B / C / D).</li>
+  </ul>
+</div>
+
+<h2>Section 1 — Introduction to TypeScript</h2>
+
+<div class="q"><p>1. What is TypeScript?</p>
+<ol class="opts">
+<li>A replacement for JavaScript that runs on its own engine</li>
+<li>A superset of JavaScript that adds extra features to it</li>
+<li>A subset of JavaScript with fewer features</li>
+<li>A JavaScript testing framework</li>
+</ol></div>
+
+<div class="q"><p>2. What file extension do TypeScript files use?</p>
+<ol class="opts"><li><code>.js</code></li><li><code>.tsx</code> only</li><li><code>.ts</code></li><li><code>.tscript</code></li></ol></div>
+
+<div class="q"><p>3. What happens to TypeScript code before it runs in a browser?</p>
+<ol class="opts">
+<li>It runs directly in the browser without any change</li>
+<li>It is compiled (converted) into regular JavaScript</li>
+<li>It is converted into machine code</li>
+<li>It is interpreted by the TypeScript engine in the browser</li>
+</ol></div>
+
+<div class="q"><p>4. Arrange the correct order of how TypeScript works:</p>
+<ol class="opts">
+<li>Write <code>.js</code> &rarr; compile &rarr; <code>.ts</code> &rarr; run</li>
+<li>Write <code>.ts</code> &rarr; compiler converts to <code>.js</code> &rarr; JS runs in browser/Node.js</li>
+<li>Write <code>.ts</code> &rarr; run directly in browser &rarr; compile to <code>.js</code></li>
+<li>Write <code>.ts</code> &rarr; compile to <code>.exe</code> &rarr; run</li>
+</ol></div>
+
+<div class="q"><p>5. Which statement is TRUE about the relationship between JavaScript and TypeScript?</p>
+<ol class="opts">
+<li>All TypeScript code is valid JavaScript</li>
+<li>All JavaScript code is valid TypeScript</li>
+<li>JavaScript and TypeScript are completely incompatible</li>
+<li>JavaScript code must be rewritten fully before using it in TypeScript</li>
+</ol></div>
+
+<div class="q"><p>6. In TypeScript, types are:</p>
+<ol class="opts">
+<li>Mandatory for every variable</li>
+<li>Optional features added on top of JavaScript</li>
+<li>Not supported at all</li>
+<li>Only allowed inside classes</li>
+</ol></div>
+
+<div class="q"><p>7. Which of the following is NOT a benefit of using TypeScript?</p>
+<ol class="opts">
+<li>Helps catch mistakes early, before running the code</li>
+<li>Makes large projects easier to manage</li>
+<li>Works smoothly with existing JavaScript code</li>
+<li>Makes the JavaScript output run faster than hand-written JavaScript</li>
+</ol></div>
+
+<div class="q"><p>8. TypeScript helps catch mistakes:</p>
+<ol class="opts">
+<li>Only at runtime</li>
+<li>Before running the code (at compile time)</li>
+<li>Only during deployment</li>
+<li>Only when unit tests are executed</li>
+</ol></div>
+
+<h2>Section 2 — Setting Up TypeScript</h2>
+
+<div class="q"><p>9. Which tool is required to run the TypeScript compiler?</p>
+<ol class="opts"><li>Python</li><li>Node.js</li><li>Java JDK</li><li>Docker</li></ol></div>
+
+<div class="q"><p>10. Which command checks the installed Node.js version?</p>
+<ol class="opts"><li><code>node --version</code></li><li><code>npm -v</code></li><li><code>tsc -v</code></li><li><code>node --check</code></li></ol></div>
+
+<div class="q"><p>11. Which Node.js version is recommended in the setup instructions?</p>
+<ol class="opts"><li>8+</li><li>12+</li><li>18+</li><li>22 only</li></ol></div>
+
+<div class="q"><p>12. Which command installs the TypeScript compiler globally?</p>
+<ol class="opts"><li><code>npm install typescript</code></li><li><code>npm install -g typescript</code></li>
+<li><code>npm -g add tsc</code></li><li><code>node install -g typescript</code></li></ol></div>
+
+<div class="q"><p>13. In <code>npm install -g typescript</code>, what does the <code>-g</code> flag mean?</p>
+<ol class="opts"><li>Generate JavaScript files</li><li>Install globally (available system-wide)</li>
+<li>Install the GitHub version</li><li>Install in debug/global mode</li></ol></div>
+
+<div class="q"><p>14. Which command verifies that the TypeScript compiler is installed?</p>
+<ol class="opts"><li><code>typescript -v</code></li><li><code>tsc --version</code></li>
+<li><code>node tsc -v</code></li><li><code>npm tsc -v</code></li></ol></div>
+
+<div class="q"><p>15. On Windows, if you get the error <code>'tsc' is not recognized</code>, what is the fix?</p>
+<ol class="opts"><li>Reinstall Node.js</li>
+<li>Add <code>C:\Users\&lt;your-username&gt;\AppData\Roaming\npm</code> to System Environment Variables</li>
+<li>Rename <code>tsc</code> to <code>tsc.exe</code></li><li>Run VS Code as administrator</li></ol></div>
+
+<div class="q"><p>16. Which tool lets you run TypeScript files directly without compiling them first?</p>
+<ol class="opts"><li><code>tsc</code></li><li><code>tsx</code></li><li><code>npx</code></li><li><code>nodemon</code></li></ol></div>
+
+<div class="q"><p>17. Which command installs TSX globally?</p>
+<ol class="opts"><li><code>npm install -g tsx</code></li><li><code>npm install tsx --save</code></li>
+<li><code>tsc install tsx</code></li><li><code>npm add -g typescript-x</code></li></ol></div>
+
+<div class="q"><p>18. Which editor is recommended for TypeScript development?</p>
+<ol class="opts"><li>Notepad</li><li>Eclipse</li><li>VS Code</li><li>IntelliJ Community Edition</li></ol></div>
+
+<h2>Section 3 — First TypeScript Program</h2>
+
+<div class="q"><p>19. What is the correct order of steps to create your first TypeScript program?</p>
+<ol class="opts">
+<li>Create <code>app.ts</code> &rarr; open folder in VS Code &rarr; compile &rarr; run</li>
+<li>Create project folder &rarr; open folder in VS Code &rarr; create <code>app.ts</code> &rarr; compile &rarr; run</li>
+<li>Compile &rarr; create folder &rarr; write code &rarr; run</li>
+<li>Install VS Code &rarr; run <code>node app.js</code> &rarr; create <code>app.ts</code></li>
+</ol></div>
+
+<div class="q"><p>20. Which shortcut opens the terminal in VS Code?</p>
+<ol class="opts"><li><code>Ctrl + T</code></li><li><code>Ctrl + ~</code> (backtick)</li>
+<li><code>Ctrl + Shift + P</code></li><li><code>Alt + F4</code></li></ol></div>
+
+<div class="q"><p>21. What does the command <code>tsc app.ts</code> do?</p>
+<ol class="opts"><li>Runs <code>app.ts</code> directly</li>
+<li>Generates <code>app.js</code>, the JavaScript version of the file</li>
+<li>Deletes <code>app.ts</code> after checking types</li><li>Installs TypeScript for that file</li></ol></div>
+
+<div class="q"><p>22. After running <code>tsc app.ts</code>, how do you execute the generated file?</p>
+<ol class="opts"><li><code>node app.ts</code></li><li><code>node app.js</code></li>
+<li><code>tsc app.js</code></li><li><code>run app.js</code></li></ol></div>
+
+<div class="q"><p>23. What is the output of <code>console.log("Welcome to TypeScript!");</code>?</p>
+<ol class="opts"><li><code>Welcome to TypeScript</code></li><li><code>Welcome to TypeScript!</code></li>
+<li><code>console.log("Welcome to TypeScript!")</code></li>
+<li>Nothing &mdash; <code>console.log</code> is not supported in TypeScript</li></ol></div>
+
+<div class="q"><p>24. Which single command runs a <code>.ts</code> file without creating a <code>.js</code> file?</p>
+<ol class="opts"><li><code>tsc app.ts</code></li><li><code>tsx app.ts</code></li>
+<li><code>node app.ts</code></li><li><code>npm run app.ts</code></li></ol></div>
+
+<div class="q"><p>25. Which command fixes the Execution Policy error that appears when running <code>tsc</code> in PowerShell?</p>
+<ol class="opts">
+<li><code>Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned</code></li>
+<li><code>Set-ExecutionPolicy -Scope AllUsers -ExecutionPolicy Unrestricted</code></li>
+<li><code>npm config set execution-policy remote</code></li>
+<li><code>tsc --allow-scripts</code></li></ol></div>
+
+<div class="q"><p>26. The Execution Policy error typically occurs on which platform?</p>
+<ol class="opts"><li>macOS</li><li>Linux</li><li>Windows (PowerShell)</li><li>All platforms equally</li></ol></div>
+
+<h2>Section 4 — Quick Summary Recall</h2>
+
+<div class="q"><p>27. Which tool converts <code>.ts</code> files into <code>.js</code> files?</p>
+<ol class="opts"><li>Node.js</li><li><code>tsc</code> (TypeScript Compiler)</li><li>VS Code</li><li><code>tsx</code></li></ol></div>
+
+<div class="q"><p>28. Which pair is correctly matched?</p>
+<ol class="opts"><li>Node.js &rarr; best editor for TypeScript</li>
+<li><code>tsc</code> &rarr; runs TypeScript without compiling</li>
+<li><code>tsx</code> &rarr; runs TypeScript without compiling</li>
+<li>VS Code &rarr; converts <code>.ts</code> to <code>.js</code></li></ol></div>
+
+<div class="q"><p>29. You wrote a TypeScript file and want the fastest way to see its output during practice. What is the recommended approach?</p>
+<ol class="opts"><li>Compile with <code>tsc</code>, then run with <code>node</code></li>
+<li>Run it directly with <code>tsx</code></li>
+<li>Paste the code into the browser console</li>
+<li>Rename the file to <code>.js</code> and run it</li></ol></div>
+
+<div class="q"><p>30. Which statement about TypeScript adoption in an existing JavaScript project is TRUE?</p>
+<ol class="opts"><li>The whole project must be rewritten before TypeScript can be used</li>
+<li>TypeScript works smoothly alongside existing JavaScript code</li>
+<li>TypeScript cannot be used with Node.js projects</li>
+<li>TypeScript requires removing all existing <code>.js</code> files</li></ol></div>
+
+<!-- ================= ANSWER KEY ON A NEW PAGE ================= -->
+<div class="pb"></div>
+<h1>Answer Key</h1>
+<div class="meta">Getting Started with TypeScript &middot; 30 MCQs</div>
+<div class="rule"></div>
+
+<table class="key">
+<tr><th>Q</th><th>Ans</th><th>Q</th><th>Ans</th><th>Q</th><th>Ans</th><th>Q</th><th>Ans</th><th>Q</th><th>Ans</th></tr>
+<tr><td>1</td><td>B</td><td>7</td><td>D</td><td>13</td><td>B</td><td>19</td><td>B</td><td>25</td><td>A</td></tr>
+<tr><td>2</td><td>C</td><td>8</td><td>B</td><td>14</td><td>B</td><td>20</td><td>B</td><td>26</td><td>C</td></tr>
+<tr><td>3</td><td>B</td><td>9</td><td>B</td><td>15</td><td>B</td><td>21</td><td>B</td><td>27</td><td>B</td></tr>
+<tr><td>4</td><td>B</td><td>10</td><td>A</td><td>16</td><td>B</td><td>22</td><td>B</td><td>28</td><td>C</td></tr>
+<tr><td>5</td><td>B</td><td>11</td><td>C</td><td>17</td><td>A</td><td>23</td><td>B</td><td>29</td><td>B</td></tr>
+<tr><td>6</td><td>B</td><td>12</td><td>B</td><td>18</td><td>C</td><td>24</td><td>B</td><td>30</td><td>B</td></tr>
+</table>
+
+<h2>Explanations for the tricky ones</h2>
+<div class="exp"><b>Q5 (B)</b> &mdash; The relationship is one-directional. JavaScript is a subset of TypeScript, so any working JS is valid TS &mdash; but TS-specific syntax (type annotations, interfaces) is <i>not</i> valid JavaScript.</div>
+<div class="exp"><b>Q7 (D)</b> &mdash; TypeScript's benefits are developer-side (early error detection, maintainability, JS interop). The compiled output is plain JavaScript, so there is no runtime speed gain.</div>
+<div class="exp"><b>Q10 (A)</b> &mdash; <code>node -v</code> / <code>node --version</code> checks Node.js; <code>npm -v</code> checks npm; <code>tsc -v</code> checks the compiler. Three different tools, three different checks.</div>
+<div class="exp"><b>Q15 (B)</b> &mdash; The error means Windows cannot find the global npm binaries folder. Adding <code>AppData\Roaming\npm</code> to the PATH environment variable resolves it; reinstalling Node.js does not.</div>
+<div class="exp"><b>Q24 / Q29 (B)</b> &mdash; <code>tsc</code> compiles only, producing a <code>.js</code> file you then run separately; <code>tsx</code> compiles and executes in one step, leaving no <code>.js</code> behind.</div>
+<div class="exp"><b>Q25 (A)</b> &mdash; PowerShell blocks running scripts by default. <code>RemoteSigned</code> at <code>CurrentUser</code> scope is the recommended minimum change &mdash; safer than <code>Unrestricted</code> for all users.</div>
+
+<footer>
+Reference material: www.pavanonlinetrainings.com &middot; www.youtube.com/@sdetpavan
+</footer>
+
+</body>
+</html>

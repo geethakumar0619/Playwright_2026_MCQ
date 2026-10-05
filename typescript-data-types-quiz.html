@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TypeScript Quiz — Data Types, Annotations &amp; Type Inference</title>
+<style>
+  :root {
+    --bg: #fbfbfa; --surface: #fff; --surface-2: #f4f4f2; --border: #e4e4e0;
+    --text: #1f1f1d; --dim: #6b6b66;
+    --accent: #2f6f4f; --accent-soft: #eaf3ed;
+    --ok-bg: #e7f4ec; --ok-br: #7fba97; --ok-tx: #1c5c38;
+    --no-bg: #fbeaea; --no-br: #d99b9b; --no-tx: #8d2b2b;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17181a; --surface: #1e2022; --surface-2: #24262a; --border: #33363a;
+      --text: #e8e8e6; --dim: #9a9a96;
+      --accent: #7fc4a0; --accent-soft: #22302a;
+      --ok-bg: #1b2f23; --ok-br: #3f7a57; --ok-tx: #8fd5aa;
+      --no-bg: #331d1d; --no-br: #7a4040; --no-tx: #e69b9b;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 88px; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.62 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  header.top {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in srgb, var(--bg) 90%, transparent);
+    backdrop-filter: blur(10px); border-bottom: 1px solid var(--border);
+  }
+  .top-inner {
+    max-width: 1100px; margin: 0 auto; padding: 11px 24px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .brand { font-weight: 650; font-size: 15px; letter-spacing: -.01em; }
+  .brand span { color: var(--dim); font-weight: 400; }
+  .scoreboard { display: flex; gap: 8px; margin-left: auto; align-items: center; flex-wrap: wrap; }
+  .stat {
+    font-size: 12.5px; padding: 4px 11px; border-radius: 999px;
+    background: var(--surface); border: 1px solid var(--border); color: var(--dim); white-space: nowrap;
+  }
+  .stat b { color: var(--text); font-weight: 650; font-variant-numeric: tabular-nums; }
+  .stat.good b { color: var(--ok-tx); }
+  button.ctl {
+    font: inherit; font-size: 12.5px; font-weight: 600; padding: 5px 12px;
+    border-radius: 7px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text); cursor: pointer;
+  }
+  button.ctl:hover { background: var(--surface-2); border-color: var(--dim); }
+  .progress-wrap { height: 3px; background: var(--border); }
+  .progress-bar { height: 100%; width: 0; background: var(--accent); transition: width .25s; }
+
+  .shell { max-width: 1100px; margin: 0 auto; padding: 0 24px 90px; display: flex; gap: 38px; }
+  nav.toc { width: 200px; flex: none; position: sticky; top: 74px; align-self: flex-start; padding-top: 32px; }
+  nav.toc h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .09em; color: var(--dim); margin: 0 0 10px; }
+  nav.toc a {
+    display: flex; justify-content: space-between; gap: 8px; align-items: baseline;
+    padding: 6px 10px; margin-bottom: 2px; border-radius: 6px; font-size: 13.5px;
+    color: var(--dim); text-decoration: none; border-left: 2px solid transparent;
+  }
+  nav.toc a:hover { background: var(--surface-2); color: var(--text); }
+  nav.toc a.active { color: var(--accent); background: var(--accent-soft); border-left-color: var(--accent); font-weight: 600; }
+  nav.toc a em { font-style: normal; font-size: 11.5px; font-variant-numeric: tabular-nums; opacity: .85; }
+  main { flex: 1; min-width: 0; padding-top: 32px; }
+
+  .hero { margin-bottom: 34px; }
+  .hero h1 { font-size: 28px; line-height: 1.24; margin: 0 0 10px; letter-spacing: -.02em; }
+  .hero .sub { color: var(--dim); font-size: 15px; margin: 0 0 16px; max-width: 64ch; }
+  .chips { display: flex; gap: 9px; flex-wrap: wrap; margin-bottom: 18px; }
+  .chip { font-size: 12.5px; padding: 5px 11px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); color: var(--dim); }
+  .chip b { color: var(--text); font-weight: 650; }
+  .credit {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent); border-radius: 10px; padding: 13px 17px; font-size: 14px; color: var(--dim);
+  }
+  .credit a { color: var(--accent); text-decoration: none; font-weight: 550; }
+  .credit a:hover { text-decoration: underline; }
+  .credit p { margin: 0 0 5px; }
+  .credit p:last-child { margin: 0; }
+
+  section.sec { margin-bottom: 48px; scroll-margin-top: 88px; }
+  .sec-head { display: flex; align-items: baseline; gap: 12px; padding-bottom: 9px; border-bottom: 2px solid var(--border); margin-bottom: 8px; }
+  .sec-head h2 { font-size: 19.5px; margin: 0; letter-spacing: -.015em; }
+  .sec-head h2 code { font-size: .9em; }
+  .sec-head .n { font-size: 13px; color: var(--dim); margin-left: auto; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .sec-note { color: var(--dim); font-size: 14px; margin: 12px 0 20px; }
+
+  .q { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 17px 19px; margin-bottom: 13px; }
+  .q-top { display: flex; gap: 11px; align-items: flex-start; margin-bottom: 13px; }
+  .qid {
+    flex: none; font: 650 12px/1.55 var(--mono); color: var(--accent);
+    background: var(--accent-soft); border-radius: 6px; padding: 2px 8px; margin-top: 2px;
+  }
+  .qtext { flex: 1; min-width: 0; font-weight: 500; }
+  .qtext p { margin: 0; }
+  .qtext pre { font-weight: 400; margin: 10px 0 0; }
+
+  .opts { display: flex; flex-direction: column; gap: 7px; }
+  button.opt {
+    display: flex; gap: 11px; align-items: flex-start; width: 100%; text-align: left;
+    font: inherit; font-size: 15px; line-height: 1.5;
+    padding: 10px 13px; border-radius: 8px; cursor: pointer;
+    background: var(--surface); color: var(--text); border: 1px solid var(--border);
+    transition: background .12s, border-color .12s;
+  }
+  button.opt:hover:not(:disabled) { background: var(--surface-2); border-color: var(--dim); }
+  button.opt:disabled { cursor: default; }
+  .letter {
+    flex: none; width: 21px; height: 21px; margin-top: 1px; border-radius: 5px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    font: 650 11.5px/20px var(--mono); text-align: center; color: var(--dim);
+  }
+  .otext { flex: 1; min-width: 0; }
+  .mark { flex: none; font-size: 14px; font-weight: 700; margin-top: 1px; }
+  button.opt.correct { background: var(--ok-bg); border-color: var(--ok-br); color: var(--ok-tx); }
+  button.opt.correct .letter { background: var(--ok-br); border-color: var(--ok-br); color: #fff; }
+  button.opt.wrong { background: var(--no-bg); border-color: var(--no-br); color: var(--no-tx); }
+  button.opt.wrong .letter { background: var(--no-br); border-color: var(--no-br); color: #fff; }
+  button.opt.dimmed { opacity: .5; }
+
+  .why {
+    display: none; margin-top: 13px; padding: 12px 14px; font-size: 14.5px;
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent); border-radius: 8px;
+  }
+  .q.answered .why { display: block; }
+  .why .label { display: block; font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+  .why p { margin: 0 0 7px; }
+  .why p:last-child { margin: 0; }
+  .why .nb { color: var(--dim); font-style: italic; }
+  .why pre { margin: 8px 0; }
+
+  code { font: .875em/1.4 var(--mono); background: var(--surface-2); padding: 1.5px 5px; border-radius: 4px; border: 1px solid var(--border); }
+  button.opt code { background: color-mix(in srgb, currentColor 9%, transparent); border-color: color-mix(in srgb, currentColor 22%, transparent); }
+  pre { background: var(--surface-2); border: 1px solid var(--border); border-radius: 7px; padding: 11px 13px; overflow-x: auto; }
+  pre code { background: none; border: none; padding: 0; font-size: 13.5px; line-height: 1.55; white-space: pre; }
+
+  .results { display: none; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 40px; scroll-margin-top: 90px; }
+  .results.show { display: block; }
+  .results h2 { margin: 0 0 4px; font-size: 22px; }
+  .big-score { font: 700 44px/1.1 -apple-system, "Segoe UI", sans-serif; letter-spacing: -.03em; margin: 12px 0 6px; font-variant-numeric: tabular-nums; }
+  .band { display: inline-block; font-size: 13px; font-weight: 650; padding: 4px 12px; border-radius: 999px; margin-bottom: 14px; }
+  .band.pass { background: var(--ok-bg); color: var(--ok-tx); border: 1px solid var(--ok-br); }
+  .band.fail { background: var(--no-bg); color: var(--no-tx); border: 1px solid var(--no-br); }
+  .verdict { color: var(--dim); margin-bottom: 20px; max-width: 62ch; }
+  .bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 9px; font-size: 14px; }
+  .bar-row .nm { width: 178px; flex: none; color: var(--dim); }
+  .bar-track { flex: 1; height: 9px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--accent); }
+  .bar-row .sc { width: 48px; flex: none; text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .advice { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 14.5px; }
+  .advice h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .07em; color: var(--dim); margin: 0 0 10px; }
+  .advice p { margin: 0 0 9px; }
+
+  table { border-collapse: collapse; width: 100%; margin: 12px 0 0; font-size: 14.5px; }
+  th, td { text-align: left; padding: 8px 11px; border: 1px solid var(--border); vertical-align: top; }
+  th { background: var(--surface-2); font-weight: 600; font-size: 13px; }
+  .cmp td:first-child { font-weight: 600; white-space: nowrap; }
+  details.ref { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; margin-bottom: 12px; }
+  details.ref summary { cursor: pointer; font-weight: 600; font-size: 15px; }
+  footer.end { border-top: 1px solid var(--border); margin-top: 42px; padding-top: 18px; color: var(--dim); font-size: 13.5px; }
+  footer.end a { color: var(--accent); }
+
+  @media (max-width: 900px) {
+    .shell { display: block; padding: 0 17px 60px; }
+    nav.toc { position: static; width: auto; display: flex; gap: 6px; overflow-x: auto; padding: 22px 0 8px; }
+    nav.toc h2 { display: none; }
+    nav.toc a { white-space: nowrap; border-left: none; border-bottom: 2px solid transparent; }
+    nav.toc a.active { border-left: none; border-bottom-color: var(--accent); }
+    main { padding-top: 6px; }
+    .hero h1 { font-size: 22px; }
+    .bar-row .nm { width: 100px; }
+  }
+  @media print {
+    header.top, nav.toc, .why, .results { display: none !important; }
+    body { background: #fff; color: #000; font-size: 11pt; }
+    .shell { display: block; max-width: none; padding: 0; }
+    main { padding-top: 0; }
+    .q { break-inside: avoid; margin-bottom: 8px; padding: 9px 11px; }
+    button.opt { border-color: #bbb; padding: 5px 9px; }
+    html.print-key .why { display: block !important; break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">TypeScript Quiz <span>· Data Types, Annotations &amp; Inference</span></div>
+    <div class="scoreboard">
+      <span class="stat">Answered <b id="s-answered">0</b>/<b id="s-total">34</b></span>
+      <span class="stat good">Correct <b id="s-correct">0</b></span>
+      <button class="ctl" id="btn-reset">Reset</button>
+      <button class="ctl" id="btn-print">Print blank</button>
+    </div>
+  </div>
+  <div class="progress-wrap"><div class="progress-bar" id="progress"></div></div>
+</header>
+
+<div class="shell">
+  <nav class="toc" id="toc"></nav>
+
+  <main>
+    <div class="hero">
+      <h1>TypeScript — Data Types, Annotations &amp; Type Inference</h1>
+      <p class="sub">Dynamic vs static typing, type safety, annotations vs inference, and the primitive and non-primitive types. Click an option to lock your answer and see why it's right.</p>
+      <div class="chips">
+        <span class="chip"><b>34</b> questions</span>
+        <span class="chip">~<b>20</b> minutes</span>
+        <span class="chip"><b>5</b> sections</span>
+        <span class="chip">Suggested pass <b>26/34</b></span>
+      </div>
+      <div class="credit">
+        <p><strong>Source:</strong> course content from SDET Pavan.</p>
+        <p><a href="https://www.pavanonlinetrainings.com" target="_blank" rel="noopener">pavanonlinetrainings.com</a> · <a href="https://www.youtube.com/@sdetpavan" target="_blank" rel="noopener">youtube.com/@sdetpavan</a></p>
+      </div>
+    </div>
+
+    <div class="results" id="results">
+      <h2>Results</h2>
+      <div class="big-score" id="r-score">—</div>
+      <div id="r-band"></div>
+      <div class="verdict" id="r-verdict"></div>
+      <div id="r-bars"></div>
+      <div class="advice" id="r-advice"></div>
+    </div>
+
+    <div id="quiz"></div>
+
+    <details class="ref">
+      <summary>Cheat sheet — JavaScript vs TypeScript</summary>
+      <table class="cmp">
+        <tr><th></th><th>JavaScript</th><th>TypeScript</th></tr>
+        <tr><td>Typing</td><td>Dynamic</td><td>Static</td></tr>
+        <tr><td>Types checked</td><td>At runtime</td><td>At compile time</td></tr>
+        <tr><td>Can a variable change type?</td><td>Yes</td><td>No</td></tr>
+        <tr><td>Type-safe?</td><td>No</td><td>Yes</td></tr>
+        <tr><td><code>"5" + 3</code></td><td><code>"53"</code>, no error</td><td>Error if assigned to <code>number</code></td></tr>
+        <tr><td>When bugs surface</td><td>When the code runs</td><td>Before the code runs</td></tr>
+      </table>
+    </details>
+
+    <details class="ref">
+      <summary>Cheat sheet — the data types</summary>
+      <table class="cmp">
+        <tr><th>Type</th><th>Holds</th><th>Example</th></tr>
+        <tr><td><code>number</code></td><td>Integers and decimals</td><td><code>let n: number = 3.14;</code></td></tr>
+        <tr><td><code>string</code></td><td>Text — single, double, or backticks</td><td><code>let s: string = "Hi";</code></td></tr>
+        <tr><td><code>boolean</code></td><td><code>true</code> / <code>false</code></td><td><code>let b: boolean = true;</code></td></tr>
+        <tr><td><code>null</code></td><td>An intentional empty value</td><td><code>let x = null;</code></td></tr>
+        <tr><td><code>undefined</code></td><td>Declared but not assigned</td><td><code>let y;</code></td></tr>
+        <tr><td><code>any</code></td><td>Anything — disables checking</td><td><code>let z: any = "Hi";</code></td></tr>
+        <tr><td>Union <code>|</code></td><td>One of several types</td><td><code>let id: string | number;</code></td></tr>
+        <tr><td><code>void</code></td><td>Function returns nothing</td><td><code>function log(): void {}</code></td></tr>
+      </table>
+      <p style="margin:14px 0 0;font-size:14.5px;color:var(--dim)"><b>Non-primitive:</b> Array, Tuple, Class, Functions, Interface — these hold structured data rather than a single value.</p>
+    </details>
+
+    <footer class="end">
+      34 multiple-choice questions · single-file HTML, no dependencies.
+      Content credit: <a href="https://www.pavanonlinetrainings.com" target="_blank" rel="noopener">pavanonlinetrainings.com</a> ·
+      <a href="https://www.youtube.com/@sdetpavan" target="_blank" rel="noopener">@sdetpavan</a>
+    </footer>
+  </main>
+</div>
+
+<script>
+var SECTIONS = [
+  {
+    id: "dyn", title: "Section A — Dynamic vs Static Typing", short: "A · Dynamic vs Static", start: 1,
+    note: "When types get checked, and whether a variable is allowed to change type.",
+    qs: [
+      { q: "JavaScript is a ____ typed language.",
+        o: ["Statically", "Dynamically", "Strongly", "Not typed at all"], a: 1,
+        why: "JavaScript is <strong>dynamically typed</strong> — a variable's type is determined as the program runs, and it can change freely." },
+
+      { q: "In JavaScript, variable types are checked:",
+        o: ["At compile time", "At runtime", "Never", "When the file is saved"], a: 1,
+        why: "At runtime. There is no compile step in which JavaScript could reject a type mismatch, so problems only surface once the line actually executes." },
+
+      { q: "TypeScript is a ____ typed language, with types checked ____.",
+        o: ["Dynamically / at runtime", "Statically / at compile time", "Statically / at runtime", "Dynamically / at compile time"], a: 1,
+        why: "<strong>Statically typed, checked at compile time.</strong> TypeScript analyses your code before it runs and refuses to compile if the types don't line up." },
+
+      { q: "What is the result of this JavaScript?",
+        code: "let age = 25;\nage = \"twenty-five\";\nconsole.log(age);",
+        o: ["Error: cannot change type", "Prints <code>25</code>", "Prints <code>twenty-five</code> — no error", "Prints <code>undefined</code>"], a: 2,
+        why: "No error. JavaScript allows the type to change dynamically, so <code>age</code> simply becomes a string and <code>twenty-five</code> is printed." },
+
+      { q: "What happens with this TypeScript?",
+        code: "let data: number = 10;\ndata = \"ten\";",
+        o: [
+          "It runs fine and <code>data</code> becomes a string",
+          "Compile-time error: Type <code>'string'</code> is not assignable to type <code>'number'</code>",
+          "Runtime error when the line executes",
+          "<code>data</code> is silently converted to <code>0</code>"
+        ], a: 1,
+        why: "TypeScript catches this <strong>before the code runs</strong> and reports <code>Type 'string' is not assignable to type 'number'</code>. Once a variable is typed as <code>number</code>, it stays a <code>number</code>." },
+
+      { q: "Which statement about the two languages is TRUE?",
+        o: [
+          "JavaScript types are fixed; TypeScript types are flexible",
+          "Both check types at compile time",
+          "JavaScript types are flexible and checked at runtime; TypeScript types are fixed and checked at compile time",
+          "Neither language checks types at all"
+        ], a: 2,
+        why: "That's the core distinction. Dynamic typing (JS) = flexible, checked at runtime. Static typing (TS) = fixed, checked at compile time." },
+
+      { q: "What is the main practical advantage of checking types at compile time?",
+        o: [
+          "The code runs faster",
+          "Bugs are caught before the code ever runs, rather than in production",
+          "It reduces the file size",
+          "It removes the need for testing"
+        ], a: 1,
+        why: "You find the mistake while writing the code, not when a user hits it. A runtime type bug might sit unnoticed until an unusual code path executes.",
+        nb: "It does not remove the need for testing — type checking only proves the types line up, not that the logic is correct." }
+    ]
+  },
+  {
+    id: "safe", title: "Section B — Type Safety", short: "B · Type Safety", start: 8,
+    note: "What happens when you mix incompatible types, and why JavaScript's answer is surprising.",
+    qs: [
+      { q: "What is the output of this JavaScript?",
+        code: "const result = \"5\" + 3;\nconsole.log(result);",
+        o: ["<code>8</code>", "<code>\"53\"</code>", "<code>NaN</code>", "A TypeError"], a: 1,
+        why: "JavaScript converts the number <code>3</code> into a string and concatenates, producing the string <code>\"53\"</code> — not the <code>8</code> you might expect." },
+
+      { q: "Why does JavaScript produce that result?",
+        o: [
+          "Because <code>+</code> always performs addition and rounds down",
+          "Because when either operand of <code>+</code> is a string, the other is coerced to a string and the two are concatenated",
+          "Because numbers in quotes are invalid",
+          "Because <code>const</code> forces string conversion"
+        ], a: 1,
+        why: "This is <strong>type coercion</strong>. The <code>+</code> operator is overloaded: with two numbers it adds, but if either side is a string it switches to concatenation.",
+        nb: "Other operators behave differently — \"5\" - 3 gives 6, because - has no string meaning so both sides are coerced to numbers. That inconsistency is exactly why type safety matters." },
+
+      { q: "Is <code>\"5\" + 3</code> reported as an error in JavaScript?",
+        o: [
+          "Yes, it throws a TypeError",
+          "No — it runs silently, but the result may not be what you intended",
+          "Yes, but only in strict mode",
+          "No, and the result is always correct"
+        ], a: 1,
+        why: "No error at all. That's the danger: JavaScript is <strong>not type-safe</strong>, so an unintended operation between incompatible types produces a wrong value rather than a complaint." },
+
+      { q: "What happens with this TypeScript?",
+        code: "const result: number = \"5\" + 3;",
+        o: [
+          "It compiles and <code>result</code> is <code>8</code>",
+          "It compiles and <code>result</code> is <code>\"53\"</code>",
+          "Error: Type <code>'string'</code> is not assignable to type <code>'number'</code>",
+          "It compiles with a warning only"
+        ], a: 2,
+        why: "TypeScript works out that <code>\"5\" + 3</code> produces a <code>string</code>, sees that you declared <code>result</code> as a <code>number</code>, and rejects it before the code runs." },
+
+      { q: "\"Type-safe\" means the language:",
+        o: [
+          "Encrypts variable values",
+          "Prevents operations between incompatible types",
+          "Automatically converts all types to strings",
+          "Runs faster than an untyped language"
+        ], a: 1,
+        why: "Type safety means the language stops you combining values whose types don't make sense together, catching potential bugs early." },
+
+      { q: "If you actually want <code>8</code> from <code>\"5\"</code> and <code>3</code>, what should you write?",
+        o: ["<code>\"5\" + 3</code>", "<code>Number(\"5\") + 3</code>", "<code>\"5\" + \"3\"</code>", "<code>String(5) + 3</code>"], a: 1,
+        why: "Convert the string to a number <em>first</em>, then add: <code>Number(\"5\") + 3</code> gives <code>8</code>. The other options all end up concatenating strings.",
+        nb: "parseInt(\"5\") + 3 also works. The point is that the conversion should be explicit and deliberate, not something the language guesses for you." }
+    ]
+  },
+  {
+    id: "ann", title: "Section C — Annotations &amp; Inference", short: "C · Annotation/Inference", start: 14,
+    note: "Two ways a variable gets its type: you declare it, or TypeScript works it out.",
+    qs: [
+      { q: "A <strong>type annotation</strong> is:",
+        o: [
+          "A comment describing what a variable holds",
+          "Explicitly telling TypeScript the type of a variable using <code>: type</code>",
+          "TypeScript guessing the type automatically",
+          "A runtime check on the variable's value"
+        ], a: 1,
+        why: "An annotation is the explicit <code>: type</code> you write after the variable name — you are stating the type rather than leaving it to TypeScript." },
+
+      { q: "In <code>let name: string = \"Alice\";</code>, which part is the type annotation?",
+        o: ["<code>let</code>", "<code>name</code>", "<code>: string</code>", "<code>\"Alice\"</code>"], a: 2,
+        why: "<code>: string</code> is the annotation. <code>name</code> is the identifier and <code>\"Alice\"</code> is the value." },
+
+      { q: "<strong>Type inference</strong> is:",
+        o: [
+          "TypeScript automatically determining the type when you don't annotate it",
+          "Converting one type into another at runtime",
+          "A way to disable type checking",
+          "Declaring the type twice for safety"
+        ], a: 0,
+        why: "If you omit the annotation, TypeScript infers the type from the value you assign. You get the same protection without writing the type out." },
+
+      { q: "What type does TypeScript infer here?",
+        code: "let message = \"Hello\";",
+        o: ["<code>any</code>", "<code>string</code>", "<code>object</code>", "No type — it stays untyped"], a: 1,
+        why: "TypeScript infers <code>string</code> from the assigned value. No annotation is needed for it to be fully typed." },
+
+      { q: "What type does TypeScript infer here?",
+        code: "let count = 42;",
+        o: ["<code>any</code>", "<code>integer</code>", "<code>number</code>", "<code>42</code>"], a: 2,
+        why: "<code>number</code>. TypeScript has a single numeric type covering both integers and decimals — there is no separate <code>integer</code> type.",
+        nb: "With const instead of let, TypeScript would narrow it further to the literal type 42, since a const can never be reassigned." },
+
+      { q: "After <code>let message = \"Hello\";</code> with no annotation, what happens if you then write <code>message = 123;</code>?",
+        o: [
+          "It works — no annotation means no checking",
+          "Error — TypeScript inferred <code>string</code> and enforces it",
+          "<code>message</code> silently becomes a number",
+          "It works but TypeScript logs a warning"
+        ], a: 1,
+        why: "Inference is just as binding as an annotation. TypeScript decided <code>message</code> is a <code>string</code>, so assigning a number is an error.",
+        nb: "This is the most commonly misunderstood point in the topic: skipping the annotation does not skip the type checking." },
+
+      { q: "What is the key difference between annotation and inference?",
+        o: [
+          "Annotation works at runtime; inference works at compile time",
+          "Annotation is for primitives; inference is for objects",
+          "With an annotation you define the type manually; with inference TypeScript figures it out for you",
+          "Inference is less safe than annotation"
+        ], a: 2,
+        why: "They differ only in who writes the type down — the resulting checking is identical.",
+        nb: "In practice, let inference handle simple initialised variables and annotate where it adds clarity: function parameters, return types, and public APIs." }
+    ]
+  },
+  {
+    id: "prim", title: "Section D — Primitive Types", short: "D · Primitives", start: 21,
+    note: "The built-in types that hold a single value: number, string, boolean, null, undefined, any, union, void.",
+    qs: [
+      { q: "Which type represents both integers and decimals in TypeScript?",
+        o: ["<code>int</code>", "<code>float</code>", "<code>number</code>", "<code>decimal</code>"], a: 2,
+        why: "<code>number</code> covers both — <code>42</code> and <code>3.14</code> are the same type. TypeScript has no separate <code>int</code> or <code>float</code>." },
+
+      { q: "Which is <strong>NOT</strong> a valid way to write a string in TypeScript?",
+        o: ["Single quotes — <code>'Hello'</code>", "Double quotes — <code>\"Hello\"</code>", "Backticks — <code>`Hello`</code>", "Angle brackets — <code>&lt;Hello&gt;</code>"], a: 3,
+        why: "Strings use single quotes, double quotes, or backticks. Angle brackets are not string delimiters." },
+
+      { q: "Which quote style is required for a template literal like <code>Hello ${name}</code>?",
+        o: ["Single quotes", "Double quotes", "Backticks", "Any of the three"], a: 2,
+        why: "Only backticks support <code>${...}</code> interpolation. In single or double quotes, <code>${name}</code> is just literal text." },
+
+      { q: "The <code>boolean</code> type represents:",
+        o: ["<code>0</code> and <code>1</code>", "<code>true</code> and <code>false</code>", "<code>yes</code> and <code>no</code>", "Any non-empty value"], a: 1,
+        why: "Exactly two values, <code>true</code> and <code>false</code> — typically used to drive conditions such as <code>if (isLoggedIn) { ... }</code>." },
+
+      { q: "<code>null</code> represents:",
+        o: [
+          "A variable declared but not assigned",
+          "An intentional empty value",
+          "A syntax error",
+          "The number zero"
+        ], a: 1,
+        why: "<code>null</code> is deliberate — you are saying \"this has no value on purpose.\" Compare with <code>undefined</code>, which means nobody has assigned anything yet." },
+
+      { q: "What is the value of <code>y</code> here?",
+        code: "let y;\nconsole.log(y);",
+        o: ["<code>null</code>", "<code>0</code>", "<code>undefined</code>", "An error"], a: 2,
+        why: "A variable that is declared but never assigned holds <code>undefined</code>. That's the difference from <code>null</code>: <code>undefined</code> happens to you, <code>null</code> is chosen by you." },
+
+      { q: "Which type accepts any value and disables TypeScript's checks on that variable?",
+        o: ["<code>unknown</code>", "<code>any</code>", "<code>void</code>", "<code>null</code>"], a: 1,
+        why: "<code>any</code> opts the variable out of type checking entirely — <code>let z: any = \"Hello\"; z = 10;</code> is allowed." },
+
+      { q: "What is the recommended guidance on using <code>any</code>?",
+        o: [
+          "Use it everywhere — it makes code shorter",
+          "Avoid it unless necessary; prefer proper types for safety",
+          "Use it for all function parameters",
+          "It is required for union types"
+        ], a: 1,
+        why: "Every <code>any</code> is a hole in your type coverage. Using it throws away the very protection you adopted TypeScript for, so reserve it for cases where the type genuinely cannot be known." },
+
+      { q: "What does this declaration create?",
+        code: "let id: string | number = \"123\";",
+        o: ["A type annotation error", "A union type — <code>id</code> may hold a string or a number", "A tuple", "An <code>any</code> type in disguise"], a: 1,
+        why: "The <code>|</code> pipe creates a <strong>union type</strong>, allowing more than one type for a variable while still excluding everything else.",
+        nb: "Unlike any, a union stays safe: id = true would still be an error, because boolean isn't one of the permitted types." },
+
+      { q: "Which type is used for a function that doesn't return anything?",
+        o: ["<code>null</code>", "<code>undefined</code>", "<code>void</code>", "<code>any</code>"], a: 2,
+        why: "<code>void</code> marks the absence of a return value — for example <code>function log(): void { console.log(\"Hi\"); }</code>." }
+    ]
+  },
+  {
+    id: "non", title: "Section E — Non-Primitive Types", short: "E · Non-Primitives", start: 31,
+    note: "The complex types that hold structured data rather than a single value.",
+    qs: [
+      { q: "Which of these is a <strong>non-primitive</strong> type?",
+        o: ["<code>number</code>", "<code>boolean</code>", "<code>Array</code>", "<code>null</code>"], a: 2,
+        why: "Array is non-primitive — it holds a structured collection. <code>number</code>, <code>boolean</code>, and <code>null</code> are primitives holding a single value." },
+
+      { q: "Which of the following is <strong>NOT</strong> listed as a non-primitive type?",
+        o: ["Tuple", "Interface", "Boolean", "Class"], a: 2,
+        why: "Boolean is a primitive. The non-primitive types are Array, Tuple, Class, Functions, and Interface." },
+
+      { q: "The essential difference between primitive and non-primitive types is:",
+        o: [
+          "Primitives are faster to type",
+          "Primitives hold a single value; non-primitives hold structured data",
+          "Primitives only exist in JavaScript",
+          "Non-primitives cannot be annotated"
+        ], a: 1,
+        why: "Primitives (<code>number</code>, <code>string</code>, <code>boolean</code>, …) are basic single values. Non-primitives (Array, Class, Interface, …) are complex and hold structured data." },
+
+      { q: "Which symbol is used to declare a union type?",
+        o: ["<code>&amp;</code>", "<code>|</code>", "<code>||</code>", "<code>:</code>"], a: 1,
+        why: "A single pipe, <code>|</code>, as in <code>string | number</code>. The double pipe <code>||</code> is the logical OR operator, a different thing entirely.",
+        nb: "The & symbol does exist in TypeScript — it creates an intersection type, which combines types rather than choosing between them." },
+
+      { q: "Which non-primitive type is used to describe the shape an object must have?",
+        o: ["Tuple", "Array", "Interface", "Function"], a: 2,
+        why: "An Interface defines the structure — which properties exist and what types they hold — that an object is required to match." }
+    ]
+  }
+];
+
+(function () {
+  var quizEl = document.getElementById('quiz');
+  var tocEl = document.getElementById('toc');
+  var total = 0, answered = 0, correct = 0;
+  var stats = {};
+  var PASS = 26;
+
+  SECTIONS.forEach(function (s) { total += s.qs.length; stats[s.id] = { c: 0, t: s.qs.length, short: s.short }; });
+  document.getElementById('s-total').textContent = total;
+
+  var LETTERS = ['a', 'b', 'c', 'd'];
+
+  tocEl.innerHTML = '<h2>Sections</h2>';
+  SECTIONS.forEach(function (s) {
+    tocEl.insertAdjacentHTML('beforeend',
+      '<a href="#sec-' + s.id + '">' + s.short + ' <em id="toc-' + s.id + '">0/' + s.qs.length + '</em></a>');
+  });
+  tocEl.insertAdjacentHTML('beforeend', '<a href="#results">Results <em>&nbsp;</em></a>');
+
+  function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+
+  SECTIONS.forEach(function (sec) {
+    var wrap = document.createElement('section');
+    wrap.className = 'sec';
+    wrap.id = 'sec-' + sec.id;
+    var last = sec.start + sec.qs.length - 1;
+    wrap.innerHTML =
+      '<div class="sec-head"><h2>' + sec.title + '</h2><span class="n">' +
+      (sec.start === last ? 'Q' + sec.start : 'Q' + sec.start + '–Q' + last) + '</span></div>' +
+      '<p class="sec-note">' + sec.note + '</p>';
+
+    sec.qs.forEach(function (item, idx) {
+      var num = sec.start + idx;
+      var card = document.createElement('div');
+      card.className = 'q';
+
+      var optsHtml = item.o.map(function (text, i) {
+        return '<button class="opt" data-i="' + i + '">' +
+                 '<span class="letter">' + LETTERS[i] + '</span>' +
+                 '<span class="otext">' + text + '</span>' +
+                 '<span class="mark"></span>' +
+               '</button>';
+      }).join('');
+
+      card.innerHTML =
+        '<div class="q-top"><span class="qid">Q' + num + '</span><div class="qtext"><p>' + item.q + '</p>' +
+          (item.code ? '<pre><code>' + esc(item.code) + '</code></pre>' : '') +
+        '</div></div>' +
+        '<div class="opts">' + optsHtml + '</div>' +
+        '<div class="why"><span class="label">Why</span><p>' + item.why + '</p>' +
+          (item.nb ? '<p class="nb">' + item.nb + '</p>' : '') +
+        '</div>';
+
+      var buttons = Array.prototype.slice.call(card.querySelectorAll('.opt'));
+      buttons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          if (card.classList.contains('answered')) return;
+          var picked = parseInt(btn.dataset.i, 10);
+          card.classList.add('answered');
+          buttons.forEach(function (b, i) {
+            b.disabled = true;
+            if (i === item.a) { b.classList.add('correct'); b.querySelector('.mark').textContent = '✓'; }
+            else if (i === picked) { b.classList.add('wrong'); b.querySelector('.mark').textContent = '✕'; }
+            else { b.classList.add('dimmed'); }
+          });
+          answered++;
+          if (picked === item.a) { correct++; stats[sec.id].c++; }
+          paint();
+        });
+      });
+
+      wrap.appendChild(card);
+    });
+
+    quizEl.appendChild(wrap);
+  });
+
+  function paint() {
+    document.getElementById('s-answered').textContent = answered;
+    document.getElementById('s-correct').textContent = correct;
+    document.getElementById('progress').style.width = (answered / total * 100) + '%';
+    SECTIONS.forEach(function (s) {
+      document.getElementById('toc-' + s.id).textContent = stats[s.id].c + '/' + stats[s.id].t;
+    });
+    if (answered === total) showResults();
+  }
+
+  function showResults() {
+    var pct = Math.round(correct / total * 100);
+    document.getElementById('r-score').textContent = correct + ' / ' + total + '  ·  ' + pct + '%';
+
+    var bandText, verdict;
+    if (pct === 100)     { bandText = 'Perfect';    verdict = 'Full marks. Move on to arrays, tuples and interfaces in detail.'; }
+    else if (pct >= 88)  { bandText = 'Strong';     verdict = 'Skim the ones you missed and move on.'; }
+    else if (pct >= 76)  { bandText = 'Pass';       verdict = 'Solid grasp. Reread the explanations for your misses.'; }
+    else if (pct >= 55)  { bandText = 'Shaky';      verdict = 'Work through both cheat sheets at the bottom, then retake this.'; }
+    else                 { bandText = 'Needs work'; verdict = 'Rewatch the session and type each example into VS Code yourself.'; }
+
+    document.getElementById('r-band').innerHTML =
+      '<span class="band ' + (correct >= PASS ? 'pass' : 'fail') + '">' + bandText + ' · suggested pass mark ' + PASS + '/' + total + '</span>';
+    document.getElementById('r-verdict').textContent = verdict;
+
+    document.getElementById('r-bars').innerHTML = SECTIONS.map(function (s) {
+      var st = stats[s.id];
+      var p = Math.round(st.c / st.t * 100);
+      return '<div class="bar-row"><span class="nm">' + s.short + '</span>' +
+             '<span class="bar-track"><span class="bar-fill" style="width:' + p + '%"></span></span>' +
+             '<span class="sc">' + st.c + '/' + st.t + '</span></div>';
+    }).join('');
+
+    var FIX = {
+      dyn: "Fix one sentence in your head: JavaScript checks types <em>at runtime</em> and lets them change; TypeScript checks <em>at compile time</em> and does not.",
+      safe: "Re-run the <code>\"5\" + 3</code> example in both a <code>.js</code> and a <code>.ts</code> file and watch the difference for yourself.",
+      ann: "Remember that inference is not a loophole — an inferred type is enforced exactly like an annotated one.",
+      prim: "Learn the two easily-confused pairs: <code>null</code> vs <code>undefined</code>, and <code>any</code> vs a union type.",
+      non: "Memorise the five: Array, Tuple, Class, Functions, Interface. Everything else in the lesson is primitive."
+    };
+    var weak = SECTIONS.slice().sort(function (x, y) {
+      return (stats[x.id].c / stats[x.id].t) - (stats[y.id].c / stats[y.id].t);
+    })[0];
+    var advice = '<h3>What to fix</h3>';
+    if (stats[weak.id].c === stats[weak.id].t) {
+      advice += '<p>Clean sweep across every section — nothing to fix.</p>';
+    } else {
+      advice += '<p><b>Weakest section: ' + weak.short + '</b> (' + stats[weak.id].c + '/' + stats[weak.id].t + '). ' + FIX[weak.id] + '</p>';
+    }
+    advice += '<p style="color:var(--dim)"><b>The idea that ties it all together:</b> TypeScript does its entire job <em>before</em> your code runs. Once compiled, the types are erased and what executes is ordinary JavaScript — so every guarantee you get is a compile-time one.</p>';
+    document.getElementById('r-advice').innerHTML = advice;
+
+    document.getElementById('results').classList.add('show');
+  }
+
+  document.getElementById('btn-reset').addEventListener('click', function () {
+    answered = 0; correct = 0;
+    SECTIONS.forEach(function (s) { stats[s.id].c = 0; });
+    document.querySelectorAll('.q').forEach(function (card) {
+      card.classList.remove('answered');
+      card.querySelectorAll('.opt').forEach(function (b) {
+        b.disabled = false;
+        b.classList.remove('correct', 'wrong', 'dimmed');
+        b.querySelector('.mark').textContent = '';
+      });
+    });
+    document.getElementById('results').classList.remove('show');
+    paint();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  document.getElementById('btn-print').addEventListener('click', function () { window.print(); });
+
+  function onScroll() {
+    var links = document.querySelectorAll('nav.toc a');
+    var best = null, bestTop = -Infinity;
+    links.forEach(function (a) {
+      var t = document.querySelector(a.getAttribute('href'));
+      if (!t) return;
+      var top = t.getBoundingClientRect().top - 130;
+      if (top <= 0 && top > bestTop) { bestTop = top; best = a; }
+    });
+    links.forEach(function (a) { a.classList.toggle('active', a === best); });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+  paint();
+})();
+</script>
+</body>
+</html>
