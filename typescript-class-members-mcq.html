@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TypeScript Classes, Readonly, Optional &amp; Static – MCQ Quiz</title>
+<style>
+  :root {
+    --bg: #f4f6fb; --card: #fff; --text: #1f2937; --muted: #6b7280;
+    --primary: #3178c6; --correct: #16a34a; --wrong: #dc2626; --border: #e5e7eb;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Segoe UI", system-ui, sans-serif; background: var(--bg); color: var(--text); }
+  header { background: var(--primary); color: #fff; padding: 24px 16px; text-align: center; }
+  header h1 { margin: 0 0 6px; font-size: 1.8rem; }
+  header p { margin: 0; opacity: .9; }
+  main { max-width: 860px; margin: 24px auto; padding: 0 16px 80px; }
+  .progress { position: sticky; top: 0; background: var(--bg); padding: 10px 0; z-index: 5; }
+  .bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .bar > div { height: 100%; width: 0; background: var(--primary); transition: width .3s; }
+  .progress small { color: var(--muted); }
+  .q { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin-bottom: 18px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+  .q h3 { margin: 0 0 12px; font-size: 1.05rem; line-height: 1.5; }
+  .q h3 .num { color: var(--primary); margin-right: 6px; }
+  .tag { display: inline-block; font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--primary); background: #e8f1fb; padding: 2px 8px; border-radius: 10px; margin-bottom: 8px; }
+  pre { background: #1e1e2e; color: #e0e0e0; padding: 12px 14px; border-radius: 8px; overflow-x: auto; font-size: .9rem; margin: 0 0 12px; }
+  code { font-family: Consolas, "Courier New", monospace; }
+  h3 code, label code, .explain code { background: #eef2f7; padding: 1px 5px; border-radius: 4px; font-size: .92em; }
+  label { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: background .15s, border-color .15s; }
+  label:hover { background: #f0f6ff; }
+  input[type=radio] { margin-top: 3px; accent-color: var(--primary); }
+  label.correct { border-color: var(--correct); background: #ecfdf3; }
+  label.wrong { border-color: var(--wrong); background: #fef2f2; }
+  .explain { display: none; margin-top: 10px; padding: 10px 12px; border-left: 4px solid var(--primary); background: #f0f6ff; border-radius: 4px; font-size: .93rem; }
+  .submitted .explain { display: block; }
+  .submitted label { cursor: default; }
+  .actions { display: flex; gap: 12px; justify-content: center; margin-top: 24px; }
+  button { padding: 12px 26px; font-size: 1rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+  #submitBtn { background: var(--primary); color: #fff; }
+  #resetBtn { background: #e5e7eb; color: var(--text); }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  #result { display: none; text-align: center; background: var(--card); border: 2px solid var(--primary); border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+  #result h2 { margin: 0 0 6px; }
+  #result ul { list-style: none; padding: 0; margin: 10px 0 0; color: var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <h1>TypeScript Classes – MCQ Quiz</h1>
+  <p>Classes, read-only properties, optional properties, static properties &amp; methods</p>
+</header>
+
+<main>
+  <div id="result"></div>
+  <div class="progress">
+    <div class="bar"><div id="barFill"></div></div>
+    <small id="progressText"></small>
+  </div>
+  <form id="quiz"></form>
+  <div class="actions">
+    <button id="submitBtn" type="button">Submit Answers</button>
+    <button id="resetBtn" type="button">Reset</button>
+  </div>
+</main>
+
+<script>
+const questions = [
+  // ---------- Class ----------
+  {
+    topic: "Class",
+    q: "What is a class in TypeScript?",
+    options: ["A single object literal", "A blueprint for creating objects with properties and methods", "A built-in data type like string or number", "A function that runs automatically on page load"],
+    answer: 1,
+    explain: "A class is a blueprint; objects (instances) are created from it and share its properties and methods."
+  },
+  {
+    topic: "Class",
+    q: "What is the output of this code?",
+    code: `class Person {
+  name: string;
+  constructor(name: string) {
+    this.name = name;
+  }
+  greet() {
+    console.log(\`Hello, \${this.name}\`);
+  }
+}
+const p1 = new Person("Pavan");
+p1.greet();`,
+    options: ["Hello, name", "Hello, Pavan", "Hello, undefined", "Compile error"],
+    answer: 1,
+    explain: "The constructor stores \"Pavan\" in <code>this.name</code>, and <code>greet()</code> prints it."
+  },
+  {
+    topic: "Class",
+    q: "Which special method runs automatically when you create an object with <code>new</code>?",
+    options: ["init()", "create()", "constructor()", "main()"],
+    answer: 2,
+    explain: "The <code>constructor</code> is called automatically by <code>new</code> and is typically used to initialize properties."
+  },
+  {
+    topic: "Class",
+    q: "Inside a class method, what does <code>this</code> refer to?",
+    options: ["The class itself", "The current object (instance)", "The global window object", "The parent class"],
+    answer: 1,
+    explain: "In instance methods and the constructor, <code>this</code> refers to the object the method was called on, e.g. <code>p1</code>."
+  },
+  {
+    topic: "Class",
+    q: "Which keyword creates an object (instance) from a class?",
+    options: ["new", "create", "instance", "object"],
+    answer: 0,
+    explain: "<code>const p1 = new Person(\"Pavan\");</code> creates a new instance of <code>Person</code>."
+  },
+
+  // ---------- Readonly ----------
+  {
+    topic: "Read-only",
+    q: "Which keyword makes a class property unchangeable after initialization?",
+    options: ["const", "final", "readonly", "static"],
+    answer: 2,
+    explain: "TypeScript uses <code>readonly</code> for class properties. (<code>const</code> is for variables, not class properties.)"
+  },
+  {
+    topic: "Read-only",
+    q: "What happens when the last line runs?",
+    code: `class Car {
+  readonly brand: string;
+  constructor(brand: string) {
+    this.brand = brand;
+  }
+}
+const car = new Car("Toyota");
+car.brand = "Honda";`,
+    options: ["brand becomes \"Honda\"", "brand stays \"Toyota\" silently", "Compile error: Cannot assign to 'brand' because it is a read-only property", "Runtime error: car is undefined"],
+    answer: 2,
+    explain: "A <code>readonly</code> property can't be reassigned after initialization; TypeScript reports a compile error."
+  },
+  {
+    topic: "Read-only",
+    q: "Where is it allowed to assign a value to a <code>readonly</code> property?",
+    options: ["Anywhere in the program", "Only in its declaration or inside the constructor", "Only inside static methods", "Nowhere – it can never be assigned"],
+    answer: 1,
+    explain: "A <code>readonly</code> property can be initialized where it's declared or in the constructor. After that, it can't be changed."
+  },
+  {
+    topic: "Read-only",
+    q: "Which is a good use case for a <code>readonly</code> property?",
+    options: ["A counter that increments on every click", "A value like an ID or brand that shouldn't change after the object is created", "A temporary loop variable", "A list that must be updated frequently"],
+    answer: 1,
+    explain: "Read-only properties suit constants or values that shouldn't be modified once set."
+  },
+
+  // ---------- Optional ----------
+  {
+    topic: "Optional",
+    q: "Which symbol marks a property as optional?",
+    options: ["!", "?", "*", "#"],
+    answer: 1,
+    explain: "Add <code>?</code> after the property name, e.g. <code>age?: number;</code>."
+  },
+  {
+    topic: "Optional",
+    q: "What does <code>age?: number;</code> mean?",
+    options: ["age must always be a number", "age is a number or may be missing (undefined)", "age is readonly", "age can be any type"],
+    answer: 1,
+    explain: "An optional property doesn't have to be provided; its type is effectively <code>number | undefined</code>."
+  },
+  {
+    topic: "Optional",
+    q: "Given the class below, which object creations are valid?",
+    code: `class Student {
+  name: string;
+  age?: number;
+  constructor(name: string, age?: number) {
+    this.name = name;
+    if (age) this.age = age;
+  }
+}`,
+    options: ["Only new Student(\"Kiran\", 22)", "Only new Student(\"Pavan\")", "Both new Student(\"Pavan\") and new Student(\"Kiran\", 22)", "Neither – age is required"],
+    answer: 2,
+    explain: "Because <code>age</code> is an optional parameter, the constructor can be called with or without it."
+  },
+  {
+    topic: "Optional",
+    q: "Using the same <code>Student</code> class, what does this print?",
+    code: `const s1 = new Student("Pavan");
+console.log(s1.age);`,
+    options: ["0", "null", "undefined", "Compile error"],
+    answer: 2,
+    explain: "No age was passed, so <code>this.age</code> was never set and reading it returns <code>undefined</code>."
+  },
+  {
+    topic: "Optional",
+    q: "Which statement about optional parameters is TRUE?",
+    options: ["Optional parameters must come before required ones", "Required parameters can't follow an optional parameter", "A function can have only one optional parameter", "Optional parameters must have a default value"],
+    answer: 1,
+    explain: "In TypeScript, an optional parameter can't be followed by a required one. That's why <code>(name: string, age?: number)</code> puts <code>age</code> last."
+  },
+
+  // ---------- Static ----------
+  {
+    topic: "Static",
+    q: "Static members belong to:",
+    options: ["Each individual object", "The class itself, not the instances", "Only the first object created", "The global scope"],
+    answer: 1,
+    explain: "Static properties and methods belong to the class and are shared, not copied into each instance."
+  },
+  {
+    topic: "Static",
+    q: "How should you access a static property?",
+    options: ["Through an object: obj.PI", "Using the class name: MathUtils.PI", "Using this.PI inside any object", "Using super.PI"],
+    answer: 1,
+    explain: "Static members are accessed through the class name, e.g. <code>MathUtils.PI</code>."
+  },
+  {
+    topic: "Static",
+    q: "What is the output?",
+    code: `class MathUtils {
+  static PI = 3.14;
+  static square(num: number): number {
+    return num * num;
+  }
+}
+console.log(MathUtils.PI);
+console.log(MathUtils.square(5));`,
+    options: ["3.14 and 10", "3.14 and 25", "undefined and 25", "Compile error"],
+    answer: 1,
+    explain: "<code>MathUtils.PI</code> is 3.14 and <code>MathUtils.square(5)</code> returns 5 × 5 = 25."
+  },
+  {
+    topic: "Static",
+    q: "What happens here?",
+    code: `const m = new MathUtils();
+console.log(m.PI);`,
+    options: ["Prints 3.14", "Prints undefined with no error", "Compile error: Property 'PI' does not exist on type 'MathUtils' (it's a static member)", "Prints 0"],
+    answer: 2,
+    explain: "Static members aren't available on instances. TypeScript suggests using <code>MathUtils.PI</code> instead."
+  },
+  {
+    topic: "Static",
+    q: "Which is the BEST use case for static methods?",
+    options: ["Methods that depend on each object's own data", "Utility/helper methods or shared data that don't need an instance", "Methods that must be overridden for every object", "Private data for a single instance"],
+    answer: 1,
+    explain: "Static members suit utility methods (like <code>square()</code>) or data shared by all instances."
+  },
+  {
+    topic: "Static",
+    q: "Do you need to create an object to call <code>MathUtils.square(5)</code>?",
+    options: ["Yes, always use new MathUtils() first", "No, static methods are called directly on the class", "Only if square is readonly", "Only in JavaScript, not TypeScript"],
+    answer: 1,
+    explain: "Static methods are called on the class itself, so no instance is needed."
+  },
+
+  // ---------- Mixed ----------
+  {
+    topic: "Mixed",
+    q: "Match the keyword/symbol to its purpose: <code>readonly</code>, <code>?</code>, <code>static</code>",
+    options: [
+      "Can't change after init / Not required / Belongs to class",
+      "Belongs to class / Can't change after init / Not required",
+      "Not required / Belongs to class / Can't change after init",
+      "Can't change after init / Belongs to class / Not required"
+    ],
+    answer: 0,
+    explain: "<code>readonly</code> → can't change after initialization; <code>?</code> → optional (not required); <code>static</code> → belongs to the class."
+  },
+  {
+    topic: "Mixed",
+    q: "Which line causes a compile error?",
+    code: `class Config {
+  static appName = "MyApp";
+  readonly version: string = "1.0";
+  env?: string;
+}
+const c = new Config();
+c.env = "prod";            // Line A
+console.log(Config.appName); // Line B
+c.version = "2.0";         // Line C`,
+    options: ["Line A", "Line B", "Line C", "None of them"],
+    answer: 2,
+    explain: "Line C reassigns a <code>readonly</code> property. Line A sets an optional property, and Line B reads a static property through the class name; both are fine."
+  }
+];
+
+const form = document.getElementById("quiz");
+const submitBtn = document.getElementById("submitBtn");
+const resetBtn = document.getElementById("resetBtn");
+const resultBox = document.getElementById("result");
+const barFill = document.getElementById("barFill");
+const progressText = document.getElementById("progressText");
+const letters = ["A", "B", "C", "D"];
+
+function escapeHtml(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function render() {
+  form.innerHTML = questions.map((item, i) => `
+    <div class="q" id="q${i}">
+      <span class="tag">${item.topic}</span>
+      <h3><span class="num">Q${i + 1}.</span>${item.q}</h3>
+      ${item.code ? `<pre><code>${escapeHtml(item.code)}</code></pre>` : ""}
+      ${item.options.map((opt, j) => `
+        <label>
+          <input type="radio" name="q${i}" value="${j}">
+          <span><strong>${letters[j]}.</strong> ${escapeHtml(opt)}</span>
+        </label>`).join("")}
+      <div class="explain"><strong>Explanation:</strong> ${item.explain}</div>
+    </div>`).join("");
+  updateProgress();
+}
+
+function updateProgress() {
+  const answered = questions.filter((_, i) => form.querySelector(`input[name=q${i}]:checked`)).length;
+  barFill.style.width = `${(answered / questions.length) * 100}%`;
+  progressText.textContent = `Answered ${answered} of ${questions.length}`;
+}
+
+form.addEventListener("change", updateProgress);
+
+submitBtn.addEventListener("click", () => {
+  const unanswered = questions.filter((_, i) => !form.querySelector(`input[name=q${i}]:checked`)).length;
+  if (unanswered && !confirm(`You have ${unanswered} unanswered question(s). Submit anyway?`)) return;
+
+  let score = 0;
+  const byTopic = {};
+  questions.forEach((item, i) => {
+    const block = document.getElementById(`q${i}`);
+    const labels = block.querySelectorAll("label");
+    const picked = block.querySelector("input:checked");
+    byTopic[item.topic] = byTopic[item.topic] || { right: 0, total: 0 };
+    byTopic[item.topic].total++;
+    labels[item.answer].classList.add("correct");
+    if (picked) {
+      const val = Number(picked.value);
+      if (val === item.answer) { score++; byTopic[item.topic].right++; }
+      else labels[val].classList.add("wrong");
+    }
+    block.querySelectorAll("input").forEach(inp => inp.disabled = true);
+    block.classList.add("submitted");
+  });
+
+  const pct = Math.round((score / questions.length) * 100);
+  const msg = pct >= 80 ? "Excellent work! 🎉" : pct >= 60 ? "Good job – review the explanations to improve." : "Keep practicing – read through the explanations below.";
+  const breakdown = Object.entries(byTopic).map(([t, v]) => `<li>${t}: ${v.right} / ${v.total}</li>`).join("");
+  resultBox.innerHTML = `<h2>Your Score: ${score} / ${questions.length} (${pct}%)</h2><p>${msg}</p><ul>${breakdown}</ul>`;
+  resultBox.style.display = "block";
+  submitBtn.disabled = true;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+resetBtn.addEventListener("click", () => {
+  resultBox.style.display = "none";
+  submitBtn.disabled = false;
+  render();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+render();
+</script>
+</body>
+</html>

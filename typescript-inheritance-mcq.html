@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TypeScript Inheritance, super(), Overriding &amp; Access Modifiers – MCQ Quiz</title>
+<style>
+  :root {
+    --bg: #f4f6fb; --card: #fff; --text: #1f2937; --muted: #6b7280;
+    --primary: #3178c6; --correct: #16a34a; --wrong: #dc2626; --border: #e5e7eb;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Segoe UI", system-ui, sans-serif; background: var(--bg); color: var(--text); }
+  header { background: var(--primary); color: #fff; padding: 24px 16px; text-align: center; }
+  header h1 { margin: 0 0 6px; font-size: 1.8rem; }
+  header p { margin: 0; opacity: .9; }
+  main { max-width: 860px; margin: 24px auto; padding: 0 16px 80px; }
+  .progress { position: sticky; top: 0; background: var(--bg); padding: 10px 0; z-index: 5; }
+  .bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .bar > div { height: 100%; width: 0; background: var(--primary); transition: width .3s; }
+  .progress small { color: var(--muted); }
+  .q { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin-bottom: 18px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+  .q h3 { margin: 0 0 12px; font-size: 1.05rem; line-height: 1.5; }
+  .q h3 .num { color: var(--primary); margin-right: 6px; }
+  .tag { display: inline-block; font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--primary); background: #e8f1fb; padding: 2px 8px; border-radius: 10px; margin-bottom: 8px; }
+  pre { background: #1e1e2e; color: #e0e0e0; padding: 12px 14px; border-radius: 8px; overflow-x: auto; font-size: .9rem; margin: 0 0 12px; }
+  code { font-family: Consolas, "Courier New", monospace; }
+  h3 code, label code, .explain code { background: #eef2f7; padding: 1px 5px; border-radius: 4px; font-size: .92em; }
+  label { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: background .15s, border-color .15s; }
+  label:hover { background: #f0f6ff; }
+  input[type=radio] { margin-top: 3px; accent-color: var(--primary); }
+  label.correct { border-color: var(--correct); background: #ecfdf3; }
+  label.wrong { border-color: var(--wrong); background: #fef2f2; }
+  .explain { display: none; margin-top: 10px; padding: 10px 12px; border-left: 4px solid var(--primary); background: #f0f6ff; border-radius: 4px; font-size: .93rem; }
+  .submitted .explain { display: block; }
+  .submitted label { cursor: default; }
+  .actions { display: flex; gap: 12px; justify-content: center; margin-top: 24px; }
+  button { padding: 12px 26px; font-size: 1rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+  #submitBtn { background: var(--primary); color: #fff; }
+  #resetBtn { background: #e5e7eb; color: var(--text); }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  #result { display: none; text-align: center; background: var(--card); border: 2px solid var(--primary); border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+  #result h2 { margin: 0 0 6px; }
+  #result ul { list-style: none; padding: 0; margin: 10px 0 0; color: var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <h1>TypeScript Inheritance – MCQ Quiz</h1>
+  <p>Inheritance, super(), method overriding &amp; access modifiers</p>
+</header>
+
+<main>
+  <div id="result"></div>
+  <div class="progress">
+    <div class="bar"><div id="barFill"></div></div>
+    <small id="progressText"></small>
+  </div>
+  <form id="quiz"></form>
+  <div class="actions">
+    <button id="submitBtn" type="button">Submit Answers</button>
+    <button id="resetBtn" type="button">Reset</button>
+  </div>
+</main>
+
+<script>
+const questions = [
+  // ---------- Inheritance ----------
+  {
+    topic: "Inheritance",
+    q: "What does inheritance allow a class to do?",
+    options: ["Create multiple objects at once", "Acquire properties and methods from another class", "Hide all of its properties", "Run code without creating an object"],
+    answer: 1,
+    explain: "Inheritance lets a child class acquire the properties and methods of a parent class."
+  },
+  {
+    topic: "Inheritance",
+    q: "Which keyword is used to inherit from a class in TypeScript?",
+    options: ["implements", "inherits", "extends", "super"],
+    answer: 2,
+    explain: "<code>class Dog extends Animal</code>. <code>implements</code> is for interfaces, not class inheritance."
+  },
+  {
+    topic: "Inheritance",
+    q: "In <code>class Dog extends Animal</code>, which is the parent (base) class?",
+    options: ["Dog", "Animal", "Both", "Neither"],
+    answer: 1,
+    explain: "<code>Animal</code> is the parent (base/super) class and <code>Dog</code> is the child (derived/sub) class."
+  },
+  {
+    topic: "Inheritance",
+    q: "What is the output?",
+    code: `class Animal {
+  eat() {
+    console.log("Animal eats food");
+  }
+}
+class Dog extends Animal {
+  bark() {
+    console.log("Dog barks");
+  }
+}
+const d = new Dog();
+d.eat();
+d.bark();`,
+    options: ["Animal eats food, then Dog barks", "Only Dog barks", "Compile error: eat does not exist on Dog", "Dog barks, then Animal eats food"],
+    answer: 0,
+    explain: "<code>eat()</code> is inherited from <code>Animal</code> and <code>bark()</code> is Dog's own method; they run in the order they're called."
+  },
+  {
+    topic: "Inheritance",
+    q: "Using the same classes, what happens here?",
+    code: `const a = new Animal();
+a.bark();`,
+    options: ["Prints \"Dog barks\"", "Prints \"Animal eats food\"", "Compile error: Property 'bark' does not exist on type 'Animal'", "Prints undefined"],
+    answer: 2,
+    explain: "Inheritance works one way: the child gets the parent's members, but the parent doesn't get the child's."
+  },
+  {
+    topic: "Inheritance",
+    q: "How many classes can a TypeScript class directly extend?",
+    options: ["Only one", "Two", "Unlimited", "None – TypeScript has no inheritance"],
+    answer: 0,
+    explain: "TypeScript supports single class inheritance: a class can <code>extend</code> only one class. (It can <code>implement</code> multiple interfaces.)"
+  },
+
+  // ---------- super() ----------
+  {
+    topic: "super()",
+    q: "What is <code>super()</code> used for in a child class constructor?",
+    options: ["To create a new child object", "To call the parent class constructor", "To make a property static", "To override a method"],
+    answer: 1,
+    explain: "<code>super(...)</code> calls the parent class constructor so the parent's part of the object gets initialized."
+  },
+  {
+    topic: "super()",
+    q: "What are the values of <code>d.name</code> and <code>d.breed</code>?",
+    code: `class Animal {
+  constructor(public name: string) {}
+}
+class Dog extends Animal {
+  constructor(name: string, public breed: string) {
+    super(name);
+  }
+}
+const d = new Dog("Tommy", "Labrador");`,
+    options: ["undefined and Labrador", "Tommy and Labrador", "Tommy and undefined", "Compile error"],
+    answer: 1,
+    explain: "<code>super(name)</code> passes \"Tommy\" to Animal's constructor, which sets <code>name</code>. <code>public breed</code> sets <code>breed</code> on Dog."
+  },
+  {
+    topic: "super()",
+    q: "What happens if a child class has its own constructor but does NOT call <code>super()</code>?",
+    code: `class Animal {
+  constructor(public name: string) {}
+}
+class Dog extends Animal {
+  constructor(public breed: string) {
+    // no super() call
+  }
+}`,
+    options: ["It works fine; name is undefined", "Compile error: Constructors for derived classes must contain a 'super' call", "The parent constructor is called automatically", "Runtime error only"],
+    answer: 1,
+    explain: "If a derived class defines a constructor, it must call <code>super()</code>."
+  },
+  {
+    topic: "super()",
+    q: "In a child constructor, where must <code>super()</code> be called relative to <code>this</code>?",
+    options: ["After using this", "Before accessing this", "It doesn't matter", "super() and this cannot be used together"],
+    answer: 1,
+    explain: "<code>super()</code> must be called before you access <code>this</code> in a derived class constructor; otherwise you get a compile error."
+  },
+  {
+    topic: "super()",
+    q: "Inside a child class method, how can you call the parent's version of <code>makeSound()</code>?",
+    options: ["parent.makeSound()", "super.makeSound()", "this.parent.makeSound()", "Animal::makeSound()"],
+    answer: 1,
+    explain: "<code>super.methodName()</code> calls the parent class's implementation from inside the child."
+  },
+
+  // ---------- Overriding ----------
+  {
+    topic: "Overriding",
+    q: "What is method overriding?",
+    options: ["Defining two methods with the same name in one class", "A child class redefining a method inherited from the parent", "Making a method private", "Calling a method twice"],
+    answer: 1,
+    explain: "Overriding means the child class provides its own version of a method that already exists in the parent."
+  },
+  {
+    topic: "Overriding",
+    q: "What is the output?",
+    code: `class Animal {
+  makeSound() {
+    console.log("Animal makes sound");
+  }
+}
+class Dog extends Animal {
+  makeSound() {
+    console.log("Dog barks");
+  }
+}
+const dog = new Dog();
+dog.makeSound();`,
+    options: ["Animal makes sound", "Dog barks", "Animal makes sound, then Dog barks", "Compile error: duplicate method"],
+    answer: 1,
+    explain: "Dog overrides <code>makeSound()</code>, so calling it on a Dog object runs Dog's version."
+  },
+  {
+    topic: "Overriding",
+    q: "For overriding, the method in the child class should have:",
+    options: ["A different name", "The same name and signature as the parent method", "The private modifier", "The static keyword"],
+    answer: 1,
+    explain: "An overriding method uses the same name and signature (parameters and return type) as the parent method."
+  },
+  {
+    topic: "Overriding",
+    q: "What is the output?",
+    code: `class Animal {
+  makeSound() {
+    console.log("Animal makes sound");
+  }
+}
+class Dog extends Animal {
+  makeSound() {
+    super.makeSound();
+    console.log("Dog barks");
+  }
+}
+new Dog().makeSound();`,
+    options: ["Dog barks", "Animal makes sound", "Animal makes sound, then Dog barks", "Dog barks, then Animal makes sound"],
+    answer: 2,
+    explain: "<code>super.makeSound()</code> runs the parent's version first, then the child prints its own message."
+  },
+  {
+    topic: "Overriding",
+    q: "What is the output?",
+    code: `class Animal {
+  makeSound() { console.log("Animal makes sound"); }
+}
+class Cat extends Animal {}
+new Cat().makeSound();`,
+    options: ["Nothing is printed", "Animal makes sound", "Compile error: Cat has no makeSound", "undefined"],
+    answer: 1,
+    explain: "Cat doesn't override <code>makeSound()</code>, so the inherited parent version runs."
+  },
+
+  // ---------- Access Modifiers ----------
+  {
+    topic: "Access Modifiers",
+    q: "What are access modifiers used for?",
+    options: ["To control the visibility of class members", "To change a property's data type", "To create objects", "To speed up code execution"],
+    answer: 0,
+    explain: "Access modifiers (<code>public</code>, <code>private</code>, <code>protected</code>) control where properties and methods can be accessed from."
+  },
+  {
+    topic: "Access Modifiers",
+    q: "What is the default access modifier for class members in TypeScript?",
+    options: ["private", "protected", "public", "readonly"],
+    answer: 2,
+    explain: "If no modifier is written, the member is <code>public</code>, so it can be accessed from anywhere."
+  },
+  {
+    topic: "Access Modifiers",
+    q: "A <code>private</code> member is accessible:",
+    options: ["From anywhere", "Only within the same class", "In the class and its subclasses", "Only in subclasses"],
+    answer: 1,
+    explain: "<code>private</code> members can only be used inside the class that declares them, not even in child classes."
+  },
+  {
+    topic: "Access Modifiers",
+    q: "A <code>protected</code> member is accessible:",
+    options: ["From anywhere", "Only within the same class", "In the class and its subclasses", "Only from outside the class"],
+    answer: 2,
+    explain: "<code>protected</code> members are available in the declaring class and in any subclass, but not from outside."
+  },
+  {
+    topic: "Access Modifiers",
+    q: "In the <code>Student</code> class below, which line causes a compile error?",
+    code: `class Person {
+  public name: string;
+  private age: number;
+  protected city: string;
+  constructor(name: string, age: number, city: string) {
+    this.name = name;
+    this.age = age;
+    this.city = city;
+  }
+}
+class Student extends Person {
+  show() {
+    console.log(this.name); // Line A
+    console.log(this.city); // Line B
+    console.log(this.age);  // Line C
+  }
+}`,
+    options: ["Line A", "Line B", "Line C", "None of them"],
+    answer: 2,
+    explain: "<code>age</code> is <code>private</code> to Person, so a subclass can't access it. <code>name</code> (public) and <code>city</code> (protected) are allowed."
+  },
+  {
+    topic: "Access Modifiers",
+    q: "Using the same <code>Person</code> class, which line compiles WITHOUT error?",
+    code: `const p = new Person("Pavan", 30, "Hyderabad");`,
+    options: ["console.log(p.age);", "console.log(p.city);", "console.log(p.name);", "None of them"],
+    answer: 2,
+    explain: "Only <code>public</code> members can be accessed from outside the class. <code>age</code> is private and <code>city</code> is protected."
+  },
+  {
+    topic: "Access Modifiers",
+    q: "What is the compile error for <code>p.city</code> outside the class?",
+    options: [
+      "Property 'city' does not exist on type 'Person'",
+      "Property 'city' is protected and only accessible within class 'Person' and its subclasses",
+      "Property 'city' is private and only accessible within class 'Person'",
+      "Cannot assign to 'city' because it is a read-only property"
+    ],
+    answer: 1,
+    explain: "<code>protected</code> members can't be accessed from outside the class hierarchy; TypeScript reports exactly this message."
+  },
+  {
+    topic: "Access Modifiers",
+    q: "Match each modifier to its visibility: <code>public</code>, <code>private</code>, <code>protected</code>",
+    options: [
+      "Anywhere / Same class only / Class + subclasses",
+      "Same class only / Anywhere / Class + subclasses",
+      "Class + subclasses / Same class only / Anywhere",
+      "Anywhere / Class + subclasses / Same class only"
+    ],
+    answer: 0,
+    explain: "public → anywhere (default); private → same class only; protected → class and its subclasses."
+  },
+  {
+    topic: "Access Modifiers",
+    q: "You want a property that subclasses can use but outside code can't. Which modifier should you use?",
+    options: ["public", "private", "protected", "static"],
+    answer: 2,
+    explain: "<code>protected</code> is the right fit: subclasses can access it, outside code can't."
+  }
+];
+
+const form = document.getElementById("quiz");
+const submitBtn = document.getElementById("submitBtn");
+const resetBtn = document.getElementById("resetBtn");
+const resultBox = document.getElementById("result");
+const barFill = document.getElementById("barFill");
+const progressText = document.getElementById("progressText");
+const letters = ["A", "B", "C", "D"];
+
+function escapeHtml(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function render() {
+  form.innerHTML = questions.map((item, i) => `
+    <div class="q" id="q${i}">
+      <span class="tag">${item.topic}</span>
+      <h3><span class="num">Q${i + 1}.</span>${item.q}</h3>
+      ${item.code ? `<pre><code>${escapeHtml(item.code)}</code></pre>` : ""}
+      ${item.options.map((opt, j) => `
+        <label>
+          <input type="radio" name="q${i}" value="${j}">
+          <span><strong>${letters[j]}.</strong> ${escapeHtml(opt)}</span>
+        </label>`).join("")}
+      <div class="explain"><strong>Explanation:</strong> ${item.explain}</div>
+    </div>`).join("");
+  updateProgress();
+}
+
+function updateProgress() {
+  const answered = questions.filter((_, i) => form.querySelector(`input[name=q${i}]:checked`)).length;
+  barFill.style.width = `${(answered / questions.length) * 100}%`;
+  progressText.textContent = `Answered ${answered} of ${questions.length}`;
+}
+
+form.addEventListener("change", updateProgress);
+
+submitBtn.addEventListener("click", () => {
+  const unanswered = questions.filter((_, i) => !form.querySelector(`input[name=q${i}]:checked`)).length;
+  if (unanswered && !confirm(`You have ${unanswered} unanswered question(s). Submit anyway?`)) return;
+
+  let score = 0;
+  const byTopic = {};
+  questions.forEach((item, i) => {
+    const block = document.getElementById(`q${i}`);
+    const labels = block.querySelectorAll("label");
+    const picked = block.querySelector("input:checked");
+    byTopic[item.topic] = byTopic[item.topic] || { right: 0, total: 0 };
+    byTopic[item.topic].total++;
+    labels[item.answer].classList.add("correct");
+    if (picked) {
+      const val = Number(picked.value);
+      if (val === item.answer) { score++; byTopic[item.topic].right++; }
+      else labels[val].classList.add("wrong");
+    }
+    block.querySelectorAll("input").forEach(inp => inp.disabled = true);
+    block.classList.add("submitted");
+  });
+
+  const pct = Math.round((score / questions.length) * 100);
+  const msg = pct >= 80 ? "Excellent work! 🎉" : pct >= 60 ? "Good job – review the explanations to improve." : "Keep practicing – read through the explanations below.";
+  const breakdown = Object.entries(byTopic).map(([t, v]) => `<li>${t}: ${v.right} / ${v.total}</li>`).join("");
+  resultBox.innerHTML = `<h2>Your Score: ${score} / ${questions.length} (${pct}%)</h2><p>${msg}</p><ul>${breakdown}</ul>`;
+  resultBox.style.display = "block";
+  submitBtn.disabled = true;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+resetBtn.addEventListener("click", () => {
+  resultBox.style.display = "none";
+  submitBtn.disabled = false;
+  render();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+render();
+</script>
+</body>
+</html>

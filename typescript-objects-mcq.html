@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TypeScript Objects – MCQ Quiz</title>
+<style>
+  :root {
+    --bg: #f4f6fb; --card: #fff; --text: #1f2937; --muted: #6b7280;
+    --primary: #3178c6; --correct: #16a34a; --wrong: #dc2626; --border: #e5e7eb;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Segoe UI", system-ui, sans-serif; background: var(--bg); color: var(--text); }
+  header { background: var(--primary); color: #fff; padding: 24px 16px; text-align: center; }
+  header h1 { margin: 0 0 6px; font-size: 1.8rem; }
+  header p { margin: 0; opacity: .9; }
+  main { max-width: 860px; margin: 24px auto; padding: 0 16px 80px; }
+  .progress { position: sticky; top: 0; background: var(--bg); padding: 10px 0; z-index: 5; }
+  .bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .bar > div { height: 100%; width: 0; background: var(--primary); transition: width .3s; }
+  .progress small { color: var(--muted); }
+  .q { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin-bottom: 18px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+  .q h3 { margin: 0 0 12px; font-size: 1.05rem; line-height: 1.5; }
+  .q h3 .num { color: var(--primary); margin-right: 6px; }
+  pre { background: #1e1e2e; color: #e0e0e0; padding: 12px 14px; border-radius: 8px; overflow-x: auto; font-size: .9rem; margin: 0 0 12px; }
+  code { font-family: Consolas, "Courier New", monospace; }
+  p code, label code, .explain code { background: #eef2f7; padding: 1px 5px; border-radius: 4px; font-size: .92em; }
+  label { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: background .15s, border-color .15s; }
+  label:hover { background: #f0f6ff; }
+  input[type=radio] { margin-top: 3px; accent-color: var(--primary); }
+  label.correct { border-color: var(--correct); background: #ecfdf3; }
+  label.wrong { border-color: var(--wrong); background: #fef2f2; }
+  .explain { display: none; margin-top: 10px; padding: 10px 12px; border-left: 4px solid var(--primary); background: #f0f6ff; border-radius: 4px; font-size: .93rem; }
+  .submitted .explain { display: block; }
+  .submitted label { cursor: default; }
+  .actions { display: flex; gap: 12px; justify-content: center; margin-top: 24px; }
+  button { padding: 12px 26px; font-size: 1rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+  #submitBtn { background: var(--primary); color: #fff; }
+  #resetBtn { background: #e5e7eb; color: var(--text); }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  #result { display: none; text-align: center; background: var(--card); border: 2px solid var(--primary); border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+  #result h2 { margin: 0 0 6px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>TypeScript Objects – MCQ Quiz</h1>
+  <p>Objects, inline types, type aliases, intersection types &amp; classes</p>
+</header>
+
+<main>
+  <div id="result"></div>
+  <div class="progress">
+    <div class="bar"><div id="barFill"></div></div>
+    <small id="progressText"></small>
+  </div>
+  <form id="quiz"></form>
+  <div class="actions">
+    <button id="submitBtn" type="button">Submit Answers</button>
+    <button id="resetBtn" type="button">Reset</button>
+  </div>
+</main>
+
+<script>
+const questions = [
+  {
+    q: "What is an object in TypeScript/JavaScript?",
+    options: ["An ordered list of values accessed by index", "A collection of key-value pairs", "A function that returns a value", "A primitive data type"],
+    answer: 1,
+    explain: "An object is a collection of key-value pairs containing properties (variables) and methods (functions)."
+  },
+  {
+    q: "In an object, what are <code>name</code>, <code>age</code>, and <code>salary</code> typically called?",
+    options: ["Methods", "Constructors", "Properties", "Interfaces"],
+    answer: 2,
+    explain: "Variables stored inside an object are called properties. Functions inside an object are called methods."
+  },
+  {
+    q: "In an object, what is <code>getDetails()</code> an example of?",
+    options: ["A property", "A method", "A type alias", "A constructor"],
+    answer: 1,
+    explain: "Functions defined inside an object are called methods."
+  },
+  {
+    q: "What will <code>employee.getDetails()</code> return?",
+    code: `let employee = {
+  name: "John",
+  salary: 50000,
+  job: "Engineer",
+  getDetails: function () {
+    return \`\${this.name} is a \${this.job} earning \${this.salary}\`;
+  }
+};`,
+    options: ["undefined is a undefined earning undefined", "John is a Engineer earning 50000", "Error: this is not defined", "${this.name} is a ${this.job} earning ${this.salary}"],
+    answer: 1,
+    explain: "Inside a regular <code>function</code> method, <code>this</code> refers to the object, so the template literal is filled with the object's values."
+  },
+  {
+    q: "Which of the following are valid ways to access the <code>name</code> property of <code>employee</code>?",
+    options: ["employee.name and employee[\"name\"]", "employee->name and employee::name", "employee(name) only", "employee{name} only"],
+    answer: 0,
+    explain: "Properties can be accessed with dot notation (<code>employee.name</code>) or bracket notation (<code>employee[\"name\"]</code>)."
+  },
+  {
+    q: "What is the value of <code>employee.job</code> after this code runs?",
+    code: `let employee = { name: "John", job: "Engineer" };
+employee.job = "Manager";`,
+    options: ["\"Engineer\"", "\"Manager\"", "undefined", "Compile error – properties cannot be changed"],
+    answer: 1,
+    explain: "Object properties can be modified by assigning a new value, e.g. <code>employee.job = \"Manager\"</code>."
+  },
+  {
+    q: "Which of the following is NOT one of the four ways to create objects listed in the notes?",
+    options: ["Using object type", "Inline type object", "Using type aliases", "Using enums"],
+    answer: 3,
+    explain: "The four approaches are: object type, inline type object, type aliases, and classes."
+  },
+  {
+    q: "What happens in TypeScript when you run <code>console.log(employee.name)</code> here?",
+    code: `let employee: object = {
+  name: "John",
+  age: 30,
+  job: "Engineer"
+};`,
+    options: ["Prints \"John\"", "Prints undefined", "Compile error: Property 'name' does not exist on type 'object'", "Runtime error: employee is null"],
+    answer: 2,
+    explain: "With the generic <code>object</code> type, TypeScript doesn't know the structure, so you can't access properties directly unless you define the structure or use <code>any</code>."
+  },
+  {
+    q: "What is the main limitation of the Inline Type Object approach?",
+    options: ["It doesn't support methods", "You must repeat the type structure for each object", "It only works in JavaScript", "It cannot have number properties"],
+    answer: 1,
+    explain: "Inline types are written right at the declaration, so every new object with the same shape needs the structure repeated."
+  },
+  {
+    q: "In the inline type below, what does <code>getSummary: () =&gt; string</code> mean?",
+    code: `let student: {
+  name: string;
+  age: number;
+  grade: string;
+  getSummary: () => string;
+} = { ... };`,
+    options: ["getSummary is a string property", "getSummary is a function that takes no arguments and returns a string", "getSummary is an arrow function that returns void", "getSummary is optional"],
+    answer: 1,
+    explain: "<code>() =&gt; string</code> is a function type: no parameters and a <code>string</code> return value."
+  },
+  {
+    q: "Which keyword is used to create a reusable type definition (type alias)?",
+    options: ["interface", "typedef", "type", "struct"],
+    answer: 2,
+    explain: "Type aliases are created with the <code>type</code> keyword, e.g. <code>type Product = { ... }</code>."
+  },
+  {
+    q: "What is the main benefit of using type aliases over inline types?",
+    options: ["Faster runtime performance", "Reusable type definitions – cleaner and avoids repetition", "They allow constructors", "They remove the need for types at all"],
+    answer: 1,
+    explain: "A type alias is defined once and can be reused for many objects, e.g. <code>let book1: Product</code>, <code>let book2: Product</code>."
+  },
+  {
+    q: "Which operator is used to create an intersection type that combines multiple types?",
+    options: ["|", "&amp;", "+", "&amp;&amp;"],
+    answer: 1,
+    explain: "The <code>&amp;</code> operator combines types: <code>type Candidate = Personal &amp; Contact &amp; { ... }</code>."
+  },
+  {
+    q: "Given the code below, which properties must a <code>Candidate</code> object have?",
+    code: `type Personal = { name: string; age: number };
+type Contact  = { email: string; phone: string };
+
+type Candidate = Personal & Contact & {
+  getContactInfo: () => string;
+};`,
+    options: ["Only name and age", "Either Personal or Contact properties", "name, age, email, phone and getContactInfo", "Only getContactInfo"],
+    answer: 2,
+    explain: "An intersection type requires ALL members of every combined type to be present."
+  },
+  {
+    q: "What is a class?",
+    options: ["A single object literal", "A blueprint for creating multiple objects with the same structure and behavior", "A type that only exists at compile time", "A special kind of array"],
+    answer: 1,
+    explain: "A class is a blueprint; you create objects (instances) from it using <code>new</code>."
+  },
+  {
+    q: "What does <code>public</code> in the constructor parameters do?",
+    code: `class Person {
+  constructor(public ssn: string, public firstName: string, public lastName: string) {}
+}`,
+    options: ["Makes the constructor callable without new", "Automatically declares and initializes class properties from the parameters", "Makes the parameters optional", "Exports the class from the module"],
+    answer: 1,
+    explain: "This is TypeScript's parameter property shorthand: <code>public ssn: string</code> declares the property and assigns it from the argument."
+  },
+  {
+    q: "What does <code>person1.getDetails()</code> return?",
+    code: `class Person {
+  constructor(public ssn: string, public firstName: string, public lastName: string) {}
+  getFullName(): string {
+    return \`\${this.firstName} \${this.lastName}\`;
+  }
+  getDetails(): string {
+    return \`SSN: \${this.ssn}, Name: \${this.getFullName()}\`;
+  }
+}
+let person1 = new Person("123", "John", "Doe");`,
+    options: ["SSN: 123, Name: John Doe", "SSN: 123, Name: undefined", "John Doe", "Compile error"],
+    answer: 0,
+    explain: "<code>getDetails()</code> uses <code>this.ssn</code> and calls <code>this.getFullName()</code>, which returns \"John Doe\"."
+  },
+  {
+    q: "Which keyword is used to create an object from a class?",
+    options: ["create", "new", "make", "instance"],
+    answer: 1,
+    explain: "Objects are created from classes using <code>new</code>, e.g. <code>new Person(\"123\", \"John\", \"Doe\")</code>."
+  },
+  {
+    q: "According to the summary table, which approach is recommended for one-time objects?",
+    options: ["Object type", "Inline type", "Type aliases", "Classes"],
+    answer: 1,
+    explain: "Inline types have strong typing but low reusability, which makes them suited to one-time objects."
+  },
+  {
+    q: "According to the summary table, which approach is best for object-oriented designs?",
+    options: ["Object type", "Inline type", "Type aliases", "Classes"],
+    answer: 3,
+    explain: "Classes provide structure + behavior and are recommended for object-oriented designs."
+  },
+  {
+    q: "According to the summary table, which approach offers only basic TypeScript support and suits small, quick objects?",
+    options: ["Object type", "Inline type", "Type aliases", "Classes"],
+    answer: 0,
+    explain: "The plain <code>object</code> type gives only basic type checking and is suited to small, quick objects."
+  }
+];
+
+const form = document.getElementById("quiz");
+const submitBtn = document.getElementById("submitBtn");
+const resetBtn = document.getElementById("resetBtn");
+const resultBox = document.getElementById("result");
+const barFill = document.getElementById("barFill");
+const progressText = document.getElementById("progressText");
+const letters = ["A", "B", "C", "D"];
+
+function escapeHtml(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function render() {
+  form.innerHTML = questions.map((item, i) => `
+    <div class="q" id="q${i}">
+      <h3><span class="num">Q${i + 1}.</span>${item.q}</h3>
+      ${item.code ? `<pre><code>${escapeHtml(item.code)}</code></pre>` : ""}
+      ${item.options.map((opt, j) => `
+        <label>
+          <input type="radio" name="q${i}" value="${j}">
+          <span><strong>${letters[j]}.</strong> ${opt}</span>
+        </label>`).join("")}
+      <div class="explain"><strong>Explanation:</strong> ${item.explain}</div>
+    </div>`).join("");
+  updateProgress();
+}
+
+function updateProgress() {
+  const answered = questions.filter((_, i) => form.querySelector(`input[name=q${i}]:checked`)).length;
+  barFill.style.width = `${(answered / questions.length) * 100}%`;
+  progressText.textContent = `Answered ${answered} of ${questions.length}`;
+}
+
+form.addEventListener("change", updateProgress);
+
+submitBtn.addEventListener("click", () => {
+  const unanswered = questions.filter((_, i) => !form.querySelector(`input[name=q${i}]:checked`)).length;
+  if (unanswered && !confirm(`You have ${unanswered} unanswered question(s). Submit anyway?`)) return;
+
+  let score = 0;
+  questions.forEach((item, i) => {
+    const block = document.getElementById(`q${i}`);
+    const labels = block.querySelectorAll("label");
+    const picked = block.querySelector("input:checked");
+    labels[item.answer].classList.add("correct");
+    if (picked) {
+      const val = Number(picked.value);
+      if (val === item.answer) score++;
+      else labels[val].classList.add("wrong");
+    }
+    block.querySelectorAll("input").forEach(inp => inp.disabled = true);
+    block.classList.add("submitted");
+  });
+
+  const pct = Math.round((score / questions.length) * 100);
+  const msg = pct >= 80 ? "Excellent work! 🎉" : pct >= 60 ? "Good job – review the explanations to improve." : "Keep practicing – read through the explanations below.";
+  resultBox.innerHTML = `<h2>Your Score: ${score} / ${questions.length} (${pct}%)</h2><p>${msg}</p>`;
+  resultBox.style.display = "block";
+  submitBtn.disabled = true;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+resetBtn.addEventListener("click", () => {
+  resultBox.style.display = "none";
+  submitBtn.disabled = false;
+  render();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+render();
+</script>
+</body>
+</html>
